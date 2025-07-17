@@ -1,0 +1,8 @@
+---
+alwaysApply: true
+---
+
+- Always use React Aria components when creating new UI components.
+- The new components should always be functional React components
+- Use tailwind for styling
+- Use lucide react for icons

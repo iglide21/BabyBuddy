@@ -1,0 +1,9 @@
+---
+description: This rule is used for advise on code completion and feature development from MVP requirements file for the project.
+globs:
+alwaysApply: true
+---
+
+- use the MVP document to try and understand the requirements when you code features or provide code completions
+
+@MVP.txt
