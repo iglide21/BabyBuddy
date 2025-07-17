@@ -1,0 +1,9 @@
+---
+description: This rule is for using typescript in the project
+globs:
+  - "**/*.ts"
+  - "**/*.tsx"
+alwaysApply: true
+---
+
+- Always use typescript in the project
