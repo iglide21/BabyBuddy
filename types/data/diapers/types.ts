@@ -1,14 +1,9 @@
-export type Diaper = {
-  id: string;
-  timestamp: Date;
-  type: "wet" | "dirty" | "both";
-  notes?: string;
-};
+// import { Database } from "@/types/supabase";
 
-export type CreateDiaper = Omit<Diaper, "id">;
+// export type Diaper = Database["public"]["Tables"]["diapers"]["Row"];
 
-export type UpdateDiaper = Partial<Diaper>;
+// export type CreateDiaper = Omit<Diaper, "id" | "created_at">;
 
-export type DeleteDiaper = {
-  id: string;
-};
+// export type UpdateDiaper = Partial<Omit<Diaper, "created_at">>;
+
+// export type DeleteDiaper = Pick<Diaper, "id">;
