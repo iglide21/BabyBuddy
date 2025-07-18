@@ -1,6 +1,6 @@
 export type Feeding = {
   id: string;
-  timestamp: Date;
+  created_at: string; // Supabase returns timestamps as ISO strings
   type: "breast" | "bottle" | "solid";
   amount?: number;
   duration?: number;
