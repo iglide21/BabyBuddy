@@ -1,16 +1,9 @@
-export type Feeding = {
-  id: string;
-  timestamp: Date;
-  type: "breast" | "bottle" | "solid";
-  amount?: number;
-  duration?: number;
-  notes?: string;
-};
+import { Database } from "@/types/supabase";
 
-export type CreateFeeding = Omit<Feeding, "id">;
+export type Feeding = Database["public"]["Tables"]["feedings"]["Row"];
 
-export type UpdateFeeding = Partial<Feeding>;
+export type CreateFeeding = Omit<Feeding, "id" | "created_at">;
 
-export type DeleteFeeding = {
-  id: string;
-};
+export type UpdateFeeding = Partial<Omit<Feeding, "created_at">>;
+
+export type DeleteFeeding = Pick<Feeding, "id">;

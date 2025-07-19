@@ -6,22 +6,19 @@ export const GET = async (request: NextRequest) => {
   const babyId = searchParams.get("babyId");
 
   if (!babyId) {
-    const { data, error } = await supabase.from("feedings").select();
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    return NextResponse.json(data);
+    return NextResponse.json({ error: "Baby ID is required" }, { status: 400 });
   }
 
   const { data, error } = await supabase
-    .from("feedings")
+    .from("all_events_view")
     .select()
-    .eq("baby_id", babyId);
+    .eq("baby_id", Number(babyId))
+    .order("created_at", { ascending: false });
+
+  console.log(error);
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    throw new Error(error.message);
   }
 
   return NextResponse.json(data);

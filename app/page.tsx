@@ -11,18 +11,10 @@ import { AIChat } from "components/ai-chat";
 import { LogFeedingModal, EditFeedingModal } from "components/feeding";
 import { LogSleepModal, EditSleepModal } from "components/sleeping";
 import { LogDiaperModal, EditDiaperModal } from "components/diaper";
-import {
-  Plus,
-  Baby,
-  Moon,
-  Milk,
-  Calendar,
-  Settings,
-  History,
-  Edit,
-  Bell,
-} from "lucide-react";
-import { useFeedings } from "hooks/data/queries";
+import { Plus, Baby, Moon, Milk, Calendar, Edit } from "lucide-react";
+import { useApplicationStore } from "@/src/stores/applicationStore";
+import QuickStats from "@/src/components/quick-stats";
+import TodaysActivities from "@/src/components/todays-activities";
 
 interface FeedingLog {
   id: string;
@@ -53,9 +45,9 @@ type LogEntry =
   | (DiaperLog & { logType: "diaper" });
 
 export default function BabyBuddyApp() {
-  const [currentView, setCurrentView] = useState<
-    "dashboard" | "history" | "settings" | "notifications"
-  >("dashboard");
+  const currentView = useApplicationStore.use.currentView();
+  const setCurrentView = useApplicationStore.use.setCurrentView();
+
   const [feedingLogs, setFeedingLogs] = useState<FeedingLog[]>([]);
   const [sleepLogs, setSleepLogs] = useState<SleepLog[]>([]);
   const [diaperLogs, setDiaperLogs] = useState<DiaperLog[]>([]);
@@ -70,9 +62,6 @@ export default function BabyBuddyApp() {
   const [editingDiaper, setEditingDiaper] = useState<DiaperLog | null>(null);
   const [babyName, setBabyName] = useState("Baby");
   const [birthDate, setBirthDate] = useState("");
-
-  const { data: feedings } = useFeedings();
-  console.log(feedings);
 
   useEffect(() => {
     const savedFeedings = localStorage.getItem("babybuddy-feedings");
@@ -257,16 +246,7 @@ export default function BabyBuddyApp() {
     Math.round((totalSleepToday / (1000 * 60 * 60)) * 10) / 10;
 
   const totalDiapersToday = todayDiapers.length;
-
-  const lastFeeding = todayFeedings[0];
-  const lastSleep = todaySleep[0];
-  const lastDiaper = todayDiapers[0];
   const activeSleep = sleepLogs.find((log) => !log.endTime);
-
-  const formatTime = (date: Date | undefined) => {
-    if (!date) return "";
-    return date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-  };
 
   const formatDuration = (startTime: Date, endTime: Date) => {
     const diff = endTime.getTime() - startTime.getTime();
@@ -283,19 +263,6 @@ export default function BabyBuddyApp() {
       return `${hours}h ${minutes}m`;
     }
     return `${minutes}m`;
-  };
-
-  const getTimeSince = (date: Date | undefined) => {
-    if (!date) return "";
-    const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-
-    if (hours > 0) {
-      return `${hours}h ${minutes}m ago`;
-    }
-    return `${minutes}m ago`;
   };
 
   if (currentView === "history") {
@@ -416,114 +383,8 @@ export default function BabyBuddyApp() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50">
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-pink-100 sticky top-0 z-10">
-        <div className="max-w-md mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-pink-400 to-purple-400 rounded-full flex items-center justify-center">
-                <Baby className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h1 className="text-lg font-bold text-gray-800">BabyBuddy</h1>
-                <p className="text-xs text-gray-600">Tracking for {babyName}</p>
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setCurrentView("notifications")}
-                className="text-gray-600 flex flex-col items-center px-3 py-2"
-              >
-                <Bell className="w-4 h-4" />
-                <span className="text-xs mt-1">Alerts</span>
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setCurrentView("history")}
-                className="text-gray-600 flex flex-col items-center px-3 py-2 bg-blue-50 border border-blue-200"
-              >
-                <History className="w-4 h-4" />
-                <span className="text-xs mt-1">History</span>
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setCurrentView("settings")}
-                className="text-gray-600 flex flex-col items-center px-3 py-2"
-              >
-                <Settings className="w-4 h-4" />
-                <span className="text-xs mt-1">Settings</span>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div className="max-w-md mx-auto px-4 py-6 space-y-6">
-        {/* Quick Stats */}
-        <div className="grid grid-cols-3 gap-3">
-          <Card className="bg-orange-50 border-orange-200">
-            <CardContent className="p-4 text-center">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <Milk className="w-5 h-5 text-orange-600" />
-                <span className="text-sm font-medium text-orange-800">
-                  Feedings Today
-                </span>
-              </div>
-              <div className="text-2xl font-bold text-orange-700">
-                {totalFeedingsToday}
-              </div>
-              {lastFeeding && (
-                <div className="text-xs text-orange-600 mt-1">
-                  Last: {getTimeSince(lastFeeding.timestamp)}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card className="bg-blue-50 border-blue-200">
-            <CardContent className="p-4 text-center">
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <Moon className="w-5 h-5 text-blue-600" />
-                <span className="text-sm font-medium text-blue-800">
-                  Sleep Today
-                </span>
-              </div>
-              <div className="text-2xl font-bold text-blue-700">
-                {totalSleepHours}h
-              </div>
-              {lastSleep && (
-                <div className="text-xs text-blue-600 mt-1">
-                  {lastSleep.endTime
-                    ? `Last: ${getTimeSince(lastSleep.endTime)}`
-                    : "Sleeping now 😴"}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card className="bg-green-50 border-green-200">
-            <CardContent className="p-3 text-center">
-              <div className="flex items-center justify-center gap-1 mb-2">
-                <span className="text-lg">💩</span>
-                <span className="text-xs font-medium text-green-800">
-                  Diapers
-                </span>
-              </div>
-              <div className="text-xl font-bold text-green-700">
-                {totalDiapersToday}
-              </div>
-              {lastDiaper && (
-                <div className="text-xs text-green-600 mt-1">
-                  Last: {getTimeSince(lastDiaper.timestamp)}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+        <QuickStats />
 
         {/* Quick Add Buttons */}
         <div className="grid grid-cols-3 gap-3">
@@ -594,160 +455,7 @@ export default function BabyBuddyApp() {
           </Card>
         )}
 
-        {/* Today's Timeline */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-gray-800">
-              <Calendar className="w-5 h-5" />
-              Today's Activities
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {todayActivities.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <Baby className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                <p className="text-sm">No activities logged yet today.</p>
-                <p className="text-xs mt-1">
-                  Tap the buttons above to get started! 🍼
-                </p>
-              </div>
-            ) : (
-              <>
-                {todayActivities.map((activity) => (
-                  <div
-                    key={activity.id}
-                    className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 group"
-                  >
-                    {activity.logType === "feeding" && (
-                      <>
-                        <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                          <Milk className="w-5 h-5 text-orange-600" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium text-gray-800">
-                              Feeding
-                            </span>
-                            <Badge
-                              variant="secondary"
-                              className="bg-orange-100 text-orange-700"
-                            >
-                              {activity.type}
-                            </Badge>
-                          </div>
-                          <div className="text-sm text-gray-600">
-                            {formatTime(activity.timestamp)}
-                            {activity.amount && ` • ${activity.amount}oz`}
-                            {activity.duration && ` • ${activity.duration}min`}
-                          </div>
-                          {activity.notes && (
-                            <div className="text-xs text-gray-500 mt-1">
-                              {activity.notes}
-                            </div>
-                          )}
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEditFeeding(activity)}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                      </>
-                    )}
-
-                    {activity.logType === "sleep" && (
-                      <>
-                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                          <Moon className="w-5 h-5 text-blue-600" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium text-gray-800">
-                              Sleep
-                            </span>
-                            {!activity.endTime && (
-                              <Badge className="bg-blue-100 text-blue-700">
-                                Active
-                              </Badge>
-                            )}
-                          </div>
-                          <div className="text-sm text-gray-600">
-                            {formatTime(activity.startTime)}
-                            {activity.endTime && (
-                              <>
-                                {" - "}
-                                {formatTime(activity.endTime)}
-                                {" • "}
-                                {formatDuration(
-                                  activity.startTime,
-                                  activity.endTime
-                                )}
-                              </>
-                            )}
-                          </div>
-                          {activity.notes && (
-                            <div className="text-xs text-gray-500 mt-1">
-                              {activity.notes}
-                            </div>
-                          )}
-                        </div>
-                        {activity.endTime && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleEditSleep(activity)}
-                            className="opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                        )}
-                      </>
-                    )}
-
-                    {activity.logType === "diaper" && (
-                      <>
-                        <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                          <span className="text-lg">💩</span>
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium text-gray-800">
-                              Diaper
-                            </span>
-                            <Badge
-                              variant="secondary"
-                              className="bg-green-100 text-green-700"
-                            >
-                              {activity.type}
-                            </Badge>
-                          </div>
-                          <div className="text-sm text-gray-600">
-                            {formatTime(activity.timestamp)}
-                          </div>
-                          {activity.notes && (
-                            <div className="text-xs text-gray-500 mt-1">
-                              {activity.notes}
-                            </div>
-                          )}
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEditDiaper(activity)}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                ))}
-              </>
-            )}
-          </CardContent>
-        </Card>
+        <TodaysActivities />
 
         {/* Encouraging Message */}
         {todayActivities.length > 0 && (
