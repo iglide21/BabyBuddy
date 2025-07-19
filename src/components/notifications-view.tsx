@@ -80,7 +80,7 @@ export function NotificationsView({ onBack }: NotificationsViewProps) {
     if (!newReminder.title) return;
 
     const reminder: Reminder = {
-      id: Date.now().toString(),
+      id: generateId(),
       type: newReminder.type || "scheduled",
       activity: newReminder.activity || "feeding",
       title: newReminder.title,
@@ -137,38 +137,35 @@ export function NotificationsView({ onBack }: NotificationsViewProps) {
   const getNextTrigger = (reminder: Reminder) => {
     if (reminder.type === "scheduled" && reminder.time) {
       const [hours, minutes] = reminder.time.split(":").map(Number);
-      const now = new Date();
-      const today = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate(),
-        hours,
-        minutes
-      );
-      const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
+      const now = getNow();
+      const today = now.hour(hours).minute(minutes).second(0).millisecond(0);
+      const tomorrow = getTomorrow()
+        .hour(hours)
+        .minute(minutes)
+        .second(0)
+        .millisecond(0);
 
-      return today > now ? today : tomorrow;
+      return today.isAfter(now) ? today.toDate() : tomorrow.toDate();
     } else if (
       reminder.type === "interval" &&
       reminder.intervalHours &&
       reminder.lastTriggered
     ) {
-      return new Date(
-        reminder.lastTriggered.getTime() +
-          reminder.intervalHours * 60 * 60 * 1000
-      );
+      return dayjs(reminder.lastTriggered)
+        .add(reminder.intervalHours, "hour")
+        .toDate();
     }
     return null;
   };
 
   const formatTimeUntil = (date: Date) => {
-    const now = new Date();
-    const diff = date.getTime() - now.getTime();
+    const now = getNow();
+    const diff = dayjs(date).diff(now, "minute");
 
     if (diff < 0) return "Overdue";
 
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const hours = Math.floor(diff / 60);
+    const minutes = diff % 60;
 
     if (hours > 0) {
       return `in ${hours}h ${minutes}m`;
