@@ -12,6 +12,8 @@ import {
   DialogTitle,
 } from "components/ui/dialog";
 import { Moon, Trash2 } from "lucide-react";
+import { getTodayString, getNow } from "lib/dayjs";
+import dayjs from "lib/dayjs";
 
 interface SleepLog {
   id: string;
@@ -45,16 +47,16 @@ const EditSleepModal = ({
   // Populate form when sleep changes
   useEffect(() => {
     if (sleep) {
-      setStartDate(sleep.startTime.toISOString().split("T")[0]);
-      setStartTime(sleep.startTime.toTimeString().slice(0, 5));
+      setStartDate(dayjs(sleep.startTime).format("YYYY-MM-DD"));
+      setStartTime(dayjs(sleep.startTime).format("HH:mm"));
 
       if (sleep.endTime) {
-        setEndDate(sleep.endTime.toISOString().split("T")[0]);
-        setEndTime(sleep.endTime.toTimeString().slice(0, 5));
+        setEndDate(dayjs(sleep.endTime).format("YYYY-MM-DD"));
+        setEndTime(dayjs(sleep.endTime).format("HH:mm"));
       } else {
-        const now = new Date();
-        setEndDate(now.toISOString().split("T")[0]);
-        setEndTime(now.toTimeString().slice(0, 5));
+        const now = getNow();
+        setEndDate(now.format("YYYY-MM-DD"));
+        setEndTime(now.format("HH:mm"));
       }
 
       setNotes(sleep.notes || "");
@@ -68,22 +70,27 @@ const EditSleepModal = ({
     const [startHours, startMinutes] = startTime.split(":").map(Number);
     const [endHours, endMinutes] = endTime.split(":").map(Number);
 
-    const start = new Date(startDate);
-    start.setHours(startHours, startMinutes, 0, 0);
-
-    const end = new Date(endDate);
-    end.setHours(endHours, endMinutes, 0, 0);
+    const start = dayjs(startDate)
+      .hour(startHours)
+      .minute(startMinutes)
+      .second(0)
+      .millisecond(0);
+    const end = dayjs(endDate)
+      .hour(endHours)
+      .minute(endMinutes)
+      .second(0)
+      .millisecond(0);
 
     // Ensure end time is after start time
-    if (end <= start) {
+    if (end.isSameOrBefore(start)) {
       alert("End time must be after start time");
       return;
     }
 
     const updatedLog: SleepLog = {
       ...sleep,
-      startTime: start,
-      endTime: end,
+      startTime: start.toDate(),
+      endTime: end.toDate(),
       notes: notes || undefined,
     };
 

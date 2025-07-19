@@ -6,6 +6,7 @@ import { JSX } from "react";
 import { SleepingActivity } from "./sleeping";
 import { FeedingActivity } from "./feeding";
 import { DiaperActivity } from "./diaper";
+import { getTodayString } from "lib/dayjs";
 
 const eventTypeToComponent: Record<
   "diaper" | "nap" | "feeding",
@@ -23,7 +24,8 @@ const eventTypeToComponent: Record<
 };
 
 const TodaysActivities = () => {
-  const { data: events, isLoading, isError } = useEvents("1");
+  const today = getTodayString();
+  const { data: events, isLoading, isError } = useEvents("1", today);
 
   return (
     <Card>

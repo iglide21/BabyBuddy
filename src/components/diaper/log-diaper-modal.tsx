@@ -12,6 +12,8 @@ import {
   DialogTitle,
 } from "components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "components/ui/radio-group";
+import { getTodayString, getNow } from "lib/dayjs";
+import dayjs from "lib/dayjs";
 
 interface DiaperLog {
   timestamp: Date;
@@ -28,23 +30,25 @@ interface LogDiaperModalProps {
 const LogDiaperModal = ({ open, onClose, onSave }: LogDiaperModalProps) => {
   const [type, setType] = useState<"wet" | "dirty" | "both">("wet");
   const [time, setTime] = useState(() => {
-    const now = new Date();
-    return now.toTimeString().slice(0, 5);
+    const now = getNow();
+    return now.format("HH:mm");
   });
   const [date, setDate] = useState(() => {
-    const now = new Date();
-    return now.toISOString().split("T")[0];
+    return getTodayString();
   });
   const [notes, setNotes] = useState("");
   const [showNotes, setShowNotes] = useState(false);
 
   const handleSave = () => {
     const [hours, minutes] = time.split(":").map(Number);
-    const timestamp = new Date(date);
-    timestamp.setHours(hours, minutes, 0, 0);
+    const timestamp = dayjs(date)
+      .hour(hours)
+      .minute(minutes)
+      .second(0)
+      .millisecond(0);
 
     const log: DiaperLog = {
-      timestamp,
+      timestamp: timestamp.toDate(),
       type,
       ...(notes && { notes }),
     };
@@ -54,8 +58,7 @@ const LogDiaperModal = ({ open, onClose, onSave }: LogDiaperModalProps) => {
     // Reset form
     setNotes("");
     setShowNotes(false);
-    const now = new Date();
-    setDate(now.toISOString().split("T")[0]);
+    setDate(getTodayString());
 
     setTimeout(() => {
       onClose();
@@ -63,8 +66,8 @@ const LogDiaperModal = ({ open, onClose, onSave }: LogDiaperModalProps) => {
   };
 
   const resetTime = () => {
-    const now = new Date();
-    setTime(now.toTimeString().slice(0, 5));
+    const now = getNow();
+    setTime(now.format("HH:mm"));
   };
 
   const getTypeEmoji = (diaperType: string) => {

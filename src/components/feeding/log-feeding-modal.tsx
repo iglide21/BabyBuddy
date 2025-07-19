@@ -13,6 +13,8 @@ import {
 } from "components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "components/ui/radio-group";
 import { Milk } from "lucide-react";
+import { getTodayString, getNow } from "lib/dayjs";
+import dayjs from "lib/dayjs";
 
 interface FeedingLog {
   timestamp: Date;
@@ -31,12 +33,11 @@ interface LogFeedingModalProps {
 const LogFeedingModal = ({ open, onClose, onSave }: LogFeedingModalProps) => {
   const [type, setType] = useState<"breast" | "bottle" | "solid">("bottle");
   const [date, setDate] = useState(() => {
-    const now = new Date();
-    return now.toISOString().split("T")[0];
+    return getTodayString();
   });
   const [time, setTime] = useState(() => {
-    const now = new Date();
-    return now.toTimeString().slice(0, 5);
+    const now = getNow();
+    return now.format("HH:mm");
   });
   const [amount, setAmount] = useState("");
   const [duration, setDuration] = useState("");
@@ -45,11 +46,14 @@ const LogFeedingModal = ({ open, onClose, onSave }: LogFeedingModalProps) => {
 
   const handleSave = () => {
     const [hours, minutes] = time.split(":").map(Number);
-    const timestamp = new Date(date);
-    timestamp.setHours(hours, minutes, 0, 0);
+    const timestamp = dayjs(date)
+      .hour(hours)
+      .minute(minutes)
+      .second(0)
+      .millisecond(0);
 
     const log: FeedingLog = {
-      timestamp,
+      timestamp: timestamp.toDate(),
       type,
       ...(type === "bottle" && amount && { amount: Number.parseFloat(amount) }),
       ...(type === "breast" &&
@@ -64,9 +68,6 @@ const LogFeedingModal = ({ open, onClose, onSave }: LogFeedingModalProps) => {
     setDuration("");
     setNotes("");
     setShowNotes(false);
-    // Remove this line that was resetting the date:
-    // const now = new Date()
-    // setDate(now.toISOString().split("T")[0])
 
     setTimeout(() => {
       onClose();
@@ -74,8 +75,8 @@ const LogFeedingModal = ({ open, onClose, onSave }: LogFeedingModalProps) => {
   };
 
   const resetTime = () => {
-    const now = new Date();
-    setTime(now.toTimeString().slice(0, 5));
+    const now = getNow();
+    setTime(now.format("HH:mm"));
   };
 
   return (

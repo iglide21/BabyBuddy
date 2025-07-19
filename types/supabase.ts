@@ -66,29 +66,29 @@ export type Database = {
       diapers: {
         Row: {
           baby_id: number
-          changed_at: string
           color: Database["public"]["Enums"]["DiaperColor"] | null
           created_at: string
           id: number
           note: string
+          occurred_at: string
           type: Database["public"]["Enums"]["DiaperType"]
         }
         Insert: {
           baby_id: number
-          changed_at: string
           color?: Database["public"]["Enums"]["DiaperColor"] | null
           created_at?: string
           id?: number
           note: string
+          occurred_at?: string
           type: Database["public"]["Enums"]["DiaperType"]
         }
         Update: {
           baby_id?: number
-          changed_at?: string
           color?: Database["public"]["Enums"]["DiaperColor"] | null
           created_at?: string
           id?: number
           note?: string
+          occurred_at?: string
           type?: Database["public"]["Enums"]["DiaperType"]
         }
         Relationships: [
@@ -109,6 +109,7 @@ export type Database = {
           duration_minutes: number | null
           id: number
           note: string | null
+          occurred_at: string
           type: Database["public"]["Enums"]["Feeding type"]
         }
         Insert: {
@@ -118,6 +119,7 @@ export type Database = {
           duration_minutes?: number | null
           id?: number
           note?: string | null
+          occurred_at?: string
           type: Database["public"]["Enums"]["Feeding type"]
         }
         Update: {
@@ -127,6 +129,7 @@ export type Database = {
           duration_minutes?: number | null
           id?: number
           note?: string | null
+          occurred_at?: string
           type?: Database["public"]["Enums"]["Feeding type"]
         }
         Relationships: [
@@ -144,7 +147,7 @@ export type Database = {
           baby_id: number
           created_at: string
           duration_minutes: number
-          end_date: string
+          end_date: string | null
           id: number
           note: string | null
           start_date: string
@@ -153,7 +156,7 @@ export type Database = {
           baby_id: number
           created_at?: string
           duration_minutes: number
-          end_date: string
+          end_date?: string | null
           id?: number
           note?: string | null
           start_date: string
@@ -162,7 +165,7 @@ export type Database = {
           baby_id?: number
           created_at?: string
           duration_minutes?: number
-          end_date?: string
+          end_date?: string | null
           id?: number
           note?: string | null
           start_date?: string
@@ -179,24 +182,11 @@ export type Database = {
       }
     }
     Views: {
-      all_events_today: {
-        Row: {
-          amount_ml: number | null
-          created_at: string | null
-          duration_minutes: number | null
-          id: number | null
-          note: string | null
-          type: Database["public"]["Enums"]["Feeding type"] | null
-        }
-        Relationships: []
-      }
       all_events_view: {
         Row: {
           amount: number | null
           baby_id: number | null
-          changed_at: string | null
           color: string | null
-          created_at: string | null
           diaper_type: string | null
           duration: number | null
           end_date: string | null
@@ -204,7 +194,7 @@ export type Database = {
           feeding_type: string | null
           id: number | null
           note: string | null
-          start_date: string | null
+          occurred_at: string | null
         }
         Relationships: []
       }

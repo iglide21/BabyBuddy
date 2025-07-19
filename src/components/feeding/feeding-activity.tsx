@@ -1,5 +1,5 @@
 import { ActivityComponentProps } from "@/types/common";
-import { formatDuration, formatTime } from "@/src/lib/utils";
+import { formatDuration, formatTime } from "lib/dayjs";
 import { Badge } from "../ui/badge";
 import EditButton from "../edit-button";
 import { Milk } from "lucide-react";
@@ -18,7 +18,7 @@ const FeedingActivity = ({ event, editEvent }: ActivityComponentProps) => {
           </Badge>
         </div>
         <div className="text-sm text-gray-600">
-          {event.created_at && formatTime(new Date(event.created_at))}
+          {event.occurred_at && formatTime(event.occurred_at)}
           {event.amount && ` • ${event.amount}ml`}
           {event.duration && ` • ${event.duration}m`}
         </div>

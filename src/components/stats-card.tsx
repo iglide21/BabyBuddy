@@ -1,5 +1,5 @@
 import { Card, CardContent } from "@/src/components/ui/card";
-import { getTimeSince } from "@/src/lib/utils";
+import { getTimeSince } from "lib/dayjs";
 import { Skeleton } from "./ui/skeleton";
 
 type BaseEvent = {
@@ -41,7 +41,7 @@ const StatsCard = <T extends BaseEvent>({
         </div>
         {events.length > 0 && (
           <div className={`text-xs ${color} mt-1`}>
-            Last: {getTimeSince(new Date(events[events.length - 1].created_at))}
+            Last: {getTimeSince(events[events.length - 1].created_at)}
           </div>
         )}
       </CardContent>

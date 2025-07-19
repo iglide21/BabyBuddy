@@ -13,6 +13,7 @@ import {
 } from "components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "components/ui/radio-group";
 import { Milk, Trash2 } from "lucide-react";
+import dayjs from "lib/dayjs";
 
 interface FeedingLog {
   id: string;
@@ -50,8 +51,8 @@ const EditFeedingModal = ({
   useEffect(() => {
     if (feeding) {
       setType(feeding.type);
-      setDate(feeding.timestamp.toISOString().split("T")[0]);
-      setTime(feeding.timestamp.toTimeString().slice(0, 5));
+      setDate(dayjs(feeding.timestamp).format("YYYY-MM-DD"));
+      setTime(dayjs(feeding.timestamp).format("HH:mm"));
       setAmount(feeding.amount?.toString() || "");
       setDuration(feeding.duration?.toString() || "");
       setNotes(feeding.notes || "");
@@ -63,12 +64,15 @@ const EditFeedingModal = ({
     if (!feeding) return;
 
     const [hours, minutes] = time.split(":").map(Number);
-    const timestamp = new Date(date);
-    timestamp.setHours(hours, minutes, 0, 0);
+    const timestamp = dayjs(date)
+      .hour(hours)
+      .minute(minutes)
+      .second(0)
+      .millisecond(0);
 
     const updatedLog: FeedingLog = {
       ...feeding,
-      timestamp,
+      timestamp: timestamp.toDate(),
       type,
       ...(type === "bottle" && amount && { amount: Number.parseFloat(amount) }),
       ...(type === "breast" &&

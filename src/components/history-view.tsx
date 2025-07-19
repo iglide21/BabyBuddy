@@ -13,6 +13,8 @@ import {
   ChevronRight,
   Edit,
 } from "lucide-react";
+import { formatDateForDisplay } from "lib/dayjs";
+import dayjs from "lib/dayjs";
 
 interface FeedingLog {
   id: string;
@@ -73,7 +75,7 @@ export function HistoryView({
     } = {};
 
     feedingLogs.forEach((log) => {
-      const dateKey = log.timestamp.toDateString();
+      const dateKey = dayjs(log.timestamp).format("YYYY-MM-DD");
       if (!groups[dateKey]) {
         groups[dateKey] = { feedings: [], sleeps: [], diapers: [] };
       }
@@ -81,7 +83,7 @@ export function HistoryView({
     });
 
     sleepLogs.forEach((log) => {
-      const dateKey = log.startTime.toDateString();
+      const dateKey = dayjs(log.startTime).format("YYYY-MM-DD");
       if (!groups[dateKey]) {
         groups[dateKey] = { feedings: [], sleeps: [], diapers: [] };
       }
@@ -89,7 +91,7 @@ export function HistoryView({
     });
 
     diaperLogs.forEach((log) => {
-      const dateKey = log.timestamp.toDateString();
+      const dateKey = dayjs(log.timestamp).format("YYYY-MM-DD");
       if (!groups[dateKey]) {
         groups[dateKey] = { feedings: [], sleeps: [], diapers: [] };
       }
@@ -98,7 +100,7 @@ export function HistoryView({
 
     // Sort by date (newest first)
     return Object.entries(groups).sort(
-      ([a], [b]) => new Date(b).getTime() - new Date(a).getTime()
+      ([a], [b]) => dayjs(b).valueOf() - dayjs(a).valueOf()
     );
   };
 
@@ -115,22 +117,7 @@ export function HistoryView({
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-
-    if (date.toDateString() === today.toDateString()) {
-      return "Today";
-    } else if (date.toDateString() === yesterday.toDateString()) {
-      return "Yesterday";
-    } else {
-      return date.toLocaleDateString([], {
-        weekday: "long",
-        month: "short",
-        day: "numeric",
-      });
-    }
+    return formatDateForDisplay(dateString);
   };
 
   const getDayStats = (
@@ -142,7 +129,9 @@ export function HistoryView({
     const totalDiapers = diapers.length;
     const totalSleep = sleeps.reduce((total, log) => {
       if (log.endTime) {
-        return total + (log.endTime.getTime() - log.startTime.getTime());
+        return (
+          total + dayjs(log.endTime).diff(dayjs(log.startTime), "millisecond")
+        );
       }
       return total;
     }, 0);

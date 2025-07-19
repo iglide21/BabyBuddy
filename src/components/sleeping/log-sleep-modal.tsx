@@ -13,6 +13,8 @@ import {
 } from "components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "components/ui/radio-group";
 import { Moon, Play, Square } from "lucide-react";
+import { getNow, getTodayString, formatTime } from "lib/dayjs";
+import dayjs from "lib/dayjs";
 
 interface SleepLog {
   id: string;
@@ -38,32 +40,29 @@ const LogSleepModal = ({
 }: LogSleepModalProps) => {
   const [logType, setLogType] = useState<"start" | "complete">("complete");
   const [startTime, setStartTime] = useState(() => {
-    const now = new Date();
-    now.setMinutes(now.getMinutes() - 60); // Default to 1 hour ago
-    return now.toTimeString().slice(0, 5);
+    const now = getNow();
+    return now.subtract(1, "hour").format("HH:mm"); // Default to 1 hour ago
   });
   const [endTime, setEndTime] = useState(() => {
-    const now = new Date();
-    return now.toTimeString().slice(0, 5);
+    const now = getNow();
+    return now.format("HH:mm");
   });
   const [notes, setNotes] = useState("");
   const [showNotes, setShowNotes] = useState(false);
 
   const [startDate, setStartDate] = useState(() => {
-    const now = new Date();
-    return now.toISOString().split("T")[0];
+    return getTodayString();
   });
   const [endDate, setEndDate] = useState(() => {
-    const now = new Date();
-    return now.toISOString().split("T")[0];
+    return getTodayString();
   });
 
   const handleSave = () => {
     if (logType === "start") {
       // Start a new sleep session
-      const now = new Date();
+      const now = getNow();
       onSave({
-        startTime: now,
+        startTime: now.toDate(),
         notes: notes || undefined,
       });
     } else {
@@ -71,21 +70,26 @@ const LogSleepModal = ({
       const [startHours, startMinutes] = startTime.split(":").map(Number);
       const [endHours, endMinutes] = endTime.split(":").map(Number);
 
-      const start = new Date(startDate);
-      start.setHours(startHours, startMinutes, 0, 0);
-
-      const end = new Date(endDate);
-      end.setHours(endHours, endMinutes, 0, 0);
+      const start = dayjs(startDate)
+        .hour(startHours)
+        .minute(startMinutes)
+        .second(0)
+        .millisecond(0);
+      const end = dayjs(endDate)
+        .hour(endHours)
+        .minute(endMinutes)
+        .second(0)
+        .millisecond(0);
 
       // Ensure end time is after start time
-      if (end <= start) {
+      if (end.isSameOrBefore(start)) {
         alert("End time must be after start time");
         return;
       }
 
       onSave({
-        startTime: start,
-        endTime: end,
+        startTime: start.toDate(),
+        endTime: end.toDate(),
         notes: notes || undefined,
       });
     }
@@ -93,8 +97,7 @@ const LogSleepModal = ({
     // Reset form
     setNotes("");
     setShowNotes(false);
-    const now = new Date();
-    const dateString = now.toISOString().split("T")[0];
+    const dateString = getTodayString();
     setStartDate(dateString);
     setEndDate(dateString);
 
@@ -106,7 +109,7 @@ const LogSleepModal = ({
   const handleEndActiveSleep = () => {
     if (activeSleep) {
       onUpdateSleep(activeSleep.id, {
-        endTime: new Date(),
+        endTime: getNow().toDate(),
         notes: notes || undefined,
       });
       setNotes("");
@@ -116,8 +119,8 @@ const LogSleepModal = ({
   };
 
   const resetToNow = (type: "start" | "end") => {
-    const now = new Date();
-    const timeString = now.toTimeString().slice(0, 5);
+    const now = getNow();
+    const timeString = now.format("HH:mm");
     if (type === "start") {
       setStartTime(timeString);
     } else {
@@ -146,11 +149,7 @@ const LogSleepModal = ({
                 </span>
               </div>
               <p className="text-xs text-blue-600 mb-3">
-                Started at{" "}
-                {activeSleep.startTime.toLocaleTimeString([], {
-                  hour: "numeric",
-                  minute: "2-digit",
-                })}
+                Started at {formatTime(activeSleep.startTime)}
               </p>
               <Button
                 onClick={handleEndActiveSleep}

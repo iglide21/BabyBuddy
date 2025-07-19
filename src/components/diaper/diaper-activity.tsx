@@ -1,5 +1,5 @@
 import { Badge } from "../ui/badge";
-import { formatTime } from "@/src/lib/utils";
+import { formatTime } from "lib/dayjs";
 import { ActivityComponentProps } from "@/types/common";
 import EditButton from "../edit-button";
 
@@ -17,7 +17,7 @@ const DiaperActivity = ({ event, editEvent }: ActivityComponentProps) => {
           </Badge>
         </div>
         <div className="text-sm text-gray-600">
-          {event.created_at && formatTime(new Date(event.created_at))}
+          {event.occurred_at && formatTime(event.occurred_at)}
         </div>
         {event.note && (
           <div className="text-xs text-gray-500 mt-1">{event.note}</div>

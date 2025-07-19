@@ -13,6 +13,7 @@ import {
 } from "components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "components/ui/radio-group";
 import { Trash2 } from "lucide-react";
+import dayjs from "lib/dayjs";
 
 interface DiaperLog {
   id: string;
@@ -46,8 +47,8 @@ const EditDiaperModal = ({
   useEffect(() => {
     if (diaper) {
       setType(diaper.type);
-      setDate(diaper.timestamp.toISOString().split("T")[0]);
-      setTime(diaper.timestamp.toTimeString().slice(0, 5));
+      setDate(dayjs(diaper.timestamp).format("YYYY-MM-DD"));
+      setTime(dayjs(diaper.timestamp).format("HH:mm"));
       setNotes(diaper.notes || "");
       setShowNotes(!!diaper.notes);
     }
@@ -57,12 +58,15 @@ const EditDiaperModal = ({
     if (!diaper) return;
 
     const [hours, minutes] = time.split(":").map(Number);
-    const timestamp = new Date(date);
-    timestamp.setHours(hours, minutes, 0, 0);
+    const timestamp = dayjs(date)
+      .hour(hours)
+      .minute(minutes)
+      .second(0)
+      .millisecond(0);
 
     const updatedLog: DiaperLog = {
       ...diaper,
-      timestamp,
+      timestamp: timestamp.toDate(),
       type,
       notes: notes || undefined,
     };

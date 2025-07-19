@@ -1,12 +1,12 @@
 import { ActivityComponentProps } from "@/types/common";
 import { Moon, Badge } from "lucide-react";
-import { formatDuration } from "@/src/lib/utils";
+import { formatDuration } from "lib/dayjs";
 import EditButton from "../edit-button";
 
 const SleepingActivity = ({ event, editEvent }: ActivityComponentProps) => {
   const formattedDuration = formatDuration(
-    new Date(event.start_date || ""),
-    new Date(event.end_date || "")
+    event.occurred_at || "",
+    event.end_date || ""
   );
 
   return (

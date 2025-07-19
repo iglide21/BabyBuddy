@@ -30,6 +30,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "components/ui/select";
+import { getTwoHoursAgo, getNow, getTomorrow, generateId } from "lib/dayjs";
+import dayjs from "lib/dayjs";
 
 interface Reminder {
   id: string;
@@ -63,7 +65,7 @@ export function NotificationsView({ onBack }: NotificationsViewProps) {
       title: "Feeding reminder",
       intervalHours: 3,
       enabled: true,
-      lastTriggered: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+      lastTriggered: getTwoHoursAgo().toDate(), // 2 hours ago
     },
   ]);
 
