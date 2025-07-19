@@ -28,11 +28,7 @@ interface LogFeedingModalProps {
   onSave: (log: FeedingLog) => void;
 }
 
-export function LogFeedingModal({
-  open,
-  onClose,
-  onSave,
-}: LogFeedingModalProps) {
+const LogFeedingModal = ({ open, onClose, onSave }: LogFeedingModalProps) => {
   const [type, setType] = useState<"breast" | "bottle" | "solid">("bottle");
   const [date, setDate] = useState(() => {
     const now = new Date();
@@ -232,4 +228,6 @@ export function LogFeedingModal({
       </DialogContent>
     </Dialog>
   );
-}
+};
+
+export default LogFeedingModal;

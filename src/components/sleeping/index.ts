@@ -1,4 +1,5 @@
-import { LogSleepModal } from "./log-sleep-modal";
-import { EditSleepModal } from "./edit-sleep-modal";
+import { default as LogSleepModal } from "./log-sleep-modal";
+import { default as EditSleepModal } from "./edit-sleep-modal";
+import { default as SleepingActivity } from "./sleeping-activity";
 
-export { LogSleepModal, EditSleepModal };
+export { LogSleepModal, EditSleepModal, SleepingActivity };

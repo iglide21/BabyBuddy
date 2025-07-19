@@ -29,13 +29,13 @@ interface EditDiaperModalProps {
   diaper: DiaperLog | null;
 }
 
-export function EditDiaperModal({
+const EditDiaperModal = ({
   open,
   onClose,
   onSave,
   onDelete,
   diaper,
-}: EditDiaperModalProps) {
+}: EditDiaperModalProps) => {
   const [type, setType] = useState<"wet" | "dirty" | "both">("wet");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
@@ -227,4 +227,6 @@ export function EditDiaperModal({
       </DialogContent>
     </Dialog>
   );
-}
+};
+
+export default EditDiaperModal;

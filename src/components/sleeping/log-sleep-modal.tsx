@@ -29,13 +29,13 @@ interface LogSleepModalProps {
   onUpdateSleep: (id: string, updates: Partial<SleepLog>) => void;
 }
 
-export function LogSleepModal({
+const LogSleepModal = ({
   open,
   onClose,
   onSave,
   activeSleep,
   onUpdateSleep,
-}: LogSleepModalProps) {
+}: LogSleepModalProps) => {
   const [logType, setLogType] = useState<"start" | "complete">("complete");
   const [startTime, setStartTime] = useState(() => {
     const now = new Date();
@@ -314,4 +314,6 @@ export function LogSleepModal({
       </DialogContent>
     </Dialog>
   );
-}
+};
+
+export default LogSleepModal;

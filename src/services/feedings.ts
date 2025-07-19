@@ -5,6 +5,11 @@ const getFeedings = async () => {
   return response.json();
 };
 
+const getFeedingsForBaby = async (babyId: string) => {
+  const response = await fetch(`/api/events/feedings?babyId=${babyId}`);
+  return response.json();
+};
+
 const createFeeding = async (feeding: Feeding) => {
   const response = await fetch("/api/events/feedings", {
     method: "POST",

@@ -39,8 +39,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      babies: {
+        Row: {
+          birth_date: string
+          created_at: string
+          gender: Database["public"]["Enums"]["Gender"]
+          id: number
+          name: string
+        }
+        Insert: {
+          birth_date: string
+          created_at?: string
+          gender: Database["public"]["Enums"]["Gender"]
+          id?: number
+          name: string
+        }
+        Update: {
+          birth_date?: string
+          created_at?: string
+          gender?: Database["public"]["Enums"]["Gender"]
+          id?: number
+          name?: string
+        }
+        Relationships: []
+      }
       diapers: {
         Row: {
+          baby_id: number
           changed_at: string
           color: Database["public"]["Enums"]["DiaperColor"] | null
           created_at: string
@@ -49,6 +74,7 @@ export type Database = {
           type: Database["public"]["Enums"]["DiaperType"]
         }
         Insert: {
+          baby_id: number
           changed_at: string
           color?: Database["public"]["Enums"]["DiaperColor"] | null
           created_at?: string
@@ -57,6 +83,7 @@ export type Database = {
           type: Database["public"]["Enums"]["DiaperType"]
         }
         Update: {
+          baby_id?: number
           changed_at?: string
           color?: Database["public"]["Enums"]["DiaperColor"] | null
           created_at?: string
@@ -64,11 +91,20 @@ export type Database = {
           note?: string
           type?: Database["public"]["Enums"]["DiaperType"]
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "diapers_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       feedings: {
         Row: {
           amount_ml: number | null
+          baby_id: number
           created_at: string
           duration_minutes: number | null
           id: number
@@ -77,6 +113,7 @@ export type Database = {
         }
         Insert: {
           amount_ml?: number | null
+          baby_id: number
           created_at?: string
           duration_minutes?: number | null
           id?: number
@@ -85,41 +122,92 @@ export type Database = {
         }
         Update: {
           amount_ml?: number | null
+          baby_id?: number
           created_at?: string
           duration_minutes?: number | null
           id?: number
           note?: string | null
           type?: Database["public"]["Enums"]["Feeding type"]
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "feedings_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       naps: {
         Row: {
+          baby_id: number
           created_at: string
+          duration_minutes: number
           end_date: string
           id: number
           note: string | null
           start_date: string
         }
         Insert: {
+          baby_id: number
           created_at?: string
+          duration_minutes: number
           end_date: string
           id?: number
           note?: string | null
           start_date: string
         }
         Update: {
+          baby_id?: number
           created_at?: string
+          duration_minutes?: number
           end_date?: string
           id?: number
           note?: string | null
           start_date?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "naps_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
-      [_ in never]: never
+      all_events_today: {
+        Row: {
+          amount_ml: number | null
+          created_at: string | null
+          duration_minutes: number | null
+          id: number | null
+          note: string | null
+          type: Database["public"]["Enums"]["Feeding type"] | null
+        }
+        Relationships: []
+      }
+      all_events_view: {
+        Row: {
+          amount: number | null
+          baby_id: number | null
+          changed_at: string | null
+          color: string | null
+          created_at: string | null
+          diaper_type: string | null
+          duration: number | null
+          end_date: string | null
+          event_type: string | null
+          feeding_type: string | null
+          id: number | null
+          note: string | null
+          start_date: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
@@ -136,6 +224,7 @@ export type Database = {
         | "pink_specks"
       DiaperType: "wet" | "dirty" | "both"
       "Feeding type": "breast" | "bottle" | "solid"
+      Gender: "male" | "female" | "other"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -278,6 +367,7 @@ export const Constants = {
       ],
       DiaperType: ["wet", "dirty", "both"],
       "Feeding type": ["breast", "bottle", "solid"],
+      Gender: ["male", "female", "other"],
     },
   },
 } as const

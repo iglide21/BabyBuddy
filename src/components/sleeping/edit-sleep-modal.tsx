@@ -28,13 +28,13 @@ interface EditSleepModalProps {
   sleep: SleepLog | null;
 }
 
-export function EditSleepModal({
+const EditSleepModal = ({
   open,
   onClose,
   onSave,
   onDelete,
   sleep,
-}: EditSleepModalProps) {
+}: EditSleepModalProps) => {
   const [startDate, setStartDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -225,4 +225,6 @@ export function EditSleepModal({
       </DialogContent>
     </Dialog>
   );
-}
+};
+
+export default EditSleepModal;

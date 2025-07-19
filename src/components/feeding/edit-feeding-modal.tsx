@@ -31,13 +31,13 @@ interface EditFeedingModalProps {
   feeding: FeedingLog | null;
 }
 
-export function EditFeedingModal({
+const EditFeedingModal = ({
   open,
   onClose,
   onSave,
   onDelete,
   feeding,
-}: EditFeedingModalProps) {
+}: EditFeedingModalProps) => {
   const [type, setType] = useState<"breast" | "bottle" | "solid">("bottle");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
@@ -248,4 +248,6 @@ export function EditFeedingModal({
       </DialogContent>
     </Dialog>
   );
-}
+};
+
+export default EditFeedingModal;

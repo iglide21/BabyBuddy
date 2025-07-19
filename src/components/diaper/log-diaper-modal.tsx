@@ -25,7 +25,7 @@ interface LogDiaperModalProps {
   onSave: (log: DiaperLog) => void;
 }
 
-export function LogDiaperModal({ open, onClose, onSave }: LogDiaperModalProps) {
+const LogDiaperModal = ({ open, onClose, onSave }: LogDiaperModalProps) => {
   const [type, setType] = useState<"wet" | "dirty" | "both">("wet");
   const [time, setTime] = useState(() => {
     const now = new Date();
@@ -218,4 +218,6 @@ export function LogDiaperModal({ open, onClose, onSave }: LogDiaperModalProps) {
       </DialogContent>
     </Dialog>
   );
-}
+};
+
+export default LogDiaperModal;

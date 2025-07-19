@@ -1,25 +1,27 @@
-import { useFeedings } from "@/src/hooks/data/queries";
 import { Card, CardContent } from "@/src/components/ui/card";
 import { getTimeSince } from "@/src/lib/utils";
-import { Feeding } from "@/types/data/feeding/types";
 import { Skeleton } from "./ui/skeleton";
 
-type StatsCardProps = {
-  // event: Feeding | Sleep | Diaper;
-  events: Feeding[] | undefined;
+type BaseEvent = {
+  id: number;
+  created_at: string;
+};
+
+type StatsCardProps<T extends BaseEvent> = {
+  events: T[] | undefined;
   icon: React.ReactNode;
   title: string;
   color: string;
   isLoading: boolean;
 };
 
-const StatsCard = ({
+const StatsCard = <T extends BaseEvent>({
   events,
   icon,
   title,
   color,
   isLoading,
-}: StatsCardProps) => {
+}: StatsCardProps<T>) => {
   if (isLoading) {
     return <Skeleton className="w-full h-32 rounded-lg bg-gray-200" />;
   }

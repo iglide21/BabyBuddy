@@ -1,0 +1,31 @@
+import { Sleep } from "@/types/data/sleeps/types";
+
+const getSleeps = async () => {
+  const response = await fetch("/api/events/sleeps");
+  return response.json();
+};
+
+const createSleep = async (sleep: Sleep) => {
+  const response = await fetch("/api/events/sleeps", {
+    method: "POST",
+    body: JSON.stringify(sleep),
+  });
+  return response.json();
+};
+
+const updateSleep = async (sleep: Sleep) => {
+  const response = await fetch(`/api/events/sleeps/${sleep.id}`, {
+    method: "PUT",
+    body: JSON.stringify(sleep),
+  });
+  return response.json();
+};
+
+const deleteSleep = async (id: string) => {
+  const response = await fetch(`/api/events/sleeps/${id}`, {
+    method: "DELETE",
+  });
+  return response.json();
+};
+
+export { getSleeps, createSleep, updateSleep, deleteSleep };
