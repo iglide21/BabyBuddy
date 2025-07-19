@@ -7,6 +7,8 @@ import { Button } from "components/ui/button";
 import { Input } from "components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "components/ui/card";
 import { MessageCircle, Send, X, Bot, User, Sparkles } from "lucide-react";
+import { getWeekAgo, getNow, generateId } from "lib/dayjs";
+import dayjs from "lib/dayjs";
 
 interface Message {
   id: string;
@@ -59,7 +61,7 @@ export function AIChat({
       id: "welcome",
       type: "ai",
       content: `Hi! I'm your AI baby care assistant! 👶✨ I can help you with general baby questions or analyze ${babyName}'s feeding, sleep, and diaper patterns. What would you like to know?`,
-      timestamp: new Date(),
+      timestamp: getNow().toDate(),
     },
   ]);
   const [inputValue, setInputValue] = useState("");
@@ -83,12 +85,16 @@ export function AIChat({
     const totalDiapers = diaperLogs.length;
 
     // Get recent patterns (last 7 days)
-    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-    const recentFeedings = feedingLogs.filter(
-      (log) => log.timestamp >= weekAgo
+    const weekAgo = getWeekAgo();
+    const recentFeedings = feedingLogs.filter((log) =>
+      dayjs(log.timestamp).isAfter(weekAgo)
     );
-    const recentSleep = sleepLogs.filter((log) => log.startTime >= weekAgo);
-    const recentDiapers = diaperLogs.filter((log) => log.timestamp >= weekAgo);
+    const recentSleep = sleepLogs.filter((log) =>
+      dayjs(log.startTime).isAfter(weekAgo)
+    );
+    const recentDiapers = diaperLogs.filter((log) =>
+      dayjs(log.timestamp).isAfter(weekAgo)
+    );
 
     // Calculate average daily patterns
     const avgFeedingsPerDay = Math.round((recentFeedings.length / 7) * 10) / 10;
@@ -100,12 +106,12 @@ export function AIChat({
       completedSleeps.length > 0
         ? completedSleeps.reduce((total, log) => {
             if (log.endTime) {
-              return total + (log.endTime.getTime() - log.startTime.getTime());
+              return (
+                total + dayjs(log.endTime).diff(dayjs(log.startTime), "hour")
+              );
             }
             return total;
-          }, 0) /
-          completedSleeps.length /
-          (1000 * 60 * 60) // Convert to hours
+          }, 0) / completedSleeps.length
         : 0;
 
     // Pattern analysis responses
@@ -417,10 +423,9 @@ What's on your mind today?`,
   const calculateAge = (birthDate: string): string => {
     if (!birthDate) return "unknown age";
 
-    const birth = new Date(birthDate);
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - birth.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const birth = dayjs(birthDate);
+    const now = getNow();
+    const diffDays = now.diff(birth, "day");
 
     if (diffDays < 7) {
       return `${diffDays} day${diffDays === 1 ? "" : "s"} old`;
@@ -445,10 +450,10 @@ What's on your mind today?`,
     if (!inputValue.trim()) return;
 
     const userMessage: Message = {
-      id: Date.now().toString(),
+      id: generateId(),
       type: "user",
       content: inputValue.trim(),
-      timestamp: new Date(),
+      timestamp: getNow().toDate(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
@@ -458,10 +463,10 @@ What's on your mind today?`,
     // Simulate AI thinking time
     setTimeout(() => {
       const aiResponse: Message = {
-        id: (Date.now() + 1).toString(),
+        id: generateId(),
         type: "ai",
         content: generateAIResponse(userMessage.content),
-        timestamp: new Date(),
+        timestamp: getNow().toDate(),
       };
 
       setMessages((prev) => [...prev, aiResponse]);

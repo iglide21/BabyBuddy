@@ -14,7 +14,7 @@ const QuickStats = () => {
       <StatsCard
         events={feedings}
         icon={<Milk className="w-8 h-8 text-orange-600" />}
-        title="Feedings Today"
+        title="Feedings"
         color="orange"
         isLoading={isLoading}
       />
@@ -22,15 +22,15 @@ const QuickStats = () => {
       <StatsCard
         events={sleeps}
         icon={<Moon className="w-8 h-8 text-blue-600" />}
-        title="Sleep Today"
+        title="Sleep"
         color="blue"
         isLoading={isLoadingSleeps}
       />
 
       <StatsCard
         events={diapers}
-        icon={"💩"}
-        title="Diapers Today"
+        icon={<span className="text-2xl">💩</span>}
+        title="Diapers"
         color="green"
         isLoading={isLoadingDiapers}
       />

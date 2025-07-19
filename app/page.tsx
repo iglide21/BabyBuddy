@@ -15,6 +15,15 @@ import { Plus, Baby, Moon, Milk, Calendar, Edit } from "lucide-react";
 import { useApplicationStore } from "@/src/stores/applicationStore";
 import QuickStats from "@/src/components/quick-stats";
 import TodaysActivities from "@/src/components/todays-activities";
+import {
+  generateId,
+  getTodayStart,
+  getTodayEnd,
+  getNow,
+  formatTime,
+} from "lib/dayjs";
+import dayjs from "lib/dayjs";
+import QuickActions from "@/src/components/quick-actions";
 
 interface FeedingLog {
   id: string;
@@ -75,7 +84,7 @@ export default function BabyBuddyApp() {
       setFeedingLogs(
         parsed.map((log: any) => ({
           ...log,
-          timestamp: new Date(log.timestamp),
+          timestamp: dayjs(log.timestamp).toDate(),
         }))
       );
     }
@@ -85,8 +94,8 @@ export default function BabyBuddyApp() {
       setSleepLogs(
         parsed.map((log: any) => ({
           ...log,
-          startTime: new Date(log.startTime),
-          endTime: log.endTime ? new Date(log.endTime) : undefined,
+          startTime: dayjs(log.startTime).toDate(),
+          endTime: log.endTime ? dayjs(log.endTime).toDate() : undefined,
         }))
       );
     }
@@ -100,7 +109,7 @@ export default function BabyBuddyApp() {
       setDiaperLogs(
         parsed.map((log: any) => ({
           ...log,
-          timestamp: new Date(log.timestamp),
+          timestamp: dayjs(log.timestamp).toDate(),
         }))
       );
     }
@@ -124,17 +133,17 @@ export default function BabyBuddyApp() {
   }, [diaperLogs]);
 
   const addFeedingLog = (log: Omit<FeedingLog, "id">) => {
-    const newLog = { ...log, id: Date.now().toString() };
+    const newLog = { ...log, id: generateId() };
     setFeedingLogs((prev) => [newLog, ...prev]);
   };
 
   const addSleepLog = (log: Omit<SleepLog, "id">) => {
-    const newLog = { ...log, id: Date.now().toString() };
+    const newLog = { ...log, id: generateId() };
     setSleepLogs((prev) => [newLog, ...prev]);
   };
 
   const addDiaperLog = (log: Omit<DiaperLog, "id">) => {
-    const newLog = { ...log, id: Date.now().toString() };
+    const newLog = { ...log, id: generateId() };
     setDiaperLogs((prev) => [newLog, ...prev]);
   };
 
@@ -193,24 +202,25 @@ export default function BabyBuddyApp() {
   };
 
   // Get today's logs
-  const today = new Date();
-  const todayStart = new Date(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate()
-  );
-  const todayEnd = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
+  const todayStart = getTodayStart();
+  const todayEnd = getTodayEnd();
 
   const todayFeedings = feedingLogs.filter(
-    (log) => log.timestamp >= todayStart && log.timestamp < todayEnd
+    (log) =>
+      dayjs(log.timestamp).isAfter(todayStart) &&
+      dayjs(log.timestamp).isBefore(todayEnd)
   );
 
   const todaySleep = sleepLogs.filter(
-    (log) => log.startTime >= todayStart && log.startTime < todayEnd
+    (log) =>
+      dayjs(log.startTime).isAfter(todayStart) &&
+      dayjs(log.startTime).isBefore(todayEnd)
   );
 
   const todayDiapers = diaperLogs.filter(
-    (log) => log.timestamp >= todayStart && log.timestamp < todayEnd
+    (log) =>
+      dayjs(log.timestamp).isAfter(todayStart) &&
+      dayjs(log.timestamp).isBefore(todayEnd)
   );
 
   // Combine and sort today's activities
@@ -231,14 +241,16 @@ export default function BabyBuddyApp() {
         : b.logType === "diaper"
         ? b.timestamp
         : b.startTime;
-    return timeB.getTime() - timeA.getTime();
+    return dayjs(timeB).valueOf() - dayjs(timeA).valueOf();
   });
 
   // Calculate stats
   const totalFeedingsToday = todayFeedings.length;
   const totalSleepToday = todaySleep.reduce((total, log) => {
     if (log.endTime) {
-      return total + (log.endTime.getTime() - log.startTime.getTime());
+      return (
+        total + dayjs(log.endTime).diff(dayjs(log.startTime), "millisecond")
+      );
     }
     return total;
   }, 0);
@@ -249,15 +261,15 @@ export default function BabyBuddyApp() {
   const activeSleep = sleepLogs.find((log) => !log.endTime);
 
   const formatDuration = (startTime: Date, endTime: Date) => {
-    const diff = endTime.getTime() - startTime.getTime();
+    const diff = dayjs(endTime).diff(dayjs(startTime), "minute");
 
     // Handle negative duration (shouldn't happen with proper validation)
     if (diff < 0) {
       return "Invalid duration";
     }
 
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const hours = Math.floor(diff / 60);
+    const minutes = diff % 60;
 
     if (hours > 0) {
       return `${hours}h ${minutes}m`;
@@ -385,45 +397,7 @@ export default function BabyBuddyApp() {
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50">
       <div className="max-w-md mx-auto px-4 py-6 space-y-6">
         <QuickStats />
-
-        {/* Quick Add Buttons */}
-        <div className="grid grid-cols-3 gap-3">
-          <Button
-            onClick={() => setShowFeedingModal(true)}
-            className="h-16 bg-gradient-to-r from-orange-400 to-orange-500 hover:from-orange-500 hover:to-orange-600 text-white shadow-lg"
-            size="lg"
-          >
-            <Plus className="w-6 h-6 mr-2" />
-            <div className="text-left">
-              <div className="font-semibold">Feeding</div>
-              <div className="text-xs opacity-90">Log a feed</div>
-            </div>
-          </Button>
-
-          <Button
-            onClick={() => setShowSleepModal(true)}
-            className="h-16 bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white shadow-lg"
-            size="lg"
-          >
-            <Plus className="w-6 h-6 mr-2" />
-            <div className="text-left">
-              <div className="font-semibold">Sleep</div>
-              <div className="text-xs opacity-90">Log sleep</div>
-            </div>
-          </Button>
-
-          <Button
-            onClick={() => setShowDiaperModal(true)}
-            className="h-16 bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 text-white shadow-lg"
-            size="lg"
-          >
-            <Plus className="w-5 h-5 mr-1" />
-            <div className="text-left">
-              <div className="font-semibold text-sm">Diaper</div>
-              <div className="text-xs opacity-90">Log change</div>
-            </div>
-          </Button>
-        </div>
+        <QuickActions />
 
         {/* Active Sleep Alert */}
         {activeSleep && (
@@ -443,7 +417,9 @@ export default function BabyBuddyApp() {
                 </div>
                 <Button
                   onClick={() => {
-                    updateSleepLog(activeSleep.id, { endTime: new Date() });
+                    updateSleepLog(activeSleep.id, {
+                      endTime: getNow().toDate(),
+                    });
                   }}
                   className="bg-blue-600 hover:bg-blue-700 text-white"
                   size="sm"

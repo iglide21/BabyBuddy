@@ -31,17 +31,14 @@ const StatsCard = <T extends BaseEvent>({
   return (
     <Card className={`bg-${color}-50 border-${color}-200`}>
       <CardContent className="p-4 text-center">
-        <div className="flex items-center justify-center gap-2 mb-2">
+        <div className="flex flex-col items-center justify-center gap-2 mb-2">
           {icon}
           <span className={`text-sm font-medium ${color}`}>{title}</span>
         </div>
-        <div className={`text-2xl font-bold ${color}`}>
-          {/* this should be only for today, not all feedings ever */}
-          {events.length}
-        </div>
+        <div className={`text-2xl font-bold ${color}`}>{events.length}</div>
         {events.length > 0 && (
           <div className={`text-xs ${color} mt-1`}>
-            Last: {getTimeSince(events[events.length - 1].created_at)}
+            {getTimeSince(events[events.length - 1].created_at)}
           </div>
         )}
       </CardContent>
