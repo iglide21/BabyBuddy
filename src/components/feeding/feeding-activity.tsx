@@ -12,7 +12,7 @@ const FeedingActivity = ({ event, editEvent }: ActivityComponentProps) => {
       </div>
       <div className="flex-1">
         <div className="flex items-center gap-2">
-          <span className="font-medium text-gray-800">Feeding</span>
+          <span className="font-bold text-gray-800">Feeding</span>
           <Badge variant="secondary" className="bg-orange-100 text-orange-700">
             {event.event_type}
           </Badge>

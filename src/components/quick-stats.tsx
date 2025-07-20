@@ -10,7 +10,7 @@ const QuickStats = () => {
   const { data: events, isLoading } = useEvents("1", getTodayString());
 
   const feedings = events?.filter((event) => event.event_type === "feeding");
-  const sleeps = events?.filter((event) => event.event_type === "sleep");
+  const sleeps = events?.filter((event) => event.event_type === "nap");
   const diapers = events?.filter((event) => event.event_type === "diaper");
 
   return (

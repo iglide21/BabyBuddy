@@ -39,7 +39,7 @@ const StatsCard = <T extends BaseEvent>({
         <div className={`text-2xl font-bold ${color}`}>{events.length}</div>
         {events.length > 0 && (
           <div className={`text-xs ${color} mt-1`}>
-            {getTimeSince(events[events.length - 1].occurred_at!)}
+            {getTimeSince(events[0].occurred_at!)}
           </div>
         )}
       </CardContent>

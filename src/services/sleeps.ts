@@ -1,11 +1,11 @@
-import { Sleep } from "@/types/data/sleeps/types";
+import { CreateSleep, Sleep } from "@/types/data/sleeps/types";
 
 const getSleeps = async () => {
   const response = await fetch("/api/events/sleeps");
   return response.json();
 };
 
-const createSleep = async (sleep: Sleep) => {
+const createSleep = async (sleep: CreateSleep) => {
   const response = await fetch("/api/events/sleeps", {
     method: "POST",
     body: JSON.stringify(sleep),

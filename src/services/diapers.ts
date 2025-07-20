@@ -1,11 +1,11 @@
-import { Diaper } from "@/types/data/diapers/types";
+import { CreateDiaper, Diaper } from "@/types/data/diapers/types";
 
 const getDiapers = async () => {
   const response = await fetch("/api/events/diapers");
   return response.json();
 };
 
-const createDiaper = async (diaper: Diaper) => {
+const createDiaper = async (diaper: CreateDiaper) => {
   const response = await fetch("/api/events/diapers", {
     method: "POST",
     body: JSON.stringify(diaper),
