@@ -1,3 +1,5 @@
+import { BabyEvents } from "@/types/common";
+
 const getEventsForBaby = async (babyId: string, date?: string) => {
   const params = new URLSearchParams({ babyId });
 

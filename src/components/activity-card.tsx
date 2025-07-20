@@ -1,4 +1,8 @@
 import { LogEntry } from "@/types/common";
+import { Milk } from "lucide-react";
+import { Badge } from "./ui/badge";
+import { formatTime } from "lib/dayjs";
+import { Button } from "./ui/button";
 
 type ActivityCardProps = {
   activity: LogEntry;
@@ -20,12 +24,12 @@ const ActivityCard = ({ activity, onEdit, color }: ActivityCardProps) => {
           </Badge>
         </div>
         <div className="text-sm text-gray-600">
-          {formatTime(activity.timestamp)}
-          {activity.amount && ` • ${activity.amount}oz`}
-          {activity.duration && ` • ${activity.duration}min`}
+          {formatTime(activity.occurred_at)}
+          {activity.amount_ml && ` • ${activity.amount_ml}ml`}
+          {activity.duration_minutes && ` • ${activity.duration_minutes}min`}
         </div>
-        {activity.notes && (
-          <div className="text-xs text-gray-500 mt-1">{activity.notes}</div>
+        {activity.note && (
+          <div className="text-xs text-gray-500 mt-1">{activity.note}</div>
         )}
       </div>
       <Button

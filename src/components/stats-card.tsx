@@ -1,10 +1,11 @@
 import { Card, CardContent } from "@/src/components/ui/card";
 import { getTimeSince } from "lib/dayjs";
 import { Skeleton } from "./ui/skeleton";
+import { Nullable } from "@/types/common";
 
 type BaseEvent = {
-  id: number;
-  created_at: string;
+  id: Nullable<number>;
+  occurred_at: Nullable<string>;
 };
 
 type StatsCardProps<T extends BaseEvent> = {
@@ -38,7 +39,7 @@ const StatsCard = <T extends BaseEvent>({
         <div className={`text-2xl font-bold ${color}`}>{events.length}</div>
         {events.length > 0 && (
           <div className={`text-xs ${color} mt-1`}>
-            {getTimeSince(events[events.length - 1].created_at)}
+            {getTimeSince(events[events.length - 1].occurred_at!)}
           </div>
         )}
       </CardContent>

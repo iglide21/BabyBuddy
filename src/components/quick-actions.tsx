@@ -1,7 +1,6 @@
 import { Baby, Moon, Plus } from "lucide-react";
 import { useApplicationStore } from "../stores/applicationStore";
 import QuickActionButton from "./quick-action-button";
-import { Button } from "./ui/button";
 
 const QuickActions = () => {
   const showModal = useApplicationStore.use.showModal();

@@ -18,7 +18,24 @@ export const GET = async (request: NextRequest) => {
   const { data, error } = await supabase
     .from("feedings")
     .select()
-    .eq("baby_id", babyId);
+    .eq("baby_id", Number(babyId));
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json(data);
+};
+
+export const POST = async (request: NextRequest) => {
+  const body = await request.json();
+  const { data, error } = await supabase
+    .from("feedings")
+    .insert({
+      ...body,
+      baby_id: 1,
+    })
+    .select();
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

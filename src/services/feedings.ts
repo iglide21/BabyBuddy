@@ -1,4 +1,4 @@
-import { Feeding } from "@/types/data/feeding/types";
+import { CreateFeeding, Feeding } from "@/types/data/feeding/types";
 
 const getFeedings = async () => {
   const response = await fetch("/api/events/feedings");
@@ -10,7 +10,7 @@ const getFeedingsForBaby = async (babyId: string) => {
   return response.json();
 };
 
-const createFeeding = async (feeding: Feeding) => {
+const createFeeding = async (feeding: CreateFeeding) => {
   const response = await fetch("/api/events/feedings", {
     method: "POST",
     body: JSON.stringify(feeding),

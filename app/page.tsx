@@ -1,397 +1,129 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Button } from "components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "components/ui/card";
-import { Badge } from "components/ui/badge";
-import { HistoryView } from "components/history-view";
-import { SettingsView } from "components/settings-view";
-import { NotificationsView } from "components/notifications-view";
-import { AIChat } from "components/ai-chat";
-import { LogFeedingModal, EditFeedingModal } from "components/feeding";
-import { LogSleepModal, EditSleepModal } from "components/sleeping";
-import { LogDiaperModal, EditDiaperModal } from "components/diaper";
-import { Plus, Baby, Moon, Milk, Calendar, Edit } from "lucide-react";
-import { useApplicationStore } from "@/src/stores/applicationStore";
+import { Card, CardContent } from "components/ui/card";
+import { LogFeedingModal } from "components/feeding";
+import { LogSleepModal } from "components/sleeping";
+import { LogDiaperModal } from "components/diaper";
 import QuickStats from "@/src/components/quick-stats";
 import TodaysActivities from "@/src/components/todays-activities";
-import {
-  generateId,
-  getTodayStart,
-  getTodayEnd,
-  getNow,
-  formatTime,
-} from "lib/dayjs";
-import dayjs from "lib/dayjs";
 import QuickActions from "@/src/components/quick-actions";
 
-interface FeedingLog {
-  id: string;
-  timestamp: Date;
-  type: "breast" | "bottle" | "solid";
-  amount?: number;
-  duration?: number;
-  notes?: string;
-}
-
-interface SleepLog {
-  id: string;
-  startTime: Date;
-  endTime?: Date;
-  notes?: string;
-}
-
-interface DiaperLog {
-  id: string;
-  timestamp: Date;
-  type: "wet" | "dirty" | "both";
-  notes?: string;
-}
-
-type LogEntry =
-  | (FeedingLog & { logType: "feeding" })
-  | (SleepLog & { logType: "sleep" })
-  | (DiaperLog & { logType: "diaper" });
-
 export default function BabyBuddyApp() {
-  const currentView = useApplicationStore.use.currentView();
-  const setCurrentView = useApplicationStore.use.setCurrentView();
+  // if (currentView === "history") {
+  //   return (
+  //     <>
+  //       <HistoryView
+  //         feedingLogs={feedingLogs}
+  //         sleepLogs={sleepLogs}
+  //         diaperLogs={diaperLogs}
+  //         onBack={() => setCurrentView("dashboard")}
+  //         formatTime={formatTime}
+  //         formatDuration={formatDuration}
+  //         onEditFeeding={handleEditFeeding}
+  //         onEditSleep={handleEditSleep}
+  //         onEditDiaper={handleEditDiaper}
+  //       />
 
-  const [feedingLogs, setFeedingLogs] = useState<FeedingLog[]>([]);
-  const [sleepLogs, setSleepLogs] = useState<SleepLog[]>([]);
-  const [diaperLogs, setDiaperLogs] = useState<DiaperLog[]>([]);
-  const [showFeedingModal, setShowFeedingModal] = useState(false);
-  const [showSleepModal, setShowSleepModal] = useState(false);
-  const [showDiaperModal, setShowDiaperModal] = useState(false);
-  const [showEditFeedingModal, setShowEditFeedingModal] = useState(false);
-  const [showEditSleepModal, setShowEditSleepModal] = useState(false);
-  const [showEditDiaperModal, setShowEditDiaperModal] = useState(false);
-  const [editingFeeding, setEditingFeeding] = useState<FeedingLog | null>(null);
-  const [editingSleep, setEditingSleep] = useState<SleepLog | null>(null);
-  const [editingDiaper, setEditingDiaper] = useState<DiaperLog | null>(null);
-  const [babyName, setBabyName] = useState("Baby");
-  const [birthDate, setBirthDate] = useState("");
+  //       {/* Edit Modals for History View */}
+  //       <EditFeedingModal
+  //         open={showEditFeedingModal}
+  //         onClose={() => {
+  //           setShowEditFeedingModal(false);
+  //           setEditingFeeding(null);
+  //         }}
+  //         onSave={editFeedingLog}
+  //         onDelete={deleteFeedingLog}
+  //         feeding={editingFeeding}
+  //       />
 
-  useEffect(() => {
-    const savedFeedings = localStorage.getItem("babybuddy-feedings");
-    const savedSleep = localStorage.getItem("babybuddy-sleep");
-    const savedBabyName = localStorage.getItem("babybuddy-baby-name");
-    const savedDiapers = localStorage.getItem("babybuddy-diapers");
-    const savedBirthDate = localStorage.getItem("babybuddy-birth-date");
+  //       <EditSleepModal
+  //         open={showEditSleepModal}
+  //         onClose={() => {
+  //           setShowEditSleepModal(false);
+  //           setEditingSleep(null);
+  //         }}
+  //         onSave={editSleepLog}
+  //         onDelete={deleteSleepLog}
+  //         sleep={editingSleep}
+  //       />
 
-    if (savedFeedings) {
-      const parsed = JSON.parse(savedFeedings);
-      setFeedingLogs(
-        parsed.map((log: any) => ({
-          ...log,
-          timestamp: dayjs(log.timestamp).toDate(),
-        }))
-      );
-    }
+  //       <EditDiaperModal
+  //         open={showEditDiaperModal}
+  //         onClose={() => {
+  //           setShowEditDiaperModal(false);
+  //           setEditingDiaper(null);
+  //         }}
+  //         onSave={editDiaperLog}
+  //         onDelete={deleteDiaperLog}
+  //         diaper={editingDiaper}
+  //       />
 
-    if (savedSleep) {
-      const parsed = JSON.parse(savedSleep);
-      setSleepLogs(
-        parsed.map((log: any) => ({
-          ...log,
-          startTime: dayjs(log.startTime).toDate(),
-          endTime: log.endTime ? dayjs(log.endTime).toDate() : undefined,
-        }))
-      );
-    }
+  //       {/* AI Chat available in all views */}
+  //       <AIChat
+  //         feedingLogs={feedingLogs}
+  //         sleepLogs={sleepLogs}
+  //         diaperLogs={diaperLogs}
+  //         babyName={babyName}
+  //         birthDate={birthDate}
+  //       />
+  //     </>
+  //   );
+  // }
 
-    if (savedBabyName) {
-      setBabyName(savedBabyName);
-    }
+  // if (currentView === "settings") {
+  //   return (
+  //     <>
+  //       <SettingsView
+  //         babyName={babyName}
+  //         birthDate={birthDate}
+  //         onBabyNameChange={(name) => {
+  //           setBabyName(name);
+  //           localStorage.setItem("babybuddy-baby-name", name);
+  //         }}
+  //         onBirthDateChange={(date) => {
+  //           setBirthDate(date);
+  //           localStorage.setItem("babybuddy-birth-date", date);
+  //         }}
+  //         onBack={() => setCurrentView("dashboard")}
+  //         onClearData={() => {
+  //           setFeedingLogs([]);
+  //           setSleepLogs([]);
+  //           setDiaperLogs([]);
+  //           localStorage.removeItem("babybuddy-feedings");
+  //           localStorage.removeItem("babybuddy-sleep");
+  //           localStorage.removeItem("babybuddy-diapers");
+  //           localStorage.removeItem("babybuddy-birth-date");
+  //         }}
+  //       />
 
-    if (savedDiapers) {
-      const parsed = JSON.parse(savedDiapers);
-      setDiaperLogs(
-        parsed.map((log: any) => ({
-          ...log,
-          timestamp: dayjs(log.timestamp).toDate(),
-        }))
-      );
-    }
+  //       {/* AI Chat available in all views */}
+  //       <AIChat
+  //         feedingLogs={feedingLogs}
+  //         sleepLogs={sleepLogs}
+  //         diaperLogs={diaperLogs}
+  //         babyName={babyName}
+  //         birthDate={birthDate}
+  //       />
+  //     </>
+  //   );
+  // }
 
-    if (savedBirthDate) {
-      setBirthDate(savedBirthDate);
-    }
-  }, []);
+  // if (currentView === "notifications") {
+  //   return (
+  //     <>
+  //       <NotificationsView onBack={() => setCurrentView("dashboard")} />
 
-  // Save data to localStorage whenever logs change
-  useEffect(() => {
-    localStorage.setItem("babybuddy-feedings", JSON.stringify(feedingLogs));
-  }, [feedingLogs]);
-
-  useEffect(() => {
-    localStorage.setItem("babybuddy-sleep", JSON.stringify(sleepLogs));
-  }, [sleepLogs]);
-
-  useEffect(() => {
-    localStorage.setItem("babybuddy-diapers", JSON.stringify(diaperLogs));
-  }, [diaperLogs]);
-
-  const addFeedingLog = (log: Omit<FeedingLog, "id">) => {
-    const newLog = { ...log, id: generateId() };
-    setFeedingLogs((prev) => [newLog, ...prev]);
-  };
-
-  const addSleepLog = (log: Omit<SleepLog, "id">) => {
-    const newLog = { ...log, id: generateId() };
-    setSleepLogs((prev) => [newLog, ...prev]);
-  };
-
-  const addDiaperLog = (log: Omit<DiaperLog, "id">) => {
-    const newLog = { ...log, id: generateId() };
-    setDiaperLogs((prev) => [newLog, ...prev]);
-  };
-
-  const updateSleepLog = (id: string, updates: Partial<SleepLog>) => {
-    setSleepLogs((prev) =>
-      prev.map((log) => (log.id === id ? { ...log, ...updates } : log))
-    );
-  };
-
-  // Edit functions
-  const editFeedingLog = (log: FeedingLog) => {
-    setFeedingLogs((prev) =>
-      prev.map((item) => (item.id === log.id ? log : item))
-    );
-  };
-
-  const editSleepLog = (log: SleepLog) => {
-    setSleepLogs((prev) =>
-      prev.map((item) => (item.id === log.id ? log : item))
-    );
-  };
-
-  const editDiaperLog = (log: DiaperLog) => {
-    setDiaperLogs((prev) =>
-      prev.map((item) => (item.id === log.id ? log : item))
-    );
-  };
-
-  // Delete functions
-  const deleteFeedingLog = (id: string) => {
-    setFeedingLogs((prev) => prev.filter((log) => log.id !== id));
-  };
-
-  const deleteSleepLog = (id: string) => {
-    setSleepLogs((prev) => prev.filter((log) => log.id !== id));
-  };
-
-  const deleteDiaperLog = (id: string) => {
-    setDiaperLogs((prev) => prev.filter((log) => log.id !== id));
-  };
-
-  // Handle edit clicks
-  const handleEditFeeding = (feeding: FeedingLog) => {
-    setEditingFeeding(feeding);
-    setShowEditFeedingModal(true);
-  };
-
-  const handleEditSleep = (sleep: SleepLog) => {
-    setEditingSleep(sleep);
-    setShowEditSleepModal(true);
-  };
-
-  const handleEditDiaper = (diaper: DiaperLog) => {
-    setEditingDiaper(diaper);
-    setShowEditDiaperModal(true);
-  };
-
-  // Get today's logs
-  const todayStart = getTodayStart();
-  const todayEnd = getTodayEnd();
-
-  const todayFeedings = feedingLogs.filter(
-    (log) =>
-      dayjs(log.timestamp).isAfter(todayStart) &&
-      dayjs(log.timestamp).isBefore(todayEnd)
-  );
-
-  const todaySleep = sleepLogs.filter(
-    (log) =>
-      dayjs(log.startTime).isAfter(todayStart) &&
-      dayjs(log.startTime).isBefore(todayEnd)
-  );
-
-  const todayDiapers = diaperLogs.filter(
-    (log) =>
-      dayjs(log.timestamp).isAfter(todayStart) &&
-      dayjs(log.timestamp).isBefore(todayEnd)
-  );
-
-  // Combine and sort today's activities
-  const todayActivities: LogEntry[] = [
-    ...todayFeedings.map((log) => ({ ...log, logType: "feeding" as const })),
-    ...todaySleep.map((log) => ({ ...log, logType: "sleep" as const })),
-    ...todayDiapers.map((log) => ({ ...log, logType: "diaper" as const })),
-  ].sort((a, b) => {
-    const timeA =
-      a.logType === "feeding"
-        ? a.timestamp
-        : a.logType === "diaper"
-        ? a.timestamp
-        : a.startTime;
-    const timeB =
-      b.logType === "feeding"
-        ? b.timestamp
-        : b.logType === "diaper"
-        ? b.timestamp
-        : b.startTime;
-    return dayjs(timeB).valueOf() - dayjs(timeA).valueOf();
-  });
-
-  // Calculate stats
-  const totalFeedingsToday = todayFeedings.length;
-  const totalSleepToday = todaySleep.reduce((total, log) => {
-    if (log.endTime) {
-      return (
-        total + dayjs(log.endTime).diff(dayjs(log.startTime), "millisecond")
-      );
-    }
-    return total;
-  }, 0);
-  const totalSleepHours =
-    Math.round((totalSleepToday / (1000 * 60 * 60)) * 10) / 10;
-
-  const totalDiapersToday = todayDiapers.length;
-  const activeSleep = sleepLogs.find((log) => !log.endTime);
-
-  const formatDuration = (startTime: Date, endTime: Date) => {
-    const diff = dayjs(endTime).diff(dayjs(startTime), "minute");
-
-    // Handle negative duration (shouldn't happen with proper validation)
-    if (diff < 0) {
-      return "Invalid duration";
-    }
-
-    const hours = Math.floor(diff / 60);
-    const minutes = diff % 60;
-
-    if (hours > 0) {
-      return `${hours}h ${minutes}m`;
-    }
-    return `${minutes}m`;
-  };
-
-  if (currentView === "history") {
-    return (
-      <>
-        <HistoryView
-          feedingLogs={feedingLogs}
-          sleepLogs={sleepLogs}
-          diaperLogs={diaperLogs}
-          onBack={() => setCurrentView("dashboard")}
-          formatTime={formatTime}
-          formatDuration={formatDuration}
-          onEditFeeding={handleEditFeeding}
-          onEditSleep={handleEditSleep}
-          onEditDiaper={handleEditDiaper}
-        />
-
-        {/* Edit Modals for History View */}
-        <EditFeedingModal
-          open={showEditFeedingModal}
-          onClose={() => {
-            setShowEditFeedingModal(false);
-            setEditingFeeding(null);
-          }}
-          onSave={editFeedingLog}
-          onDelete={deleteFeedingLog}
-          feeding={editingFeeding}
-        />
-
-        <EditSleepModal
-          open={showEditSleepModal}
-          onClose={() => {
-            setShowEditSleepModal(false);
-            setEditingSleep(null);
-          }}
-          onSave={editSleepLog}
-          onDelete={deleteSleepLog}
-          sleep={editingSleep}
-        />
-
-        <EditDiaperModal
-          open={showEditDiaperModal}
-          onClose={() => {
-            setShowEditDiaperModal(false);
-            setEditingDiaper(null);
-          }}
-          onSave={editDiaperLog}
-          onDelete={deleteDiaperLog}
-          diaper={editingDiaper}
-        />
-
-        {/* AI Chat available in all views */}
-        <AIChat
-          feedingLogs={feedingLogs}
-          sleepLogs={sleepLogs}
-          diaperLogs={diaperLogs}
-          babyName={babyName}
-          birthDate={birthDate}
-        />
-      </>
-    );
-  }
-
-  if (currentView === "settings") {
-    return (
-      <>
-        <SettingsView
-          babyName={babyName}
-          birthDate={birthDate}
-          onBabyNameChange={(name) => {
-            setBabyName(name);
-            localStorage.setItem("babybuddy-baby-name", name);
-          }}
-          onBirthDateChange={(date) => {
-            setBirthDate(date);
-            localStorage.setItem("babybuddy-birth-date", date);
-          }}
-          onBack={() => setCurrentView("dashboard")}
-          onClearData={() => {
-            setFeedingLogs([]);
-            setSleepLogs([]);
-            setDiaperLogs([]);
-            localStorage.removeItem("babybuddy-feedings");
-            localStorage.removeItem("babybuddy-sleep");
-            localStorage.removeItem("babybuddy-diapers");
-            localStorage.removeItem("babybuddy-birth-date");
-          }}
-        />
-
-        {/* AI Chat available in all views */}
-        <AIChat
-          feedingLogs={feedingLogs}
-          sleepLogs={sleepLogs}
-          diaperLogs={diaperLogs}
-          babyName={babyName}
-          birthDate={birthDate}
-        />
-      </>
-    );
-  }
-
-  if (currentView === "notifications") {
-    return (
-      <>
-        <NotificationsView onBack={() => setCurrentView("dashboard")} />
-
-        {/* AI Chat available in all views */}
-        <AIChat
-          feedingLogs={feedingLogs}
-          sleepLogs={sleepLogs}
-          diaperLogs={diaperLogs}
-          babyName={babyName}
-          birthDate={birthDate}
-        />
-      </>
-    );
-  }
+  //       {/* AI Chat available in all views */}
+  //       <AIChat
+  //         feedingLogs={feedingLogs}
+  //         sleepLogs={sleepLogs}
+  //         diaperLogs={diaperLogs}
+  //         babyName={babyName}
+  //         birthDate={birthDate}
+  //       />
+  //     </>
+  //   );
+  // }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50">
@@ -400,7 +132,7 @@ export default function BabyBuddyApp() {
         <QuickActions />
 
         {/* Active Sleep Alert */}
-        {activeSleep && (
+        {/* {activeSleep && (
           <Card className="bg-blue-100 border-blue-300">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -429,51 +161,35 @@ export default function BabyBuddyApp() {
               </div>
             </CardContent>
           </Card>
-        )}
+        )} */}
 
         <TodaysActivities />
 
         {/* Encouraging Message */}
-        {todayActivities.length > 0 && (
+        {/* {feedings && sleeps && diapers && (
           <Card className="bg-gradient-to-r from-pink-50 to-purple-50 border-pink-200">
             <CardContent className="p-4 text-center">
               <p className="text-sm text-gray-700">
-                {totalFeedingsToday >= 6 &&
-                totalSleepHours >= 10 &&
-                totalDiapersToday >= 6
+                {feedings?.length >= 6 &&
+                sleeps?.length >= 10 &&
+                diapers?.length >= 6
                   ? "Amazing job today! You're both doing great! 🌟"
-                  : totalFeedingsToday >= 3 && totalDiapersToday >= 3
+                  : feedings?.length >= 3 && diapers?.length >= 3
                   ? "You're doing wonderful! Keep up the great work! 💪"
                   : "Every moment counts. You're an amazing parent! ❤️"}
               </p>
             </CardContent>
           </Card>
-        )}
+        )} */}
       </div>
 
       {/* Add Modals */}
-      <LogFeedingModal
-        open={showFeedingModal}
-        onClose={() => setShowFeedingModal(false)}
-        onSave={addFeedingLog}
-      />
-
-      <LogSleepModal
-        open={showSleepModal}
-        onClose={() => setShowSleepModal(false)}
-        onSave={addSleepLog}
-        activeSleep={activeSleep}
-        onUpdateSleep={updateSleepLog}
-      />
-
-      <LogDiaperModal
-        open={showDiaperModal}
-        onClose={() => setShowDiaperModal(false)}
-        onSave={addDiaperLog}
-      />
+      <LogFeedingModal />
+      <LogSleepModal />
+      <LogDiaperModal />
 
       {/* Edit Modals */}
-      <EditFeedingModal
+      {/* <EditFeedingModal
         open={showEditFeedingModal}
         onClose={() => {
           setShowEditFeedingModal(false);
@@ -504,16 +220,16 @@ export default function BabyBuddyApp() {
         onSave={editDiaperLog}
         onDelete={deleteDiaperLog}
         diaper={editingDiaper}
-      />
+      /> */}
 
       {/* AI Chat - Available on all views */}
-      <AIChat
+      {/* <AIChat
         feedingLogs={feedingLogs}
         sleepLogs={sleepLogs}
         diaperLogs={diaperLogs}
         babyName={babyName}
         birthDate={birthDate}
-      />
+      /> */}
     </div>
   );
 }

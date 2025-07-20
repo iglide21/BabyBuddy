@@ -1,6 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Button } from "components/ui/button";
 import { Input } from "components/ui/input";
 import { Label } from "components/ui/label";
@@ -11,76 +14,111 @@ import {
   DialogHeader,
   DialogTitle,
 } from "components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "components/ui/form";
 import { RadioGroup, RadioGroupItem } from "components/ui/radio-group";
 import { Milk } from "lucide-react";
-import { getTodayString, getNow } from "lib/dayjs";
-import dayjs from "lib/dayjs";
+import dayjs, { getNow } from "lib/dayjs";
+import { CreateFeeding } from "@/types/data/feeding/types";
+import { useApplicationStore } from "@/src/stores/applicationStore";
+import { useCreateFeeding } from "@/src/hooks/data/mutations/useCreateFeeding";
 
-interface FeedingLog {
-  timestamp: Date;
-  type: "breast" | "bottle" | "solid";
-  amount?: number;
-  duration?: number;
-  notes?: string;
-}
+// Validation schema
+const feedingFormSchema = z
+  .object({
+    type: z.enum(["breast", "bottle", "solid"]),
+    occurred_at: z.string().min(1, "Date is required"),
+    amount_ml: z.string().optional(),
+    duration_minutes: z.string().optional(),
+    note: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      if (
+        data.type === "bottle" &&
+        (!data.amount_ml || data.amount_ml.trim() === "")
+      ) {
+        return false;
+      }
 
-interface LogFeedingModalProps {
-  open: boolean;
-  onClose: () => void;
-  onSave: (log: FeedingLog) => void;
-}
+      return true;
+    },
+    {
+      message: "Amount is required for bottle feeding",
+      path: ["amount_ml"],
+    }
+  )
+  .refine(
+    (data) => {
+      if (
+        data.type === "breast" &&
+        (!data.duration_minutes || data.duration_minutes.trim() === "")
+      ) {
+        return false;
+      }
 
-const LogFeedingModal = ({ open, onClose, onSave }: LogFeedingModalProps) => {
-  const [type, setType] = useState<"breast" | "bottle" | "solid">("bottle");
-  const [date, setDate] = useState(() => {
-    return getTodayString();
-  });
-  const [time, setTime] = useState(() => {
-    const now = getNow();
-    return now.format("HH:mm");
-  });
-  const [amount, setAmount] = useState("");
-  const [duration, setDuration] = useState("");
-  const [notes, setNotes] = useState("");
+      return true;
+    },
+    {
+      message: "Duration is required for breast feeding",
+      path: ["duration_minutes"],
+    }
+  );
+
+type FeedingFormData = z.infer<typeof feedingFormSchema>;
+
+const LogFeedingModal = () => {
   const [showNotes, setShowNotes] = useState(false);
+  const openedModal = useApplicationStore.use.currentModal();
+  const isOpen = useMemo(() => openedModal === "feeding", [openedModal]);
 
-  const handleSave = () => {
-    const [hours, minutes] = time.split(":").map(Number);
-    const timestamp = dayjs(date)
-      .hour(hours)
-      .minute(minutes)
-      .second(0)
-      .millisecond(0);
+  const { mutate: createFeeding } = useCreateFeeding();
+  const closeModal = useApplicationStore.use.closeModal();
 
-    const log: FeedingLog = {
-      timestamp: timestamp.toDate(),
+  const form = useForm<FeedingFormData>({
+    resolver: zodResolver(feedingFormSchema),
+    defaultValues: {
+      type: "bottle",
+      occurred_at: getNow().format("YYYY-MM-DDTHH:mm"),
+      amount_ml: "",
+      duration_minutes: "",
+      note: "",
+    },
+  });
+
+  const watchedType = form.watch("type");
+
+  const onSubmit = (data: FeedingFormData) => {
+    const { occurred_at, amount_ml, duration_minutes, note, type } = data;
+
+    const event: CreateFeeding = {
+      occurred_at: dayjs(occurred_at).toISOString(),
       type,
-      ...(type === "bottle" && amount && { amount: Number.parseFloat(amount) }),
-      ...(type === "breast" &&
-        duration && { duration: Number.parseInt(duration) }),
-      ...(notes && { notes }),
+      amount_ml: amount_ml ? Number(amount_ml) : null,
+      duration_minutes: duration_minutes ? Number(duration_minutes) : null,
+      note: note || null,
     };
 
-    onSave(log);
+    console.log(event);
 
-    // Reset form
-    setAmount("");
-    setDuration("");
-    setNotes("");
-    setShowNotes(false);
-
-    setTimeout(() => {
-      onClose();
-    }, 100);
+    form.reset();
+    createFeeding(event);
+    closeModal();
   };
 
-  const resetTime = () => {
-    const now = getNow();
-    setTime(now.format("HH:mm"));
+  const onClose = () => {
+    form.reset();
+    closeModal();
   };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-sm mx-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-orange-700">
@@ -89,143 +127,175 @@ const LogFeedingModal = ({ open, onClose, onSave }: LogFeedingModalProps) => {
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
-          {/* Date and Time */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-2">
-              <Label htmlFor="date" className="text-sm font-medium">
-                Date
-              </Label>
-              <Input
-                id="date"
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="text-lg"
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {/* Date and Time */}
+            <FormField
+              control={form.control}
+              name="occurred_at"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium">Time</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="datetime-local"
+                      className="text-lg"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Type */}
+            <FormField
+              control={form.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem className="space-y-3">
+                  <FormLabel className="text-sm font-medium">
+                    Feeding Type
+                  </FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      className="space-y-2"
+                    >
+                      <div className="flex items-center space-x-2 p-3 rounded-lg border border-orange-200 bg-orange-50">
+                        <RadioGroupItem value="bottle" id="bottle" />
+                        <Label
+                          htmlFor="bottle"
+                          className="flex-1 cursor-pointer"
+                        >
+                          🍼 Bottle
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2 p-3 rounded-lg border border-orange-200 bg-orange-50">
+                        <RadioGroupItem value="breast" id="breast" />
+                        <Label
+                          htmlFor="breast"
+                          className="flex-1 cursor-pointer"
+                        >
+                          🤱 Breast
+                        </Label>
+                      </div>
+                      <div className="flex items-center space-x-2 p-3 rounded-lg border border-orange-200 bg-orange-50">
+                        <RadioGroupItem value="solid" id="solid" />
+                        <Label
+                          htmlFor="solid"
+                          className="flex-1 cursor-pointer"
+                        >
+                          🥄 Solid Food
+                        </Label>
+                      </div>
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {["bottle", "solid"].includes(watchedType) && (
+              <FormField
+                control={form.control}
+                name="amount_ml"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">
+                      Amount (ml)
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step="0.5"
+                        placeholder="e.g., 4"
+                        className="text-lg"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="time" className="text-sm font-medium">
-                Time
-              </Label>
-              <Input
-                id="time"
-                type="time"
-                value={time}
-                onChange={(e) => setTime(e.target.value)}
-                className="text-lg"
+            )}
+
+            {["breast", "bottle"].includes(watchedType) && (
+              <FormField
+                control={form.control}
+                name="duration_minutes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">
+                      Duration (minutes)
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        placeholder="e.g., 15"
+                        className="text-lg"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-          </div>
+            )}
 
-          {/* Type */}
-          <div className="space-y-3">
-            <Label className="text-sm font-medium">Feeding Type</Label>
-            <RadioGroup
-              value={type}
-              onValueChange={(value: any) => setType(value)}
-            >
-              <div className="flex items-center space-x-2 p-3 rounded-lg border border-orange-200 bg-orange-50">
-                <RadioGroupItem value="bottle" id="bottle" />
-                <Label htmlFor="bottle" className="flex-1 cursor-pointer">
-                  🍼 Bottle
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2 p-3 rounded-lg border border-orange-200 bg-orange-50">
-                <RadioGroupItem value="breast" id="breast" />
-                <Label htmlFor="breast" className="flex-1 cursor-pointer">
-                  🤱 Breast
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2 p-3 rounded-lg border border-orange-200 bg-orange-50">
-                <RadioGroupItem value="solid" id="solid" />
-                <Label htmlFor="solid" className="flex-1 cursor-pointer">
-                  🥄 Solid Food
-                </Label>
-              </div>
-            </RadioGroup>
-          </div>
+            {/* Notes Toggle */}
+            {!showNotes && (
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setShowNotes(true)}
+                className="w-full text-gray-600"
+              >
+                + Add note (optional)
+              </Button>
+            )}
 
-          {/* Amount/Duration */}
-          {type === "bottle" && (
-            <div className="space-y-2">
-              <Label htmlFor="amount" className="text-sm font-medium">
-                Amount (oz)
-              </Label>
-              <Input
-                id="amount"
-                type="number"
-                step="0.5"
-                placeholder="e.g., 4"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                className="text-lg"
+            {/* Notes */}
+            {showNotes && (
+              <FormField
+                control={form.control}
+                name="note"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">Notes</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="e.g., Baby was very hungry, spit up a bit..."
+                        rows={3}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
+            )}
+
+            {/* Actions */}
+            <div className="flex gap-3 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                className="flex-1 bg-transparent"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
+              >
+                Save Feeding 🍼
+              </Button>
             </div>
-          )}
-
-          {type === "breast" && (
-            <div className="space-y-2">
-              <Label htmlFor="duration" className="text-sm font-medium">
-                Duration (minutes)
-              </Label>
-              <Input
-                id="duration"
-                type="number"
-                placeholder="e.g., 15"
-                value={duration}
-                onChange={(e) => setDuration(e.target.value)}
-                className="text-lg"
-              />
-            </div>
-          )}
-
-          {/* Notes Toggle */}
-          {!showNotes && (
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => setShowNotes(true)}
-              className="w-full text-gray-600"
-            >
-              + Add note (optional)
-            </Button>
-          )}
-
-          {/* Notes */}
-          {showNotes && (
-            <div className="space-y-2">
-              <Label htmlFor="notes" className="text-sm font-medium">
-                Notes
-              </Label>
-              <Textarea
-                id="notes"
-                placeholder="e.g., Baby was very hungry, spit up a bit..."
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                rows={3}
-              />
-            </div>
-          )}
-
-          {/* Actions */}
-          <div className="flex gap-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              className="flex-1 bg-transparent"
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSave}
-              className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
-            >
-              Save Feeding 🍼
-            </Button>
-          </div>
-        </div>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

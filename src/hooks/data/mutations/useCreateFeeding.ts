@@ -9,7 +9,9 @@ export const useCreateFeeding = () => {
     mutationKey: [QUERY_KEYS.FEEDINGS],
     mutationFn: createFeeding,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.FEEDINGS] });
+      queryClient.invalidateQueries({
+        queryKey: ["events"],
+      });
     },
   });
 };
