@@ -5,6 +5,7 @@ import useEvents from "../hooks/data/queries/useEvents";
 import { getTodayString } from "../lib/dayjs";
 import StatsCard from "./stats-card";
 import { Milk, Moon } from "lucide-react";
+import { Skeleton } from "./ui/skeleton";
 
 const QuickStats = () => {
   const { data: events, isLoading } = useEvents("1", getTodayString());
@@ -12,6 +13,15 @@ const QuickStats = () => {
   const feedings = events?.filter((event) => event.event_type === "feeding");
   const sleeps = events?.filter((event) => event.event_type === "nap");
   const diapers = events?.filter((event) => event.event_type === "diaper");
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-3 gap-3">
+        <Skeleton className="w-full h-40 rounded-lg bg-gray-200" />
+        <Skeleton className="w-full h-40 rounded-lg bg-gray-200" />
+        <Skeleton className="w-full h-40 rounded-lg bg-gray-200" />
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-3 gap-3">
@@ -20,7 +30,6 @@ const QuickStats = () => {
         icon={<Milk className="w-8 h-8 text-orange-600" />}
         title="Feedings"
         color="orange"
-        isLoading={isLoading}
       />
 
       <StatsCard
@@ -28,7 +37,6 @@ const QuickStats = () => {
         icon={<Moon className="w-8 h-8 text-blue-600" />}
         title="Sleep"
         color="blue"
-        isLoading={isLoading}
       />
 
       <StatsCard
@@ -36,7 +44,6 @@ const QuickStats = () => {
         icon={<span className="text-2xl">💩</span>}
         title="Diapers"
         color="green"
-        isLoading={isLoading}
       />
     </div>
   );

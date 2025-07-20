@@ -9,122 +9,6 @@ import TodaysActivities from "@/src/components/todays-activities";
 import QuickActions from "@/src/components/quick-actions";
 
 export default function BabyBuddyApp() {
-  // if (currentView === "history") {
-  //   return (
-  //     <>
-  //       <HistoryView
-  //         feedingLogs={feedingLogs}
-  //         sleepLogs={sleepLogs}
-  //         diaperLogs={diaperLogs}
-  //         onBack={() => setCurrentView("dashboard")}
-  //         formatTime={formatTime}
-  //         formatDuration={formatDuration}
-  //         onEditFeeding={handleEditFeeding}
-  //         onEditSleep={handleEditSleep}
-  //         onEditDiaper={handleEditDiaper}
-  //       />
-
-  //       {/* Edit Modals for History View */}
-  //       <EditFeedingModal
-  //         open={showEditFeedingModal}
-  //         onClose={() => {
-  //           setShowEditFeedingModal(false);
-  //           setEditingFeeding(null);
-  //         }}
-  //         onSave={editFeedingLog}
-  //         onDelete={deleteFeedingLog}
-  //         feeding={editingFeeding}
-  //       />
-
-  //       <EditSleepModal
-  //         open={showEditSleepModal}
-  //         onClose={() => {
-  //           setShowEditSleepModal(false);
-  //           setEditingSleep(null);
-  //         }}
-  //         onSave={editSleepLog}
-  //         onDelete={deleteSleepLog}
-  //         sleep={editingSleep}
-  //       />
-
-  //       <EditDiaperModal
-  //         open={showEditDiaperModal}
-  //         onClose={() => {
-  //           setShowEditDiaperModal(false);
-  //           setEditingDiaper(null);
-  //         }}
-  //         onSave={editDiaperLog}
-  //         onDelete={deleteDiaperLog}
-  //         diaper={editingDiaper}
-  //       />
-
-  //       {/* AI Chat available in all views */}
-  //       <AIChat
-  //         feedingLogs={feedingLogs}
-  //         sleepLogs={sleepLogs}
-  //         diaperLogs={diaperLogs}
-  //         babyName={babyName}
-  //         birthDate={birthDate}
-  //       />
-  //     </>
-  //   );
-  // }
-
-  // if (currentView === "settings") {
-  //   return (
-  //     <>
-  //       <SettingsView
-  //         babyName={babyName}
-  //         birthDate={birthDate}
-  //         onBabyNameChange={(name) => {
-  //           setBabyName(name);
-  //           localStorage.setItem("babybuddy-baby-name", name);
-  //         }}
-  //         onBirthDateChange={(date) => {
-  //           setBirthDate(date);
-  //           localStorage.setItem("babybuddy-birth-date", date);
-  //         }}
-  //         onBack={() => setCurrentView("dashboard")}
-  //         onClearData={() => {
-  //           setFeedingLogs([]);
-  //           setSleepLogs([]);
-  //           setDiaperLogs([]);
-  //           localStorage.removeItem("babybuddy-feedings");
-  //           localStorage.removeItem("babybuddy-sleep");
-  //           localStorage.removeItem("babybuddy-diapers");
-  //           localStorage.removeItem("babybuddy-birth-date");
-  //         }}
-  //       />
-
-  //       {/* AI Chat available in all views */}
-  //       <AIChat
-  //         feedingLogs={feedingLogs}
-  //         sleepLogs={sleepLogs}
-  //         diaperLogs={diaperLogs}
-  //         babyName={babyName}
-  //         birthDate={birthDate}
-  //       />
-  //     </>
-  //   );
-  // }
-
-  // if (currentView === "notifications") {
-  //   return (
-  //     <>
-  //       <NotificationsView onBack={() => setCurrentView("dashboard")} />
-
-  //       {/* AI Chat available in all views */}
-  //       <AIChat
-  //         feedingLogs={feedingLogs}
-  //         sleepLogs={sleepLogs}
-  //         diaperLogs={diaperLogs}
-  //         babyName={babyName}
-  //         birthDate={birthDate}
-  //       />
-  //     </>
-  //   );
-  // }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50">
       <div className="max-w-md mx-auto px-4 py-6 space-y-6">
@@ -183,7 +67,6 @@ export default function BabyBuddyApp() {
         )} */}
       </div>
 
-      {/* Add Modals */}
       <LogFeedingModal />
       <LogSleepModal />
       <LogDiaperModal />
@@ -220,15 +103,6 @@ export default function BabyBuddyApp() {
         onSave={editDiaperLog}
         onDelete={deleteDiaperLog}
         diaper={editingDiaper}
-      /> */}
-
-      {/* AI Chat - Available on all views */}
-      {/* <AIChat
-        feedingLogs={feedingLogs}
-        sleepLogs={sleepLogs}
-        diaperLogs={diaperLogs}
-        babyName={babyName}
-        birthDate={birthDate}
       /> */}
     </div>
   );

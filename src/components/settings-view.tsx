@@ -50,21 +50,6 @@ export function SettingsView({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50">
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-pink-100 sticky top-0 z-10">
-        <div className="max-w-md mx-auto px-4 py-4">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" onClick={onBack} className="p-2">
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-            <div className="flex items-center gap-2">
-              <Settings className="w-5 h-5 text-gray-600" />
-              <h1 className="text-lg font-bold text-gray-800">Settings</h1>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div className="max-w-md mx-auto px-4 py-6 space-y-6">
         {/* Baby Profile */}
         <Card>

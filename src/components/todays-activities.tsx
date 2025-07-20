@@ -7,6 +7,7 @@ import { SleepingActivity } from "./sleeping";
 import { FeedingActivity } from "./feeding";
 import { DiaperActivity } from "./diaper";
 import { getTodayString } from "lib/dayjs";
+import { Skeleton } from "./ui/skeleton";
 
 const eventTypeToComponent: Record<
   "diaper" | "nap" | "feeding",
@@ -35,9 +36,13 @@ const TodaysActivities = () => {
       </div>
 
       {isLoading ? (
-        <div className="text-center py-8 text-gray-500">
-          <Loader2 className="w-12 h-12 mx-auto mb-3 text-gray-300 animate-spin" />
-          <p className="text-sm">Loading activities...</p>
+        <div className="flex flex-col gap-4">
+          <Skeleton className="w-full h-20 rounded-lg bg-gray-200" />
+          <Skeleton className="w-full h-20 rounded-lg bg-gray-200" />
+          <Skeleton className="w-full h-20 rounded-lg bg-gray-200" />
+          <Skeleton className="w-full h-20 rounded-lg bg-gray-200" />
+          <Skeleton className="w-full h-20 rounded-lg bg-gray-200" />
+          <Skeleton className="w-full h-20 rounded-lg bg-gray-200" />
         </div>
       ) : isError ? (
         <div className="text-center py-8 text-gray-500">

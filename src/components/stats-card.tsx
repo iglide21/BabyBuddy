@@ -13,7 +13,6 @@ type StatsCardProps<T extends BaseEvent> = {
   icon: React.ReactNode;
   title: string;
   color: string;
-  isLoading: boolean;
 };
 
 const StatsCard = <T extends BaseEvent>({
@@ -21,12 +20,7 @@ const StatsCard = <T extends BaseEvent>({
   icon,
   title,
   color,
-  isLoading,
 }: StatsCardProps<T>) => {
-  if (isLoading) {
-    return <Skeleton className="w-full h-32 rounded-lg bg-gray-200" />;
-  }
-
   if (!events) return null;
 
   return (
