@@ -13,7 +13,10 @@ const QuickStats = () => {
 
   console.log(session);
 
-  const { data: events, isLoading } = useEvents("1", getTodayString());
+  const { data: events, isLoading } = useEvents(
+    "df8f1802-fea0-4bfd-ad28-38894ba651da",
+    getTodayString()
+  );
 
   const feedings = events?.filter((event) => event.event_type === "feeding");
   const sleeps = events?.filter((event) => event.event_type === "nap");

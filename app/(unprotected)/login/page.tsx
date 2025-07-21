@@ -18,29 +18,11 @@ import { useRouter } from "next/navigation";
 
 const LoginPage = () => {
   const router = useRouter();
-
   const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleEmailLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    // Simulate API call
-    setTimeout(() => {
-      const user = {
-        id: Date.now().toString(),
-        name: isLogin ? email.split("@")[0] : name,
-        email: email,
-      };
-      // onLogin(user);
-      setIsLoading(false);
-    }, 1500);
-  };
+  const handleEmailLogin = async (e: React.FormEvent) => {};
 
   const handleGoogleLogin = async () => {
     signInWithGoogle()
@@ -48,23 +30,11 @@ const LoginPage = () => {
         alert(error);
       })
       .finally(() => {
-        router.push("/");
+        router.push("/baby-creation");
       });
   };
 
-  const handleAppleLogin = async () => {
-    setIsLoading(true);
-    // Simulate Apple OAuth
-    setTimeout(() => {
-      const user = {
-        id: "apple_" + Date.now(),
-        name: "Apple User",
-        email: "user@icloud.com",
-      };
-      // onLogin(user);
-      setIsLoading(false);
-    }, 2000);
-  };
+  const handleAppleLogin = async () => {};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50 flex items-center justify-center p-4">
@@ -113,8 +83,6 @@ const LoginPage = () => {
                   id="name"
                   type="text"
                   placeholder="Enter your full name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
                   required={!isLogin}
                   className="border-pink-200 focus:border-pink-400"
                 />
@@ -129,8 +97,6 @@ const LoginPage = () => {
                   id="email"
                   type="email"
                   placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
                   required
                   className="pl-10 border-pink-200 focus:border-pink-400"
                 />
@@ -145,8 +111,6 @@ const LoginPage = () => {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
                   required
                   className="pl-10 pr-10 border-pink-200 focus:border-pink-400"
                 />

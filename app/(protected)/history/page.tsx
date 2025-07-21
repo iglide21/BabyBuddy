@@ -30,7 +30,11 @@ import { Skeleton } from "@/src/components/ui/skeleton";
 
 export function HistoryPage() {
   const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
-  const { data: events, isLoading, isError } = useEvents("1", getTodayString());
+  const {
+    data: events,
+    isLoading,
+    isError,
+  } = useEvents("df8f1802-fea0-4bfd-ad28-38894ba651da", getTodayString());
 
   const feedings = useMemo(
     () => events?.filter((event) => event.event_type === "feeding"),

@@ -26,7 +26,11 @@ const eventTypeToComponent: Record<
 
 const TodaysActivities = () => {
   const today = getTodayString();
-  const { data: events, isLoading, isError } = useEvents("1", today);
+  const {
+    data: events,
+    isLoading,
+    isError,
+  } = useEvents("df8f1802-fea0-4bfd-ad28-38894ba651da", today);
 
   return (
     <>
