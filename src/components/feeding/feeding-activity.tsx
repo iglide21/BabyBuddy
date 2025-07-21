@@ -12,8 +12,13 @@ const FeedingActivity = ({ event, editEvent }: ActivityComponentProps) => {
       </div>
       <div className="flex-1">
         <div className="flex items-center gap-2">
-          <span className="font-bold text-gray-800">Feeding</span>
-          <Badge variant="secondary" className="bg-orange-100 text-orange-700">
+          <span className="font-bold text-gray-800 capitalize">
+            {event.feeding_type}
+          </span>
+          <Badge
+            variant="secondary"
+            className="bg-orange-100 text-orange-700 p-2 capitalize"
+          >
             {event.event_type}
           </Badge>
         </div>

@@ -29,13 +29,7 @@ export const GET = async (request: NextRequest) => {
 
 export const POST = async (request: NextRequest) => {
   const body = await request.json();
-  const { data, error } = await supabase
-    .from("feedings")
-    .insert({
-      ...body,
-      baby_id: 1,
-    })
-    .select();
+  const { data, error } = await supabase.from("feedings").insert(body).select();
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

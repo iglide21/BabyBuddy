@@ -27,6 +27,7 @@ import dayjs, { getNow } from "lib/dayjs";
 import { CreateDiaper } from "@/types/data/diapers/types";
 import { useApplicationStore } from "@/src/stores/applicationStore";
 import { useCreateDiaper } from "@/src/hooks/data/mutations/useCreateDiaper";
+import { useCurrentBabyStore } from "@/src/stores/currentBabyStore";
 
 // Validation schema
 const diaperFormSchema = z.object({
@@ -38,6 +39,7 @@ const diaperFormSchema = z.object({
 type DiaperFormData = z.infer<typeof diaperFormSchema>;
 
 const LogDiaperModal = () => {
+  const currentBaby = useCurrentBabyStore.use.currentBaby();
   const [showNotes, setShowNotes] = useState(false);
   const openedModal = useApplicationStore.use.currentModal();
   const isOpen = useMemo(() => openedModal === "diaper", [openedModal]);
@@ -62,9 +64,9 @@ const LogDiaperModal = () => {
       type,
       note: note || "",
       color: null,
+      baby_id: currentBaby?.id ?? "",
     };
 
-    console.log(event);
 
     form.reset();
     createDiaper(event);

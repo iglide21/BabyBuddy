@@ -28,6 +28,7 @@ import dayjs, { getNow } from "lib/dayjs";
 import { CreateFeeding } from "@/types/data/feeding/types";
 import { useApplicationStore } from "@/src/stores/applicationStore";
 import { useCreateFeeding } from "@/src/hooks/data/mutations/useCreateFeeding";
+import { useCurrentBabyStore } from "@/src/stores/currentBabyStore";
 
 // Validation schema
 const feedingFormSchema = z
@@ -87,6 +88,8 @@ const feedingFormSchema = z
 type FeedingFormData = z.infer<typeof feedingFormSchema>;
 
 const LogFeedingModal = () => {
+  const currentBaby = useCurrentBabyStore.use.currentBaby();
+  console.log(currentBaby);
   const [showNotes, setShowNotes] = useState(false);
   const openedModal = useApplicationStore.use.currentModal();
   const isOpen = useMemo(() => openedModal === "feeding", [openedModal]);
@@ -116,9 +119,8 @@ const LogFeedingModal = () => {
       amount_ml: amount_ml ? Number(amount_ml) : null,
       duration_minutes: duration_minutes ? Number(duration_minutes) : null,
       note: note || null,
+      baby_id: currentBaby?.id ?? "",
     };
-
-    console.log(event);
 
     form.reset();
     createFeeding(event);

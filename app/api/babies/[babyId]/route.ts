@@ -7,7 +7,7 @@ export const GET = async (
 ) => {
   // const { searchParams } = new URL(request.url);
   // const userId = searchParams.get("userId");
-  const babyId = params.babyId;
+  const babyId = (await params).babyId;
 
   if (!babyId) {
     return NextResponse.json({ error: "Baby ID is required" }, { status: 400 });
@@ -16,7 +16,8 @@ export const GET = async (
   const { data, error } = await supabase
     .from("babies")
     .select()
-    .eq("id", babyId);
+    .eq("id", babyId)
+    .single();
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

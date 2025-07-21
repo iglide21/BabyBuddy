@@ -11,9 +11,11 @@ const DiaperActivity = ({ event, editEvent }: ActivityComponentProps) => {
       </div>
       <div className="flex-1">
         <div className="flex items-center gap-2">
-          <span className="font-bold text-gray-800">Diaper</span>
-          <Badge variant="secondary" className="bg-green-100 text-green-700">
+          <span className="font-bold text-gray-800 capitalize">
             {event.diaper_type}
+          </span>
+          <Badge variant="secondary" className="bg-green-100 text-green-700">
+            Diaper
           </Badge>
         </div>
         <div className="text-sm text-gray-600">

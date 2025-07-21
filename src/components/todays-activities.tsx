@@ -8,6 +8,7 @@ import { FeedingActivity } from "./feeding";
 import { DiaperActivity } from "./diaper";
 import { getTodayString } from "lib/dayjs";
 import { Skeleton } from "./ui/skeleton";
+import { useCurrentBabyStore } from "@/src/stores/currentBabyStore";
 
 const eventTypeToComponent: Record<
   "diaper" | "nap" | "feeding",
@@ -25,12 +26,13 @@ const eventTypeToComponent: Record<
 };
 
 const TodaysActivities = () => {
+  const currentBaby = useCurrentBabyStore.use.currentBaby();
   const today = getTodayString();
   const {
     data: events,
     isLoading,
     isError,
-  } = useEvents("df8f1802-fea0-4bfd-ad28-38894ba651da", today);
+  } = useEvents(currentBaby?.id, today);
 
   return (
     <>

@@ -28,6 +28,7 @@ import dayjs, { getNow } from "lib/dayjs";
 import { CreateSleep } from "@/types/data/sleeps/types";
 import { useApplicationStore } from "@/src/stores/applicationStore";
 import { useCreateSleep } from "@/src/hooks/data/mutations/useCreateSleep";
+import { useCurrentBabyStore } from "@/src/stores/currentBabyStore";
 
 // Validation schema
 const sleepFormSchema = z
@@ -57,6 +58,7 @@ const sleepFormSchema = z
 type SleepFormData = z.infer<typeof sleepFormSchema>;
 
 const LogSleepModal = () => {
+  const currentBaby = useCurrentBabyStore.use.currentBaby();
   const [showNotes, setShowNotes] = useState(false);
   const openedModal = useApplicationStore.use.currentModal();
   const isOpen = useMemo(() => openedModal === "sleep", [openedModal]);
@@ -87,6 +89,7 @@ const LogSleepModal = () => {
         duration_minutes: 0, // Will be calculated when sleep ends
         end_date: null,
         note: note || null,
+        baby_id: currentBaby?.id ?? null,
       };
 
       console.log(event);
@@ -104,9 +107,9 @@ const LogSleepModal = () => {
         end_date: end.toISOString(),
         duration_minutes: duration,
         note: note || null,
+        baby_id: currentBaby?.id ?? "",
       };
 
-      console.log(event);
       form.reset();
       createSleep(event);
       closeModal();
