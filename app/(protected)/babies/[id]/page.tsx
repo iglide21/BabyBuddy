@@ -7,8 +7,24 @@ import { LogDiaperModal } from "components/diaper";
 import QuickStats from "@/src/components/quick-stats";
 import TodaysActivities from "@/src/components/todays-activities";
 import QuickActions from "@/src/components/quick-actions";
+import { useParams } from "next/navigation";
+import useBaby from "@/src/hooks/data/queries/useBaby";
+import { useEffect } from "react";
+import { useCurrentBabyStore } from "@/src/stores/currentBabyStore";
 
 export default function BabyBuddyApp() {
+  const params = useParams();
+  const babyId = params.id as string;
+  const setCurrentBaby = useCurrentBabyStore.use.setCurrentBaby();
+
+  const { data: baby } = useBaby(babyId);
+
+  useEffect(() => {
+    if (baby) {
+      setCurrentBaby(baby);
+    }
+  }, [baby, setCurrentBaby]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50">
       <div className="max-w-md mx-auto px-4 py-6 space-y-6">

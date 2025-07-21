@@ -21,8 +21,6 @@ const StatsCard = <T extends BaseEvent>({
   title,
   color,
 }: StatsCardProps<T>) => {
-  if (!events) return null;
-
   return (
     <Card className={`bg-${color}-50 border-${color}-200`}>
       <CardContent className="p-4 text-center">
@@ -30,8 +28,10 @@ const StatsCard = <T extends BaseEvent>({
           {icon}
           <span className={`text-sm font-medium ${color}`}>{title}</span>
         </div>
-        <div className={`text-2xl font-bold ${color}`}>{events.length}</div>
-        {events.length > 0 && (
+        <div className={`text-2xl font-bold ${color}`}>
+          {events?.length ?? 0}
+        </div>
+        {events && events.length > 0 && (
           <div className={`text-xs ${color} mt-1`}>
             {getTimeSince(events[0].occurred_at!)}
           </div>

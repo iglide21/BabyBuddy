@@ -7,14 +7,13 @@ import StatsCard from "./stats-card";
 import { Milk, Moon } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
 import { useAuth } from "../hooks/useAuth";
+import { useCurrentBabyStore } from "../stores/currentBabyStore";
 
 const QuickStats = () => {
-  const session = useAuth();
-
-  console.log(session);
+  const currentBaby = useCurrentBabyStore.use.currentBaby();
 
   const { data: events, isLoading } = useEvents(
-    "df8f1802-fea0-4bfd-ad28-38894ba651da",
+    currentBaby?.id,
     getTodayString()
   );
 

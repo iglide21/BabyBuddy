@@ -1,6 +1,11 @@
 import type { CreateBaby } from "@/types/data/babies/types";
 import { useAuth } from "../hooks/useAuth";
 
+export const getBaby = async (babyId: string) => {
+  const response = await fetch(`/api/babies/${babyId}`);
+  return response.json();
+};
+
 const getBabies = async (userId: string) => {
   const response = await fetch(`/api/babies?userId=${userId}`);
   return response.json();
