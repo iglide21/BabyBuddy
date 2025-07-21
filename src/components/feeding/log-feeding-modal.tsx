@@ -56,6 +56,19 @@ const feedingFormSchema = z
   )
   .refine(
     (data) => {
+      if (!data.duration_minutes || data.duration_minutes.trim() === "") {
+        return false;
+      }
+
+      return true;
+    },
+    {
+      message: "Duration is required for bottle feeding",
+      path: ["duration_minutes"],
+    }
+  )
+  .refine(
+    (data) => {
       if (
         data.type === "breast" &&
         (!data.duration_minutes || data.duration_minutes.trim() === "")

@@ -18,15 +18,10 @@ export const GET = async (request: NextRequest) => {
   const startOfDay = getStartOfDay(targetDate);
   const endOfDay = getEndOfDay(targetDate);
 
-  console.log(startOfDay.toISOString(), endOfDay.toISOString());
-  console.log(babyId);
-  console.log(date);
-  console.log(targetDate);
-
   const { data, error } = await supabase
     .from("all_events_view")
     .select()
-    .eq("baby_id", Number(babyId))
+    .eq("baby_id", babyId)
     .gte("occurred_at", startOfDay.toISOString())
     .lte("occurred_at", endOfDay.toISOString())
     .order("occurred_at", { ascending: false });

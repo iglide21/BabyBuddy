@@ -17,10 +17,25 @@ const FeedingActivity = ({ event, editEvent }: ActivityComponentProps) => {
             {event.event_type}
           </Badge>
         </div>
-        <div className="text-sm text-gray-600">
-          {event.occurred_at && formatTime(event.occurred_at)}
-          {event.amount && ` • ${event.amount}ml`}
-          {event.duration && ` • ${event.duration}m`}
+        <div className="text-sm text-gray-600 flex flex-col gap-0.5">
+          {event.occurred_at && (
+            <div>
+              <span className="font-medium text-gray-700">Time: </span>
+              <span>{formatTime(event.occurred_at)}</span>
+            </div>
+          )}
+          {event.amount && (
+            <div>
+              <span className="font-medium text-gray-700">Amount: </span>
+              <span>{event.amount}ml</span>
+            </div>
+          )}
+          {event.duration && (
+            <div>
+              <span className="font-medium text-gray-700">Duration: </span>
+              <span>{event.duration}m</span>
+            </div>
+          )}
         </div>
         {event.note && (
           <div className="text-xs text-gray-500 mt-1">{event.note}</div>

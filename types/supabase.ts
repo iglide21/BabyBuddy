@@ -44,28 +44,57 @@ export type Database = {
           birth_date: string
           created_at: string
           gender: Database["public"]["Enums"]["Gender"]
-          id: number
+          id: string
           name: string
         }
         Insert: {
           birth_date: string
           created_at?: string
           gender: Database["public"]["Enums"]["Gender"]
-          id?: number
+          id?: string
           name: string
         }
         Update: {
           birth_date?: string
           created_at?: string
           gender?: Database["public"]["Enums"]["Gender"]
-          id?: number
+          id?: string
           name?: string
         }
         Relationships: []
       }
+      baby_guardians: {
+        Row: {
+          baby_id: string
+          created_at: string
+          role: string | null
+          user_id: string
+        }
+        Insert: {
+          baby_id: string
+          created_at?: string
+          role?: string | null
+          user_id: string
+        }
+        Update: {
+          baby_id?: string
+          created_at?: string
+          role?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "baby_guardians_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       diapers: {
         Row: {
-          baby_id: number
+          baby_id: string | null
           color: Database["public"]["Enums"]["DiaperColor"] | null
           created_at: string
           id: number
@@ -74,7 +103,7 @@ export type Database = {
           type: Database["public"]["Enums"]["DiaperType"]
         }
         Insert: {
-          baby_id: number
+          baby_id?: string | null
           color?: Database["public"]["Enums"]["DiaperColor"] | null
           created_at?: string
           id?: number
@@ -83,7 +112,7 @@ export type Database = {
           type: Database["public"]["Enums"]["DiaperType"]
         }
         Update: {
-          baby_id?: number
+          baby_id?: string | null
           color?: Database["public"]["Enums"]["DiaperColor"] | null
           created_at?: string
           id?: number
@@ -104,7 +133,7 @@ export type Database = {
       feedings: {
         Row: {
           amount_ml: number | null
-          baby_id: number
+          baby_id: string
           created_at: string
           duration_minutes: number | null
           id: number
@@ -114,7 +143,7 @@ export type Database = {
         }
         Insert: {
           amount_ml?: number | null
-          baby_id: number
+          baby_id: string
           created_at?: string
           duration_minutes?: number | null
           id?: number
@@ -124,7 +153,7 @@ export type Database = {
         }
         Update: {
           amount_ml?: number | null
-          baby_id?: number
+          baby_id?: string
           created_at?: string
           duration_minutes?: number | null
           id?: number
@@ -144,7 +173,7 @@ export type Database = {
       }
       naps: {
         Row: {
-          baby_id: number
+          baby_id: string | null
           created_at: string
           duration_minutes: number
           end_date: string | null
@@ -153,7 +182,7 @@ export type Database = {
           start_date: string
         }
         Insert: {
-          baby_id: number
+          baby_id?: string | null
           created_at?: string
           duration_minutes: number
           end_date?: string | null
@@ -162,7 +191,7 @@ export type Database = {
           start_date: string
         }
         Update: {
-          baby_id?: number
+          baby_id?: string | null
           created_at?: string
           duration_minutes?: number
           end_date?: string | null
@@ -185,7 +214,7 @@ export type Database = {
       all_events_view: {
         Row: {
           amount: number | null
-          baby_id: number | null
+          baby_id: string | null
           color: string | null
           diaper_type: string | null
           duration: number | null

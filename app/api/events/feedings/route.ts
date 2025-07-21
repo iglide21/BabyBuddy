@@ -18,7 +18,7 @@ export const GET = async (request: NextRequest) => {
   const { data, error } = await supabase
     .from("feedings")
     .select()
-    .eq("baby_id", Number(babyId));
+    .eq("baby_id", babyId);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

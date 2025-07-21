@@ -6,8 +6,13 @@ import { getTodayString } from "../lib/dayjs";
 import StatsCard from "./stats-card";
 import { Milk, Moon } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
+import { useAuth } from "../hooks/useAuth";
 
 const QuickStats = () => {
+  const session = useAuth();
+
+  console.log(session);
+
   const { data: events, isLoading } = useEvents("1", getTodayString());
 
   const feedings = events?.filter((event) => event.event_type === "feeding");
