@@ -23,7 +23,7 @@ import {
   FormMessage,
 } from "components/ui/form";
 import { RadioGroup, RadioGroupItem } from "components/ui/radio-group";
-import { Moon, Play, Square } from "lucide-react";
+import { Moon, Play } from "lucide-react";
 import dayjs, { getNow } from "lib/dayjs";
 import { CreateSleep } from "@/types/data/sleeps/types";
 import { useApplicationStore } from "@/src/stores/applicationStore";

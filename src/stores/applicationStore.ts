@@ -1,13 +1,13 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { createSelectors } from "../lib/createSelectors";
-
-type CurrentView = "dashboard" | "history" | "settings" | "notifications";
+import type { Nullable } from "@/types/common";
+import type { ApplicationModal } from "@/src/lib/types";
 
 type ApplicationStoreState = {
   isModalOpen: boolean;
-  currentModal: "feeding" | "sleep" | "diaper" | null;
-  showModal: (modal: "feeding" | "sleep" | "diaper") => void;
+  currentModal: Nullable<ApplicationModal>;
+  showModal: (modal: ApplicationModal) => void;
   closeModal: () => void;
 };
 
