@@ -30,7 +30,7 @@ const LoginPage = () => {
         alert(error);
       })
       .finally(() => {
-        router.push("/baby-creation");
+        router.push("/babies");
       });
   };
 

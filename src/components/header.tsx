@@ -14,7 +14,7 @@ const Header = () => {
         <div className="flex items-center justify-between">
           <div
             className="flex items-center gap-2"
-            onClick={() => router.push("/")}
+            onClick={() => router.push("/babies")}
           >
             <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-pink-400 rounded-full flex items-center justify-center">
               <Baby className="w-5 h-5 text-white" />

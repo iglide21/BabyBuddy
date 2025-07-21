@@ -2,12 +2,15 @@ import { Baby } from "@/types/data/babies/types";
 import { Card, CardContent, Button } from "../ui";
 import { Calendar } from "lucide-react";
 import dayjs from "@/src/lib/dayjs";
+import { useRouter } from "next/navigation";
 
 type BabyCardProps = {
   baby: Baby;
 };
 
 const BabyCard = ({ baby }: BabyCardProps) => {
+  const router = useRouter();
+
   const calculateAge = (birthDate: string): string => {
     const birth = dayjs(birthDate);
     const now = dayjs();
@@ -33,15 +36,32 @@ const BabyCard = ({ baby }: BabyCardProps) => {
     } old`;
   };
 
+  const getAvatarForGender = (gender: string) => {
+    switch (gender) {
+      case "boy":
+        return "👶🏻";
+      case "girl":
+        return "👶🏻";
+      case "other":
+        return "👶";
+      default:
+        return "👶";
+    }
+  };
+
+  const onBabySelect = () => {
+    router.push(`/babies/${baby.id}`);
+  };
+
   return (
     <Card
       key={baby.id}
       className="cursor-pointer hover:shadow-lg transition-all duration-200 border-2 hover:border-pink-300"
-      // onClick={() => onSelectBaby(baby)}
+      onClick={onBabySelect}
     >
       <CardContent className="p-6 text-center">
-        <div className="text-6xl mb-4">{baby.name}</div>
-        <h3 className="text-xl font-bold text-gray-800 mb-2">{baby.name}</h3>
+        <div className="text-4xl mb-4">{getAvatarForGender(baby.gender)}</div>
+        <div className="text-4xl mb-4">{baby.name}</div>
         <div className="flex items-center justify-center gap-2 text-sm text-gray-600 mb-2">
           <Calendar className="w-4 h-4" />
           <span>{calculateAge(baby.birth_date)}</span>
@@ -49,7 +69,10 @@ const BabyCard = ({ baby }: BabyCardProps) => {
         <div className="text-xs text-gray-500">
           Born: {new Date(baby.birth_date).toLocaleDateString()}
         </div>
-        <Button className="w-full mt-4 bg-gradient-to-r from-pink-400 to-purple-400 hover:from-pink-500 hover:to-purple-500 text-white">
+        <Button
+          className="w-full mt-4 bg-gradient-to-r from-pink-400 to-purple-400 hover:from-pink-500 hover:to-purple-500 text-white"
+          onClick={onBabySelect}
+        >
           Select {baby.name}
         </Button>
       </CardContent>

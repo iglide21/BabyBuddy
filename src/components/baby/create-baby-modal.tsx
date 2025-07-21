@@ -14,13 +14,19 @@ import {
 } from "../ui/form";
 import { DialogFooter } from "../ui/dialog";
 import dayjs from "lib/dayjs";
+import { useAuth } from "@/src/hooks/useAuth";
+import { useToast } from "@/src/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
+import type { CreateBaby } from "@/types/data/babies/types";
+import { useCreateBaby } from "@/src/hooks/data/mutations/useCreateBaby";
+import { cn } from "@/src/lib/utils";
 
 // Validation schema
 const babyFormSchema = z
   .object({
     name: z.string().min(1, "Name is required"),
     birthDate: z.string().min(1, "Birth date is required"),
-    gender: z.enum(["boy", "girl", "other"]),
+    gender: z.enum(["male", "female", "other"]),
   })
   .refine(
     (data) => {
@@ -45,17 +51,24 @@ const CreateBabyModal = () => {
   const modal = useApplicationStore.use.currentModal();
   const closeModal = useApplicationStore.use.closeModal();
 
+  const { mutate: createBaby, isPending } = useCreateBaby();
+
   const form = useForm<BabyFormData>({
     resolver: zodResolver(babyFormSchema),
     defaultValues: {
       name: "",
       birthDate: dayjs().format("YYYY-MM-DDTHH:mm"),
-      gender: "boy",
+      gender: "male",
     },
   });
 
   const onSubmit = (data: BabyFormData) => {
-    console.log(data);
+    const baby: CreateBaby = {
+      name: data.name,
+      birth_date: data.birthDate,
+      gender: data.gender,
+    };
+    createBaby(baby);
   };
 
   const onClose = () => {
@@ -64,8 +77,8 @@ const CreateBabyModal = () => {
   };
 
   const genderOptions = [
-    { label: "Boy", value: "boy" },
-    { label: "Girl", value: "girl" },
+    { label: "Male", value: "male" },
+    { label: "Female", value: "female" },
     { label: "Other", value: "other" },
   ];
 
@@ -173,9 +186,13 @@ const CreateBabyModal = () => {
                 </Button>
                 <Button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-pink-400 to-purple-400 hover:from-pink-500 hover:to-purple-500 text-white"
+                  className={cn(
+                    "w-full bg-gradient-to-r from-pink-400 to-purple-400 hover:from-pink-500 hover:to-purple-500 text-white",
+                    isPending && "opacity-50 cursor-not-allowed"
+                  )}
+                  disabled={isPending}
                 >
-                  Create Baby
+                  {isPending ? "Creating..." : "Create Baby"}
                 </Button>
               </DialogFooter>
             </form>
