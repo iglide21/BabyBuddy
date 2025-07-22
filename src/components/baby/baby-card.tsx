@@ -38,14 +38,14 @@ const BabyCard = ({ baby }: BabyCardProps) => {
 
   const getAvatarForGender = (gender: string) => {
     switch (gender) {
-      case "boy":
+      case "male":
         return "👶🏻";
-      case "girl":
-        return "👶🏻";
+      case "female":
+        return "👧";
       case "other":
-        return "👶";
+        return "👶🏻";
       default:
-        return "👶";
+        return "🥶";
     }
   };
 
@@ -60,7 +60,7 @@ const BabyCard = ({ baby }: BabyCardProps) => {
       onClick={onBabySelect}
     >
       <CardContent className="p-6 text-center">
-        <div className="text-4xl mb-4">{getAvatarForGender(baby.gender)}</div>
+        <div className="text-6xl mb-4">{getAvatarForGender(baby.gender)}</div>
         <div className="text-4xl mb-4">{baby.name}</div>
         <div className="flex items-center justify-center gap-2 text-sm text-gray-600 mb-2">
           <Calendar className="w-4 h-4" />

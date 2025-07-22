@@ -1,7 +1,9 @@
-import supabase from "@/src/lib/supabase";
+import { createClient } from "@/src/lib/supabase/server";
 import { NextResponse } from "next/server";
 
 export const GET = async () => {
+  const supabase = await createClient();
+
   const { data, error } = await supabase.from("diapers").select();
 
   if (error) {
@@ -13,6 +15,8 @@ export const GET = async () => {
 
 export const POST = async (request: Request) => {
   const body = await request.json();
+
+  const supabase = await createClient();
 
   const { data, error } = await supabase.from("diapers").insert(body).select();
 

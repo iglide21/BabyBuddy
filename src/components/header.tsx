@@ -3,10 +3,11 @@
 import { Baby, Bell, History, Settings } from "lucide-react";
 import { Button } from "./ui/button";
 import { useRouter } from "next/navigation";
+import { useCurrentBabyStore } from "../stores/currentBabyStore";
 
 const Header = () => {
   const router = useRouter();
-  const babyName = "Maksim";
+  const currentBaby = useCurrentBabyStore.use.currentBaby();
 
   return (
     <div className="bg-white/80 backdrop-blur-sm border-b border-pink-100 sticky top-0 z-10">
@@ -21,7 +22,11 @@ const Header = () => {
             </div>
             <div>
               <h1 className="text-lg font-bold text-gray-800">BabyBuddy</h1>
-              <p className="text-xs text-gray-600">Tracking for {babyName}</p>
+              {currentBaby && (
+                <p className="text-xs text-gray-600">
+                  Tracking for {currentBaby?.name}
+                </p>
+              )}
             </div>
           </div>
           <div className="flex gap-2">

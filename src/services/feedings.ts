@@ -33,4 +33,10 @@ const deleteFeeding = async (id: string) => {
   return response.json();
 };
 
-export { getFeedings, createFeeding, updateFeeding, deleteFeeding };
+export {
+  getFeedings,
+  createFeeding,
+  updateFeeding,
+  deleteFeeding,
+  getFeedingsForBaby,
+};

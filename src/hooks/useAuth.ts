@@ -1,9 +1,10 @@
 // lib/useAuth.ts
 import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
-import supabase from "../lib/supabase";
+import { createClient } from "@/src/lib/supabase/client";
 
 export function useAuth() {
+  const supabase = createClient();
   const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {

@@ -1,21 +1,26 @@
-import supabase from "@/src/lib/supabase";
-import { CreateBaby } from "@/types/data/babies/types";
+import { createClient } from "@/src/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export const GET = async (request: NextRequest) => {
   const { searchParams } = new URL(request.url);
   const userId = searchParams.get("userId");
 
-  console.log("userId", userId);
-
   if (!userId) {
     return NextResponse.json({ error: "User ID is required" }, { status: 400 });
+  }
+
+  const supabase = await createClient();
+
+  const { data: user, error: userError } = await supabase.auth.getUser();
+
+  if (!user?.user) {
+    return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
   const { data, error } = await supabase
     .from("baby_guardians")
     .select("baby_id")
-    .eq("user_id", userId);
+    .eq("user_id", user?.user?.id);
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -42,17 +47,11 @@ export const POST = async (request: NextRequest) => {
     return NextResponse.json({ error: "User ID is required" }, { status: 400 });
   }
 
-  const headers = request.headers;
-  const accessToken = headers.get("authorization")?.split(" ")[1];
+  const supabase = await createClient();
 
-  console.log("accessToken", accessToken);
-
-  const { data: user, error: userError } = await supabase.auth.getUser(
-    accessToken
-  );
+  const { data: user, error: userError } = await supabase.auth.getUser();
 
   if (userError || !user?.user) {
-    console.log("userError", userError);
     return NextResponse.json(
       { error: userError?.message || "User not found" },
       { status: 401 }
@@ -66,7 +65,6 @@ export const POST = async (request: NextRequest) => {
     .select();
 
   if (babyDataError) {
-    console.log("babyDataError", babyDataError);
     return NextResponse.json({ error: babyDataError.message }, { status: 500 });
   }
 
@@ -80,7 +78,6 @@ export const POST = async (request: NextRequest) => {
     .select();
 
   if (babyGuardianError) {
-    console.log("babyGuardianError", babyGuardianError);
     return NextResponse.json(
       { error: babyGuardianError.message },
       { status: 500 }

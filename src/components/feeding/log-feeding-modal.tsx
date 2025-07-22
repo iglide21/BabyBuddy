@@ -89,7 +89,6 @@ type FeedingFormData = z.infer<typeof feedingFormSchema>;
 
 const LogFeedingModal = () => {
   const currentBaby = useCurrentBabyStore.use.currentBaby();
-  console.log(currentBaby);
   const [showNotes, setShowNotes] = useState(false);
   const openedModal = useApplicationStore.use.currentModal();
   const isOpen = useMemo(() => openedModal === "feeding", [openedModal]);

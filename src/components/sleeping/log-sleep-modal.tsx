@@ -92,7 +92,6 @@ const LogSleepModal = () => {
         baby_id: currentBaby?.id ?? null,
       };
 
-      console.log(event);
       form.reset();
       createSleep(event);
       closeModal();

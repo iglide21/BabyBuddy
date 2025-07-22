@@ -1,8 +1,10 @@
-import supabase from "@/src/lib/supabase";
+import { createClient } from "@/src/lib/supabase/server";
 import { CreateSleep } from "@/types/data/sleeps/types";
 import { NextRequest, NextResponse } from "next/server";
 
 export const GET = async () => {
+  const supabase = await createClient();
+
   const { data, error } = await supabase.from("naps").select();
 
   if (error) {
@@ -14,6 +16,8 @@ export const GET = async () => {
 
 export const POST = async (request: NextRequest) => {
   const body: CreateSleep = await request.json();
+
+  const supabase = await createClient();
 
   const { data, error } = await supabase.from("naps").insert(body).select();
 

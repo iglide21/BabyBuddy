@@ -1,6 +1,6 @@
-import supabase from "@/src/lib/supabase";
 import { NextRequest, NextResponse } from "next/server";
 import { getTodayString, getStartOfDay, getEndOfDay } from "lib/dayjs";
+import { createClient } from "@/src/lib/supabase/server";
 
 export const GET = async (request: NextRequest) => {
   const { searchParams } = new URL(request.url);
@@ -17,6 +17,8 @@ export const GET = async (request: NextRequest) => {
   // Get start and end of the target date
   const startOfDay = getStartOfDay(targetDate);
   const endOfDay = getEndOfDay(targetDate);
+
+  const supabase = await createClient();
 
   const { data, error } = await supabase
     .from("all_events_view")
