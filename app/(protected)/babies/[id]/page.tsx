@@ -1,9 +1,9 @@
 "use client";
 
 import { Card, CardContent } from "components/ui/card";
-import { LogFeedingModal } from "components/feeding";
+import { EditFeedingModal, LogFeedingModal } from "components/feeding";
 import { LogSleepModal } from "components/sleeping";
-import { LogDiaperModal } from "components/diaper";
+import { EditDiaperModal, LogDiaperModal } from "components/diaper";
 import QuickStats from "@/src/components/quick-stats";
 import TodaysActivities from "@/src/components/todays-activities";
 import QuickActions from "@/src/components/quick-actions";
@@ -11,6 +11,7 @@ import { useParams } from "next/navigation";
 import useBaby from "@/src/hooks/data/queries/useBaby";
 import { useEffect } from "react";
 import { useCurrentBabyStore } from "@/src/stores/currentBabyStore";
+import BabyInformationCard from "@/src/components/baby/baby-information-card";
 
 export default function BabyBuddyApp() {
   const params = useParams();
@@ -28,6 +29,7 @@ export default function BabyBuddyApp() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50">
       <div className="max-w-md mx-auto px-4 py-6 space-y-6">
+        <BabyInformationCard />
         <QuickStats />
         <QuickActions />
 
@@ -88,38 +90,11 @@ export default function BabyBuddyApp() {
       <LogDiaperModal />
 
       {/* Edit Modals */}
-      {/* <EditFeedingModal
-        open={showEditFeedingModal}
-        onClose={() => {
-          setShowEditFeedingModal(false);
-          setEditingFeeding(null);
-        }}
-        onSave={editFeedingLog}
-        onDelete={deleteFeedingLog}
-        feeding={editingFeeding}
-      />
+      {/* <EditFeedingModal />
 
-      <EditSleepModal
-        open={showEditSleepModal}
-        onClose={() => {
-          setShowEditSleepModal(false);
-          setEditingSleep(null);
-        }}
-        onSave={editSleepLog}
-        onDelete={deleteSleepLog}
-        sleep={editingSleep}
-      />
+      <EditSleepModal /> */}
 
-      <EditDiaperModal
-        open={showEditDiaperModal}
-        onClose={() => {
-          setShowEditDiaperModal(false);
-          setEditingDiaper(null);
-        }}
-        onSave={editDiaperLog}
-        onDelete={deleteDiaperLog}
-        diaper={editingDiaper}
-      /> */}
+      <EditDiaperModal />
     </div>
   );
 }

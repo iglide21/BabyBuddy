@@ -18,7 +18,7 @@ const QuickStats = () => {
   );
 
   const feedings = events?.filter((event) => event.event_type === "feeding");
-  const sleeps = events?.filter((event) => event.event_type === "nap");
+  const sleeps = events?.filter((event) => event.event_type === "sleep");
   const diapers = events?.filter((event) => event.event_type === "diaper");
   if (isLoading) {
     return (

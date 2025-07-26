@@ -5,6 +5,11 @@ const getSleeps = async () => {
   return response.json();
 };
 
+const getSleep = async (id: number) => {
+  const response = await fetch(`/api/events/sleeps/${id}`);
+  return response.json();
+};
+
 const createSleep = async (sleep: CreateSleep) => {
   const response = await fetch("/api/events/sleeps", {
     method: "POST",
@@ -28,4 +33,4 @@ const deleteSleep = async (id: string) => {
   return response.json();
 };
 
-export { getSleeps, createSleep, updateSleep, deleteSleep };
+export { getSleeps, getSleep, createSleep, updateSleep, deleteSleep };

@@ -1,89 +1,104 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Button } from "components/ui/button";
 import { Input } from "components/ui/input";
 import { Label } from "components/ui/label";
 import { Textarea } from "components/ui/textarea";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "components/ui/dialog";
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "components/ui/form";
 import { RadioGroup, RadioGroupItem } from "components/ui/radio-group";
 import { Trash2 } from "lucide-react";
 import dayjs from "lib/dayjs";
+import DiaperModal from "./diaper-modal";
+import { useApplicationStore } from "@/src/stores/applicationStore";
+import { Diaper, UpdateDiaper } from "@/types/data/diapers/types";
+import useUpdateDiaper from "@/src/hooks/data/mutations/useUpdateDiaper";
+import useDiaper from "@/src/hooks/data/queries/useDiaper";
 
-interface DiaperLog {
-  id: string;
-  timestamp: Date;
-  type: "wet" | "dirty" | "both";
-  notes?: string;
-}
+// Validation schema
+const diaperFormSchema = z.object({
+  type: z.enum(["wet", "dirty", "both"]),
+  occurred_at: z.string().min(1, "Date is required"),
+  note: z.string().optional(),
+});
 
-interface EditDiaperModalProps {
-  open: boolean;
-  onClose: () => void;
-  onSave: (log: DiaperLog) => void;
-  onDelete: (id: string) => void;
-  diaper: DiaperLog | null;
-}
+type DiaperFormData = z.infer<typeof diaperFormSchema>;
 
-const EditDiaperModal = ({
-  open,
-  onClose,
-  onSave,
-  onDelete,
-  diaper,
-}: EditDiaperModalProps) => {
-  const [type, setType] = useState<"wet" | "dirty" | "both">("wet");
-  const [date, setDate] = useState("");
-  const [time, setTime] = useState("");
-  const [notes, setNotes] = useState("");
-  const [showNotes, setShowNotes] = useState(false);
+const EditDiaperModal = () => {
+  const openedModal = useApplicationStore.use.currentModal();
+  const closeModal = useApplicationStore.use.closeModal();
+  const { mutate: updateDiaper } = useUpdateDiaper();
+
+  const isOpen = useMemo(
+    () => openedModal?.type === "diaper_edit",
+    [openedModal]
+  );
+
+  const { data: diaper, status } = useDiaper(openedModal?.data?.eventId);
+
+  const form = useForm<DiaperFormData>({
+    resolver: zodResolver(diaperFormSchema),
+    defaultValues: {
+      type: diaper?.type,
+      occurred_at: dayjs(diaper?.occurred_at).format("YYYY-MM-DDTHH:mm"),
+      note: diaper?.note || "",
+    },
+  });
 
   // Populate form when diaper changes
   useEffect(() => {
     if (diaper) {
-      setType(diaper.type);
-      setDate(dayjs(diaper.timestamp).format("YYYY-MM-DD"));
-      setTime(dayjs(diaper.timestamp).format("HH:mm"));
-      setNotes(diaper.notes || "");
-      setShowNotes(!!diaper.notes);
+      form.reset({
+        type: diaper.type,
+        occurred_at: dayjs(diaper.occurred_at).format("YYYY-MM-DDTHH:mm"),
+        note: diaper.note || "",
+      });
     }
-  }, [diaper]);
 
-  const handleSave = () => {
+    return () => {
+      form.reset();
+    };
+  }, [diaper, form]);
+
+  const onSubmit = (data: DiaperFormData) => {
     if (!diaper) return;
 
-    const [hours, minutes] = time.split(":").map(Number);
-    const timestamp = dayjs(date)
-      .hour(hours)
-      .minute(minutes)
-      .second(0)
-      .millisecond(0);
-
-    const updatedLog: DiaperLog = {
-      ...diaper,
-      timestamp: timestamp.toDate(),
-      type,
-      notes: notes || undefined,
+    const updatedLog: UpdateDiaper = {
+      note: data.note || undefined,
+      type: data.type,
     };
 
-    onSave(updatedLog);
-    onClose();
+    updateDiaper(updatedLog, {
+      onSuccess: () => {
+        closeModal();
+      },
+    });
   };
 
   const handleDelete = () => {
     if (!diaper) return;
     if (confirm("Are you sure you want to delete this diaper entry?")) {
-      onDelete(diaper.id);
-      onClose();
+      // onDelete(diaper.id);
+      closeModal();
     }
   };
 
-  const getTypeEmoji = (diaperType: string) => {
+  const onClose = () => {
+    form.reset();
+    closeModal();
+  };
+
+  const getTypeEmoji = (diaperType: Diaper["type"]) => {
     switch (diaperType) {
       case "wet":
         return "💧";
@@ -96,110 +111,120 @@ const EditDiaperModal = ({
     }
   };
 
-  if (!diaper) return null;
+  if (!isOpen) return null;
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-sm mx-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-green-700">
-            <span className="text-lg">👶</span>
-            Edit Diaper Change
-          </DialogTitle>
-        </DialogHeader>
+    <DiaperModal onClose={onClose} action="edit">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <FormField
+            control={form.control}
+            name="occurred_at"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium">Time</FormLabel>
+                <FormControl>
+                  <Input
+                    type="datetime-local"
+                    className="text-lg"
+                    {...field}
+                    disabled={status === "pending"}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <div className="space-y-6">
-          {/* Date and Time */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-2">
-              <Label htmlFor="date" className="text-sm font-medium">
-                Date
-              </Label>
-              <Input
-                id="date"
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="text-lg"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="time" className="text-sm font-medium">
-                Time
-              </Label>
-              <Input
-                id="time"
-                type="time"
-                value={time}
-                onChange={(e) => setTime(e.target.value)}
-                className="text-lg"
-              />
-            </div>
-          </div>
+          <FormField
+            control={form.control}
+            name="type"
+            disabled={status === "pending"}
+            render={({ field }) => (
+              <FormItem className="space-y-3">
+                <FormLabel className="text-sm font-medium">
+                  Diaper Type
+                </FormLabel>
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    className="space-y-2"
+                  >
+                    {[
+                      {
+                        type: "wet",
+                        emoji: "💧",
+                        label: "Wet only",
+                      },
+                      {
+                        type: "dirty",
+                        emoji: "💩",
+                        label: "Dirty only",
+                      },
+                      {
+                        type: "both",
+                        emoji: "💧💩",
+                        label: "Wet & Dirty",
+                      },
+                    ].map(({ type, emoji, label }) => (
+                      <div
+                        key={type}
+                        className="flex items-center space-x-2 p-3 rounded-lg border border-green-200 bg-green-100"
+                      >
+                        <RadioGroupItem
+                          value={type}
+                          id={type}
+                          disabled={status === "pending"}
+                        />
+                        <Label
+                          htmlFor={type}
+                          className="flex-1 cursor-pointer disabled:cursor-not-allowed"
+                        >
+                          <div className="flex items-center gap-2 cursor-pointer">
+                            <span className="text-lg">{emoji}</span>
+                            <span>{label}</span>
+                          </div>
+                        </Label>
+                      </div>
+                    ))}
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-          {/* Type */}
-          <div className="space-y-3">
-            <Label className="text-sm font-medium">Diaper Type</Label>
-            <RadioGroup
-              value={type}
-              onValueChange={(value: any) => setType(value)}
-            >
-              <div className="flex items-center space-x-2 p-3 rounded-lg border border-green-200 bg-green-50">
-                <RadioGroupItem value="wet" id="wet" />
-                <Label htmlFor="wet" className="flex-1 cursor-pointer">
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg">💧</span>
-                    <span>Wet only</span>
-                  </div>
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2 p-3 rounded-lg border border-green-200 bg-green-50">
-                <RadioGroupItem value="dirty" id="dirty" />
-                <Label htmlFor="dirty" className="flex-1 cursor-pointer">
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg">💩</span>
-                    <span>Dirty only</span>
-                  </div>
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2 p-3 rounded-lg border border-green-200 bg-green-50">
-                <RadioGroupItem value="both" id="both" />
-                <Label htmlFor="both" className="flex-1 cursor-pointer">
-                  <div className="flex items-center gap-2">
-                    <span className="text-lg">💧💩</span>
-                    <span>Wet & Dirty</span>
-                  </div>
-                </Label>
-              </div>
-            </RadioGroup>
-          </div>
-
-          {/* Notes Toggle */}
-          {!showNotes && (
+          {/* Notes */}
+          {form.watch("note") ? (
+            <FormField
+              control={form.control}
+              name="note"
+              disabled={status === "pending"}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium">Notes</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      disabled={status === "pending"}
+                      placeholder="e.g., blowout, rash noticed, used cream..."
+                      rows={3}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          ) : (
             <Button
               type="button"
               variant="ghost"
-              onClick={() => setShowNotes(true)}
+              onClick={() => form.setValue("note", "My note")}
               className="w-full text-gray-600"
             >
               + Add note (optional)
             </Button>
-          )}
-
-          {/* Notes */}
-          {showNotes && (
-            <div className="space-y-2">
-              <Label htmlFor="notes" className="text-sm font-medium">
-                Notes
-              </Label>
-              <Textarea
-                id="notes"
-                placeholder="e.g., blowout, rash noticed, used cream..."
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                rows={3}
-              />
-            </div>
           )}
 
           {/* Actions */}
@@ -209,6 +234,7 @@ const EditDiaperModal = ({
               variant="outline"
               onClick={onClose}
               className="flex-1 bg-transparent"
+              disabled={status === "pending"}
             >
               Cancel
             </Button>
@@ -217,19 +243,21 @@ const EditDiaperModal = ({
               variant="destructive"
               onClick={handleDelete}
               className="px-3"
+              disabled={status === "pending"}
             >
               <Trash2 className="w-4 h-4" />
             </Button>
             <Button
-              onClick={handleSave}
+              type="submit"
               className="flex-1 bg-green-500 hover:bg-green-600 text-white"
+              disabled={status === "pending"}
             >
-              Save Changes {getTypeEmoji(type)}
+              Save Changes {getTypeEmoji(form.watch("type"))}
             </Button>
           </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+        </form>
+      </Form>
+    </DiaperModal>
   );
 };
 

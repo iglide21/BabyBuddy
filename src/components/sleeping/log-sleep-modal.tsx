@@ -61,7 +61,10 @@ const LogSleepModal = () => {
   const currentBaby = useCurrentBabyStore.use.currentBaby();
   const [showNotes, setShowNotes] = useState(false);
   const openedModal = useApplicationStore.use.currentModal();
-  const isOpen = useMemo(() => openedModal === "sleep", [openedModal]);
+  const isOpen = useMemo(
+    () => openedModal?.type === "sleep_log",
+    [openedModal]
+  );
 
   const { mutate: createSleep } = useCreateSleep();
   const closeModal = useApplicationStore.use.closeModal();
@@ -122,172 +125,178 @@ const LogSleepModal = () => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-sm mx-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-blue-700">
-            <Moon className="w-5 h-5" />
-            Log Sleep
+      <DialogContent className="max-w-sm mx-0 p-0 rounded-xl">
+        <DialogHeader className="p-4 bg-gradient-to-tr from-blue-400 to-blue-500 text-white rounded-t-xl">
+          <DialogTitle className="flex items-center gap-3">
+            <span className="bg-gradient-to-tr from-blue-300 to-blue-400 rounded-xl p-2">
+              <Moon className="w-5 h-5" />
+            </span>
+            <span className="text-white text-xl font-bold">Log Sleep</span>
           </DialogTitle>
         </DialogHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Log Type */}
-            <FormField
-              control={form.control}
-              name="logType"
-              render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormLabel className="text-sm font-medium">
-                    What would you like to do?
-                  </FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      value={field.value}
-                      className="space-y-2"
-                    >
-                      <div className="flex items-center space-x-2 p-3 rounded-lg border border-blue-200 bg-blue-50">
-                        <RadioGroupItem value="start" id="start" />
-                        <Label
-                          htmlFor="start"
-                          className="flex-1 cursor-pointer"
-                        >
-                          <div className="flex items-center gap-2">
-                            <Play className="w-4 h-4" />
-                            Start sleep tracking
-                          </div>
-                          <div className="text-xs text-gray-600 mt-1">
-                            Baby just fell asleep
-                          </div>
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2 p-3 rounded-lg border border-blue-200 bg-blue-50">
-                        <RadioGroupItem value="complete" id="complete" />
-                        <Label
-                          htmlFor="complete"
-                          className="flex-1 cursor-pointer"
-                        >
-                          <div className="flex items-center gap-2">
-                            <Moon className="w-4 h-4" />
-                            Log completed sleep
-                          </div>
-                          <div className="text-xs text-gray-600 mt-1">
-                            Sleep session already finished
-                          </div>
-                        </Label>
-                      </div>
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Date and Time Inputs for Complete Sleep */}
-            {watchedLogType === "complete" && (
-              <>
-                <FormField
-                  control={form.control}
-                  name="start_date"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm font-medium">
-                        Start Time
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="datetime-local"
-                          className="text-lg"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="end_date"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-sm font-medium">
-                        End Time
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="datetime-local"
-                          className="text-lg"
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </>
-            )}
-
-            {/* Notes Toggle */}
-            {!showNotes && (
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => setShowNotes(true)}
-                className="w-full text-gray-600"
-              >
-                + Add note (optional)
-              </Button>
-            )}
-
-            {/* Notes */}
-            {showNotes && (
+        <div className="p-4">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {/* Log Type */}
               <FormField
                 control={form.control}
-                name="note"
+                name="logType"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium">Notes</FormLabel>
+                  <FormItem className="space-y-3">
+                    <FormLabel className="text-sm font-medium">
+                      What would you like to do?
+                    </FormLabel>
                     <FormControl>
-                      <Textarea
-                        placeholder="e.g., nap in crib, very fussy before sleep..."
-                        rows={3}
-                        {...field}
-                      />
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        className="space-y-2"
+                      >
+                        <div className="flex items-center space-x-2 p-3 rounded-lg border border-blue-200 bg-blue-50">
+                          <RadioGroupItem value="start" id="start" />
+                          <Label
+                            htmlFor="start"
+                            className="flex-1 cursor-pointer"
+                          >
+                            <div className="flex items-center gap-2">
+                              <Play className="w-4 h-4" />
+                              Start sleep tracking
+                            </div>
+                            <div className="text-xs text-gray-600 mt-1">
+                              Baby just fell asleep
+                            </div>
+                          </Label>
+                        </div>
+                        <div className="flex items-center space-x-2 p-3 rounded-lg border border-blue-200 bg-blue-50">
+                          <RadioGroupItem value="complete" id="complete" />
+                          <Label
+                            htmlFor="complete"
+                            className="flex-1 cursor-pointer"
+                          >
+                            <div className="flex items-center gap-2">
+                              <Moon className="w-4 h-4" />
+                              Log completed sleep
+                            </div>
+                            <div className="text-xs text-gray-600 mt-1">
+                              Sleep session already finished
+                            </div>
+                          </Label>
+                        </div>
+                      </RadioGroup>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            )}
 
-            {/* Actions */}
-            <div className="flex gap-3 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onClose}
-                className="flex-1 bg-transparent"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                className="flex-1 bg-blue-500 hover:bg-blue-600 text-white"
-              >
-                {watchedLogType === "start" ? (
-                  <>
-                    <Play className="w-4 h-4 mr-2" />
-                    Start Sleep 😴
-                  </>
-                ) : (
-                  <>Save Sleep 🌙</>
-                )}
-              </Button>
-            </div>
-          </form>
-        </Form>
+              {/* Date and Time Inputs for Complete Sleep */}
+              {watchedLogType === "complete" && (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="start_date"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium">
+                          Start Time
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="datetime-local"
+                            className="text-lg"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="end_date"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium">
+                          End Time
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="datetime-local"
+                            className="text-lg"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </>
+              )}
+
+              {/* Notes Toggle */}
+              {!showNotes && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setShowNotes(true)}
+                  className="w-full text-gray-600"
+                >
+                  + Add note (optional)
+                </Button>
+              )}
+
+              {/* Notes */}
+              {showNotes && (
+                <FormField
+                  control={form.control}
+                  name="note"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium">
+                        Notes
+                      </FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="e.g., sleep in crib, very fussy before sleep..."
+                          rows={3}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              {/* Actions */}
+              <div className="flex gap-3 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={onClose}
+                  className="flex-1 bg-transparent"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="flex-1 bg-blue-500 hover:bg-blue-600 text-white"
+                >
+                  {watchedLogType === "start" ? (
+                    <>
+                      <Play className="w-4 h-4 mr-2" />
+                      Start Sleep 😴
+                    </>
+                  ) : (
+                    <>Save Sleep 🌙</>
+                  )}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </div>
       </DialogContent>
     </Dialog>
   );

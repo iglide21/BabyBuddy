@@ -1,6 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Button } from "components/ui/button";
 import { Input } from "components/ui/input";
 import { Label } from "components/ui/label";
@@ -11,243 +14,340 @@ import {
   DialogHeader,
   DialogTitle,
 } from "components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "components/ui/form";
 import { RadioGroup, RadioGroupItem } from "components/ui/radio-group";
 import { Milk, Trash2 } from "lucide-react";
 import dayjs from "lib/dayjs";
+import { useApplicationStore } from "@/src/stores/applicationStore";
+import { Feeding, UpdateFeeding } from "@/types/data/feeding/types";
+import useUpdateFeeding from "@/src/hooks/data/mutations/useUpdateFeeding";
+import useFeeding from "@/src/hooks/data/queries/useFeeding";
 
-interface FeedingLog {
-  id: string;
-  timestamp: Date;
-  type: "breast" | "bottle" | "solid";
-  amount?: number;
-  duration?: number;
-  notes?: string;
-}
+// Validation schema
+const feedingFormSchema = z.object({
+  type: z.enum(["breast", "bottle", "solid"]),
+  occurred_at: z.string().min(1, "Date is required"),
+  amount: z.number().optional(),
+  duration_minutes: z.number().optional(),
+  note: z.string().optional(),
+});
 
-interface EditFeedingModalProps {
-  open: boolean;
-  onClose: () => void;
-  onSave: (log: FeedingLog) => void;
-  onDelete: (id: string) => void;
-  feeding: FeedingLog | null;
-}
+type FeedingFormData = z.infer<typeof feedingFormSchema>;
 
-const EditFeedingModal = ({
-  open,
-  onClose,
-  onSave,
-  onDelete,
-  feeding,
-}: EditFeedingModalProps) => {
-  const [type, setType] = useState<"breast" | "bottle" | "solid">("bottle");
-  const [date, setDate] = useState("");
-  const [time, setTime] = useState("");
-  const [amount, setAmount] = useState("");
-  const [duration, setDuration] = useState("");
-  const [notes, setNotes] = useState("");
-  const [showNotes, setShowNotes] = useState(false);
+const EditFeedingModal = () => {
+  const openedModal = useApplicationStore.use.currentModal();
+  const closeModal = useApplicationStore.use.closeModal();
+  const { mutate: updateFeeding } = useUpdateFeeding();
+
+  const isOpen = useMemo(
+    () => openedModal?.type === "feeding_edit",
+    [openedModal]
+  );
+
+  const { data: feeding, status } = useFeeding(openedModal?.data?.eventId);
+
+  const form = useForm<FeedingFormData>({
+    resolver: zodResolver(feedingFormSchema),
+    defaultValues: {
+      type: "bottle",
+      occurred_at: "",
+      amount: undefined,
+      duration_minutes: undefined,
+      note: "",
+    },
+  });
 
   // Populate form when feeding changes
   useEffect(() => {
     if (feeding) {
-      setType(feeding.type);
-      setDate(dayjs(feeding.timestamp).format("YYYY-MM-DD"));
-      setTime(dayjs(feeding.timestamp).format("HH:mm"));
-      setAmount(feeding.amount?.toString() || "");
-      setDuration(feeding.duration?.toString() || "");
-      setNotes(feeding.notes || "");
-      setShowNotes(!!feeding.notes);
+      form.reset({
+        type: feeding.type,
+        occurred_at: dayjs(feeding.occurred_at).format("YYYY-MM-DDTHH:mm"),
+        amount: feeding.amount || undefined,
+        duration_minutes: feeding.duration_minutes || undefined,
+        note: feeding.note || "",
+      });
     }
-  }, [feeding]);
 
-  const handleSave = () => {
+    return () => {
+      form.reset();
+    };
+  }, [feeding, form]);
+
+  const onSubmit = (data: FeedingFormData) => {
     if (!feeding) return;
 
-    const [hours, minutes] = time.split(":").map(Number);
-    const timestamp = dayjs(date)
-      .hour(hours)
-      .minute(minutes)
-      .second(0)
-      .millisecond(0);
-
-    const updatedLog: FeedingLog = {
-      ...feeding,
-      timestamp: timestamp.toDate(),
-      type,
-      ...(type === "bottle" && amount && { amount: Number.parseFloat(amount) }),
-      ...(type === "breast" &&
-        duration && { duration: Number.parseInt(duration) }),
-      notes: notes || undefined,
+    const updatedLog: UpdateFeeding = {
+      type: data.type,
+      occurred_at: dayjs(data.occurred_at).toISOString(),
+      amount: data.amount || undefined,
+      duration_minutes: data.duration_minutes || undefined,
+      note: data.note || undefined,
     };
 
-    onSave(updatedLog);
-    onClose();
+    updateFeeding(updatedLog, {
+      onSuccess: () => {
+        closeModal();
+      },
+    });
   };
 
   const handleDelete = () => {
     if (!feeding) return;
     if (confirm("Are you sure you want to delete this feeding entry?")) {
-      onDelete(feeding.id);
-      onClose();
+      // onDelete(feeding.id);
+      closeModal();
     }
   };
 
-  if (!feeding) return null;
+  const onClose = () => {
+    form.reset();
+    closeModal();
+  };
+
+  const getTypeEmoji = (feedingType: Feeding["type"]) => {
+    switch (feedingType) {
+      case "bottle":
+        return "🍼";
+      case "breast":
+        return "🤱";
+      case "solid":
+        return "🥄";
+      default:
+        return "🍼";
+    }
+  };
+
+  if (!isOpen) return null;
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-sm mx-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-orange-700">
-            <Milk className="w-5 h-5" />
-            Edit Feeding
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-sm mx-0 p-0 rounded-xl">
+        <DialogHeader className="p-4 bg-gradient-to-tr from-orange-400 to-orange-500 text-white rounded-t-xl">
+          <DialogTitle className="flex items-center gap-3">
+            <span className="bg-gradient-to-tr from-orange-300 to-orange-400 rounded-xl p-2">
+              <Milk className="w-5 h-5" />
+            </span>
+            <span className="text-white text-xl font-bold">Edit Feeding</span>
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
-          {/* Date and Time */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-2">
-              <Label htmlFor="date" className="text-sm font-medium">
-                Date
-              </Label>
-              <Input
-                id="date"
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="text-lg"
+        <div className="p-4">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {/* Date and Time */}
+              <FormField
+                control={form.control}
+                name="occurred_at"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">Time</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="datetime-local"
+                        className="text-lg"
+                        {...field}
+                        disabled={status === "pending"}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="time" className="text-sm font-medium">
-                Time
-              </Label>
-              <Input
-                id="time"
-                type="time"
-                value={time}
-                onChange={(e) => setTime(e.target.value)}
-                className="text-lg"
-              />
-            </div>
-          </div>
 
-          {/* Type */}
-          <div className="space-y-3">
-            <Label className="text-sm font-medium">Feeding Type</Label>
-            <RadioGroup
-              value={type}
-              onValueChange={(value: any) => setType(value)}
-            >
-              <div className="flex items-center space-x-2 p-3 rounded-lg border border-orange-200 bg-orange-50">
-                <RadioGroupItem value="bottle" id="bottle" />
-                <Label htmlFor="bottle" className="flex-1 cursor-pointer">
-                  🍼 Bottle
-                </Label>
+              {/* Type */}
+              <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem className="space-y-3">
+                    <FormLabel className="text-sm font-medium">
+                      Feeding Type
+                    </FormLabel>
+                    <FormControl>
+                      <RadioGroup
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        className="space-y-2"
+                      >
+                        {[
+                          {
+                            type: "bottle",
+                            emoji: "🍼",
+                            label: "Bottle",
+                          },
+                          {
+                            type: "breast",
+                            emoji: "🤱",
+                            label: "Breast",
+                          },
+                          {
+                            type: "solid",
+                            emoji: "🥄",
+                            label: "Solid Food",
+                          },
+                        ].map(({ type, emoji, label }) => (
+                          <div
+                            key={type}
+                            className="flex items-center space-x-2 p-3 rounded-lg border border-orange-200 bg-orange-100"
+                          >
+                            <RadioGroupItem
+                              value={type}
+                              id={type}
+                              disabled={status === "pending"}
+                            />
+                            <Label
+                              htmlFor={type}
+                              className="flex-1 cursor-pointer disabled:cursor-not-allowed"
+                            >
+                              <div className="flex items-center gap-2 cursor-pointer">
+                                <span className="text-lg">{emoji}</span>
+                                <span>{label}</span>
+                              </div>
+                            </Label>
+                          </div>
+                        ))}
+                      </RadioGroup>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Amount/Duration */}
+              {form.watch("type") === "bottle" && (
+                <FormField
+                  control={form.control}
+                  name="amount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium">
+                        Amount (oz)
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          step="0.5"
+                          placeholder="e.g., 4"
+                          className="text-lg"
+                          disabled={status === "pending"}
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(
+                              e.target.value
+                                ? Number(e.target.value)
+                                : undefined
+                            )
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              {form.watch("type") === "breast" && (
+                <FormField
+                  control={form.control}
+                  name="duration_minutes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium">
+                        Duration (minutes)
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="e.g., 15"
+                          className="text-lg"
+                          disabled={status === "pending"}
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(
+                              e.target.value
+                                ? Number(e.target.value)
+                                : undefined
+                            )
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+
+              {/* Notes */}
+              {form.watch("note") ? (
+                <FormField
+                  control={form.control}
+                  name="note"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium">
+                        Notes
+                      </FormLabel>
+                      <FormControl>
+                        <Textarea
+                          disabled={status === "pending"}
+                          placeholder="e.g., Baby was very hungry, spit up a bit..."
+                          rows={3}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ) : (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => form.setValue("note", "My note")}
+                  className="w-full text-gray-600"
+                >
+                  + Add note (optional)
+                </Button>
+              )}
+
+              {/* Actions */}
+              <div className="flex gap-3 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={onClose}
+                  className="flex-1 bg-transparent"
+                  disabled={status === "pending"}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={handleDelete}
+                  className="px-3"
+                  disabled={status === "pending"}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+                <Button
+                  type="submit"
+                  className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
+                  disabled={status === "pending"}
+                >
+                  Save Changes {getTypeEmoji(form.watch("type"))}
+                </Button>
               </div>
-              <div className="flex items-center space-x-2 p-3 rounded-lg border border-orange-200 bg-orange-50">
-                <RadioGroupItem value="breast" id="breast" />
-                <Label htmlFor="breast" className="flex-1 cursor-pointer">
-                  🤱 Breast
-                </Label>
-              </div>
-              <div className="flex items-center space-x-2 p-3 rounded-lg border border-orange-200 bg-orange-50">
-                <RadioGroupItem value="solid" id="solid" />
-                <Label htmlFor="solid" className="flex-1 cursor-pointer">
-                  🥄 Solid Food
-                </Label>
-              </div>
-            </RadioGroup>
-          </div>
-
-          {/* Amount/Duration */}
-          {type === "bottle" && (
-            <div className="space-y-2">
-              <Label htmlFor="amount" className="text-sm font-medium">
-                Amount (oz)
-              </Label>
-              <Input
-                id="amount"
-                type="number"
-                step="0.5"
-                placeholder="e.g., 4"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                className="text-lg"
-              />
-            </div>
-          )}
-
-          {type === "breast" && (
-            <div className="space-y-2">
-              <Label htmlFor="duration" className="text-sm font-medium">
-                Duration (minutes)
-              </Label>
-              <Input
-                id="duration"
-                type="number"
-                placeholder="e.g., 15"
-                value={duration}
-                onChange={(e) => setDuration(e.target.value)}
-                className="text-lg"
-              />
-            </div>
-          )}
-
-          {/* Notes Toggle */}
-          {!showNotes && (
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => setShowNotes(true)}
-              className="w-full text-gray-600"
-            >
-              + Add note (optional)
-            </Button>
-          )}
-
-          {/* Notes */}
-          {showNotes && (
-            <div className="space-y-2">
-              <Label htmlFor="notes" className="text-sm font-medium">
-                Notes
-              </Label>
-              <Textarea
-                id="notes"
-                placeholder="e.g., Baby was very hungry, spit up a bit..."
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                rows={3}
-              />
-            </div>
-          )}
-
-          {/* Actions */}
-          <div className="flex gap-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              className="flex-1 bg-transparent"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={handleDelete}
-              className="px-3"
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
-            <Button
-              onClick={handleSave}
-              className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
-            >
-              Save Changes
-            </Button>
-          </div>
+            </form>
+          </Form>
         </div>
       </DialogContent>
     </Dialog>

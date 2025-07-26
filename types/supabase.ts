@@ -94,7 +94,7 @@ export type Database = {
       }
       diapers: {
         Row: {
-          baby_id: string | null
+          baby_id: string
           color: Database["public"]["Enums"]["DiaperColor"] | null
           created_at: string
           id: number
@@ -103,7 +103,7 @@ export type Database = {
           type: Database["public"]["Enums"]["DiaperType"]
         }
         Insert: {
-          baby_id?: string | null
+          baby_id: string
           color?: Database["public"]["Enums"]["DiaperColor"] | null
           created_at?: string
           id?: number
@@ -112,7 +112,7 @@ export type Database = {
           type: Database["public"]["Enums"]["DiaperType"]
         }
         Update: {
-          baby_id?: string | null
+          baby_id?: string
           color?: Database["public"]["Enums"]["DiaperColor"] | null
           created_at?: string
           id?: number
@@ -171,9 +171,9 @@ export type Database = {
           },
         ]
       }
-      naps: {
+      sleeps: {
         Row: {
-          baby_id: string | null
+          baby_id: string
           created_at: string
           duration_minutes: number
           end_date: string | null
@@ -182,7 +182,7 @@ export type Database = {
           start_date: string
         }
         Insert: {
-          baby_id?: string | null
+          baby_id: string
           created_at?: string
           duration_minutes: number
           end_date?: string | null
@@ -191,7 +191,7 @@ export type Database = {
           start_date: string
         }
         Update: {
-          baby_id?: string | null
+          baby_id?: string
           created_at?: string
           duration_minutes?: number
           end_date?: string | null

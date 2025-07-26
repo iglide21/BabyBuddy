@@ -5,6 +5,8 @@ import type { Nullable } from "@/types/common";
 import type { ApplicationModal } from "@/src/lib/types";
 
 type ApplicationStoreState = {
+  isHamburgerMenuOpen: boolean;
+  toggleHamburgerMenu: () => void;
   isModalOpen: boolean;
   currentModal: Nullable<ApplicationModal>;
   showModal: (modal: ApplicationModal) => void;
@@ -13,8 +15,14 @@ type ApplicationStoreState = {
 
 export const useApplicationStoreBase = create<ApplicationStoreState>()(
   immer((set) => ({
+    isHamburgerMenuOpen: false,
+
     isModalOpen: false,
     currentModal: null,
+    toggleHamburgerMenu: () =>
+      set((state) => {
+        state.isHamburgerMenuOpen = !state.isHamburgerMenuOpen;
+      }),
     showModal: (modal) =>
       set((state) => {
         state.isModalOpen = true;

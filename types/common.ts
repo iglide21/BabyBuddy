@@ -7,7 +7,7 @@ export type LogEntry = Feeding | Sleep | Diaper;
 
 export type ActivityComponentProps = {
   event: Event;
-  editEvent?: (event: Event) => void;
+  editEvent?: (eventId: number) => void;
 };
 
 export type Nullable<T> = T | null;

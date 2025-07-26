@@ -41,7 +41,7 @@ export function HistoryPage() {
     [events]
   );
   const sleeps = useMemo(
-    () => events?.filter((event) => event.event_type === "nap"),
+    () => events?.filter((event) => event.event_type === "sleep"),
     [events]
   );
   const diapers = useMemo(
@@ -164,7 +164,7 @@ export function HistoryPage() {
               ...log,
               event_type: "feeding" as const,
             })),
-            ...sleeps.map((log) => ({ ...log, event_type: "nap" as const })),
+            ...sleeps.map((log) => ({ ...log, event_type: "sleep" as const })),
             ...diapers.map((log) => ({
               ...log,
               event_type: "diaper" as const,
@@ -264,7 +264,7 @@ export function HistoryPage() {
                             <Edit className="w-3 h-3" />
                           </Button>
                         </>
-                      ) : activity.event_type === "nap" ? (
+                      ) : activity.event_type === "sleep" ? (
                         <>
                           <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                             <Moon className="w-4 h-4 text-blue-600" />

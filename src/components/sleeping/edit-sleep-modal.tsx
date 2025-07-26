@@ -1,6 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useMemo, useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Button } from "components/ui/button";
 import { Input } from "components/ui/input";
 import { Label } from "components/ui/label";
@@ -12,222 +15,225 @@ import {
   DialogTitle,
 } from "components/ui/dialog";
 import { Moon, Trash2 } from "lucide-react";
-import { getTodayString, getNow } from "lib/dayjs";
 import dayjs from "lib/dayjs";
+import { useApplicationStore } from "@/src/stores/applicationStore";
+import { Sleep, UpdateSleep } from "@/types/data/sleeps/types";
+import useUpdateSleep from "@/src/hooks/data/mutations/useUpdateSleep";
+import useSleep from "@/src/hooks/data/queries/useSleep";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "components/ui/form";
 
-interface SleepLog {
-  id: string;
-  startTime: Date;
-  endTime?: Date;
-  notes?: string;
-}
+// Validation schema
+const sleepFormSchema = z.object({
+  start_date: z.string().min(1, "Start date is required"),
+  end_date: z.string().min(1, "End date is required"),
+  note: z.string().optional(),
+});
 
-interface EditSleepModalProps {
-  open: boolean;
-  onClose: () => void;
-  onSave: (log: SleepLog) => void;
-  onDelete: (id: string) => void;
-  sleep: SleepLog | null;
-}
+type SleepFormData = z.infer<typeof sleepFormSchema>;
 
-const EditSleepModal = ({
-  open,
-  onClose,
-  onSave,
-  onDelete,
-  sleep,
-}: EditSleepModalProps) => {
-  const [startDate, setStartDate] = useState("");
-  const [startTime, setStartTime] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [endTime, setEndTime] = useState("");
-  const [notes, setNotes] = useState("");
-  const [showNotes, setShowNotes] = useState(false);
+const EditSleepModal = () => {
+  const openedModal = useApplicationStore.use.currentModal();
+  const closeModal = useApplicationStore.use.closeModal();
+  const { mutate: updateSleep } = useUpdateSleep();
+
+  const isOpen = useMemo(
+    () => openedModal?.type === "sleep_edit",
+    [openedModal]
+  );
+
+  const { data: sleep, status } = useSleep(openedModal?.data?.eventId);
+
+  const form = useForm<SleepFormData>({
+    resolver: zodResolver(sleepFormSchema),
+    defaultValues: {
+      start_date: sleep?.start_date
+        ? dayjs(sleep.start_date).format("YYYY-MM-DDTHH:mm")
+        : "",
+      end_date: sleep?.end_date
+        ? dayjs(sleep.end_date).format("YYYY-MM-DDTHH:mm")
+        : "",
+      note: sleep?.note || "",
+    },
+  });
 
   // Populate form when sleep changes
   useEffect(() => {
     if (sleep) {
-      setStartDate(dayjs(sleep.startTime).format("YYYY-MM-DD"));
-      setStartTime(dayjs(sleep.startTime).format("HH:mm"));
-
-      if (sleep.endTime) {
-        setEndDate(dayjs(sleep.endTime).format("YYYY-MM-DD"));
-        setEndTime(dayjs(sleep.endTime).format("HH:mm"));
-      } else {
-        const now = getNow();
-        setEndDate(now.format("YYYY-MM-DD"));
-        setEndTime(now.format("HH:mm"));
-      }
-
-      setNotes(sleep.notes || "");
-      setShowNotes(!!sleep.notes);
+      form.reset({
+        start_date: dayjs(sleep.start_date).format("YYYY-MM-DDTHH:mm"),
+        end_date: sleep.end_date
+          ? dayjs(sleep.end_date).format("YYYY-MM-DDTHH:mm")
+          : "",
+        note: sleep.note || "",
+      });
     }
-  }, [sleep]);
 
-  const handleSave = () => {
+    return () => {
+      form.reset();
+    };
+  }, [sleep, form]);
+
+  const onSubmit = (data: SleepFormData) => {
     if (!sleep) return;
 
-    const [startHours, startMinutes] = startTime.split(":").map(Number);
-    const [endHours, endMinutes] = endTime.split(":").map(Number);
+    const start = dayjs(data.start_date);
+    const end = dayjs(data.end_date);
+    const duration = Math.round(end.diff(start, "minute", true));
 
-    const start = dayjs(startDate)
-      .hour(startHours)
-      .minute(startMinutes)
-      .second(0)
-      .millisecond(0);
-    const end = dayjs(endDate)
-      .hour(endHours)
-      .minute(endMinutes)
-      .second(0)
-      .millisecond(0);
-
-    // Ensure end time is after start time
-    if (end.isSameOrBefore(start)) {
-      alert("End time must be after start time");
-      return;
-    }
-
-    const updatedLog: SleepLog = {
-      ...sleep,
-      startTime: start.toDate(),
-      endTime: end.toDate(),
-      notes: notes || undefined,
+    const updatedLog: UpdateSleep = {
+      start_date: start.toISOString(),
+      end_date: end.toISOString(),
+      duration_minutes: duration,
+      note: data.note || undefined,
     };
 
-    onSave(updatedLog);
-    onClose();
+    updateSleep(updatedLog, {
+      onSuccess: () => {
+        closeModal();
+      },
+    });
   };
 
   const handleDelete = () => {
     if (!sleep) return;
     if (confirm("Are you sure you want to delete this sleep entry?")) {
-      onDelete(sleep.id);
-      onClose();
+      // onDelete(sleep.id);
+      closeModal();
     }
   };
 
-  if (!sleep) return null;
+  const onClose = () => {
+    form.reset();
+    closeModal();
+  };
+
+  if (!isOpen) return null;
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-sm mx-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-blue-700">
-            <Moon className="w-5 h-5" />
-            Edit Sleep
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-sm mx-0 p-0 rounded-xl">
+        <DialogHeader className="p-4 bg-gradient-to-tr from-blue-400 to-blue-500 text-white rounded-t-xl">
+          <DialogTitle className="flex items-center gap-3">
+            <span className="bg-gradient-to-tr from-blue-300 to-blue-400 rounded-xl p-2">
+              <Moon className="w-5 h-5" />
+            </span>
+            <span className="text-white text-xl font-bold">Edit Sleep</span>
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6">
-          {/* Start Date and Time */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-2">
-              <Label htmlFor="startDate" className="text-sm font-medium">
-                Start Date
-              </Label>
-              <Input
-                id="startDate"
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="text-lg"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="startTime" className="text-sm font-medium">
-                Start Time
-              </Label>
-              <Input
-                id="startTime"
-                type="time"
-                value={startTime}
-                onChange={(e) => setStartTime(e.target.value)}
-                className="text-lg"
-              />
-            </div>
-          </div>
+        <div className="p-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {/* Start Date and Time */}
+            <FormField
+              control={form.control}
+              name="start_date"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium">
+                    Start Time
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="datetime-local"
+                      className="text-lg"
+                      {...field}
+                      disabled={status === "pending"}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          {/* End Date and Time */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-2">
-              <Label htmlFor="endDate" className="text-sm font-medium">
-                End Date
-              </Label>
-              <Input
-                id="endDate"
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="text-lg"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="endTime" className="text-sm font-medium">
-                End Time
-              </Label>
-              <Input
-                id="endTime"
-                type="time"
-                value={endTime}
-                onChange={(e) => setEndTime(e.target.value)}
-                className="text-lg"
-              />
-            </div>
-          </div>
+            {/* End Date and Time */}
+            <FormField
+              control={form.control}
+              name="end_date"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-sm font-medium">
+                    End Time
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      type="datetime-local"
+                      className="text-lg"
+                      {...field}
+                      disabled={status === "pending"}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          {/* Notes Toggle */}
-          {!showNotes && (
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => setShowNotes(true)}
-              className="w-full text-gray-600"
-            >
-              + Add note (optional)
-            </Button>
-          )}
-
-          {/* Notes */}
-          {showNotes && (
-            <div className="space-y-2">
-              <Label htmlFor="notes" className="text-sm font-medium">
-                Notes
-              </Label>
-              <Textarea
-                id="notes"
-                placeholder="e.g., nap in crib, very fussy before sleep..."
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                rows={3}
+            {/* Notes */}
+            {form.watch("note") ? (
+              <FormField
+                control={form.control}
+                name="note"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">Notes</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        disabled={status === "pending"}
+                        placeholder="e.g., sleep in crib, very fussy before sleep..."
+                        rows={3}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-          )}
+            ) : (
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => form.setValue("note", "My note")}
+                className="w-full text-gray-600"
+              >
+                + Add note (optional)
+              </Button>
+            )}
 
-          {/* Actions */}
-          <div className="flex gap-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onClose}
-              className="flex-1 bg-transparent"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={handleDelete}
-              className="px-3"
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
-            <Button
-              onClick={handleSave}
-              className="flex-1 bg-blue-500 hover:bg-blue-600 text-white"
-            >
-              Save Changes
-            </Button>
-          </div>
+            {/* Actions */}
+            <div className="flex gap-3 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                className="flex-1 bg-transparent"
+                disabled={status === "pending"}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={handleDelete}
+                className="px-3"
+                disabled={status === "pending"}
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+              <Button
+                type="submit"
+                className="flex-1 bg-blue-500 hover:bg-blue-600 text-white"
+                disabled={status === "pending"}
+              >
+                Save Changes 🌙
+              </Button>
+            </div>
+          </form>
         </div>
       </DialogContent>
     </Dialog>

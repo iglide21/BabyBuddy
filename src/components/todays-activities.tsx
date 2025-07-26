@@ -9,24 +9,29 @@ import { DiaperActivity } from "./diaper";
 import { getTodayString } from "lib/dayjs";
 import { Skeleton } from "./ui/skeleton";
 import { useCurrentBabyStore } from "@/src/stores/currentBabyStore";
+import { useApplicationStore } from "../stores/applicationStore";
+import { ApplicationModal } from "../lib/types";
 
 const eventTypeToComponent: Record<
-  "diaper" | "nap" | "feeding",
+  "diaper" | "sleep" | "feeding",
   ({
     event,
     editEvent,
   }: {
     event: Event;
-    editEvent?: (event: Event) => void;
+    editEvent?: (eventId: number) => void;
   }) => JSX.Element
 > = {
   feeding: FeedingActivity,
-  nap: SleepingActivity,
+  sleep: SleepingActivity,
   diaper: DiaperActivity,
 };
 
 const TodaysActivities = () => {
   const currentBaby = useCurrentBabyStore.use.currentBaby();
+  const setCurrentSelectedEvent =
+    useCurrentBabyStore.use.setCurrentSelectedEvent();
+  const showModal = useApplicationStore.use.showModal();
   const today = getTodayString();
   const {
     data: events,
@@ -83,7 +88,15 @@ const TodaysActivities = () => {
               >
                 <EventComponent
                   event={event}
-                  editEvent={() => console.log(event)}
+                  editEvent={() => {
+                    showModal({
+                      type: `${event.event_type}_edit` as ApplicationModal["type"],
+                      data: {
+                        eventId: event.id,
+                      },
+                    });
+                    setCurrentSelectedEvent(event);
+                  }}
                 />
               </div>
             );

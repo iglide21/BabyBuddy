@@ -9,12 +9,6 @@ import { Input } from "components/ui/input";
 import { Label } from "components/ui/label";
 import { Textarea } from "components/ui/textarea";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "components/ui/dialog";
-import {
   Form,
   FormControl,
   FormField,
@@ -28,6 +22,7 @@ import { CreateDiaper } from "@/types/data/diapers/types";
 import { useApplicationStore } from "@/src/stores/applicationStore";
 import { useCreateDiaper } from "@/src/hooks/data/mutations/useCreateDiaper";
 import { useCurrentBabyStore } from "@/src/stores/currentBabyStore";
+import DiaperModal from "./diaper-modal";
 
 // Validation schema
 const diaperFormSchema = z.object({
@@ -41,8 +36,6 @@ type DiaperFormData = z.infer<typeof diaperFormSchema>;
 const LogDiaperModal = () => {
   const currentBaby = useCurrentBabyStore.use.currentBaby();
   const [showNotes, setShowNotes] = useState(false);
-  const openedModal = useApplicationStore.use.currentModal();
-  const isOpen = useMemo(() => openedModal === "diaper", [openedModal]);
 
   const { mutate: createDiaper } = useCreateDiaper();
   const closeModal = useApplicationStore.use.closeModal();
@@ -66,7 +59,6 @@ const LogDiaperModal = () => {
       color: null,
       baby_id: currentBaby?.id ?? "",
     };
-
 
     form.reset();
     createDiaper(event);
@@ -92,28 +84,97 @@ const LogDiaperModal = () => {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-sm mx-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-green-700">
-            <span className="text-lg">👶</span>
-            Log Diaper Change
-          </DialogTitle>
-        </DialogHeader>
+    <DiaperModal onClose={onClose} action="log">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          {/* Date and Time */}
+          <FormField
+            control={form.control}
+            name="occurred_at"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="text-sm font-medium">Time</FormLabel>
+                <FormControl>
+                  <Input type="datetime-local" className="text-lg" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Date and Time */}
+          {/* Type */}
+          <FormField
+            control={form.control}
+            name="type"
+            render={({ field }) => (
+              <FormItem className="space-y-3">
+                <FormLabel className="text-sm font-medium">
+                  Diaper Type
+                </FormLabel>
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    className="space-y-2"
+                  >
+                    <div className="flex items-center space-x-2 p-3 rounded-lg border border-green-200 bg-green-100">
+                      <RadioGroupItem value="wet" id="wet" />
+                      <Label htmlFor="wet" className="flex-1 cursor-pointer">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">💧</span>
+                          <span>Wet only</span>
+                        </div>
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2 p-3 rounded-lg border border-green-200 bg-green-100">
+                      <RadioGroupItem value="dirty" id="dirty" />
+                      <Label htmlFor="dirty" className="flex-1 cursor-pointer">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">💩</span>
+                          <span>Dirty only</span>
+                        </div>
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2 p-3 rounded-lg border border-green-200 bg-green-100">
+                      <RadioGroupItem value="both" id="both" />
+                      <Label htmlFor="both" className="flex-1 cursor-pointer">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg">💧💩</span>
+                          <span>Wet & Dirty</span>
+                        </div>
+                      </Label>
+                    </div>
+                  </RadioGroup>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Notes Toggle */}
+          {!showNotes && (
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setShowNotes(true)}
+              className="w-full text-gray-600"
+            >
+              + Add note (optional)
+            </Button>
+          )}
+
+          {/* Notes */}
+          {showNotes && (
             <FormField
               control={form.control}
-              name="occurred_at"
+              name="note"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium">Time</FormLabel>
+                  <FormLabel className="text-sm font-medium">Notes</FormLabel>
                   <FormControl>
-                    <Input
-                      type="datetime-local"
-                      className="text-lg"
+                    <Textarea
+                      placeholder="e.g., blowout, rash noticed, used cream..."
+                      rows={3}
                       {...field}
                     />
                   </FormControl>
@@ -121,113 +182,28 @@ const LogDiaperModal = () => {
                 </FormItem>
               )}
             />
+          )}
 
-            {/* Type */}
-            <FormField
-              control={form.control}
-              name="type"
-              render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormLabel className="text-sm font-medium">
-                    Diaper Type
-                  </FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      value={field.value}
-                      className="space-y-2"
-                    >
-                      <div className="flex items-center space-x-2 p-3 rounded-lg border border-green-200 bg-green-50">
-                        <RadioGroupItem value="wet" id="wet" />
-                        <Label htmlFor="wet" className="flex-1 cursor-pointer">
-                          <div className="flex items-center gap-2">
-                            <span className="text-lg">💧</span>
-                            <span>Wet only</span>
-                          </div>
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2 p-3 rounded-lg border border-green-200 bg-green-50">
-                        <RadioGroupItem value="dirty" id="dirty" />
-                        <Label
-                          htmlFor="dirty"
-                          className="flex-1 cursor-pointer"
-                        >
-                          <div className="flex items-center gap-2">
-                            <span className="text-lg">💩</span>
-                            <span>Dirty only</span>
-                          </div>
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2 p-3 rounded-lg border border-green-200 bg-green-50">
-                        <RadioGroupItem value="both" id="both" />
-                        <Label htmlFor="both" className="flex-1 cursor-pointer">
-                          <div className="flex items-center gap-2">
-                            <span className="text-lg">💧💩</span>
-                            <span>Wet & Dirty</span>
-                          </div>
-                        </Label>
-                      </div>
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Notes Toggle */}
-            {!showNotes && (
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => setShowNotes(true)}
-                className="w-full text-gray-600"
-              >
-                + Add note (optional)
-              </Button>
-            )}
-
-            {/* Notes */}
-            {showNotes && (
-              <FormField
-                control={form.control}
-                name="note"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium">Notes</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="e.g., blowout, rash noticed, used cream..."
-                        rows={3}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            )}
-
-            {/* Actions */}
-            <div className="flex gap-3 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onClose}
-                className="flex-1 bg-transparent"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                className="flex-1 bg-green-500 hover:bg-green-600 text-white"
-              >
-                Save Change {getTypeEmoji(form.watch("type"))}
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+          {/* Actions */}
+          <div className="flex gap-3 pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              className="flex-1 bg-transparent"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              className="flex-1 bg-green-500 hover:bg-green-600 text-white"
+            >
+              Save Change {getTypeEmoji(form.watch("type"))}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </DiaperModal>
   );
 };
 

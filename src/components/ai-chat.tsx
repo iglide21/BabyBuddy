@@ -199,7 +199,7 @@ What specific feeding question can I help with?`;
     // Sleep-related questions
     if (
       message.includes("sleep") ||
-      message.includes("nap") ||
+      message.includes("sleep") ||
       message.includes("bedtime")
     ) {
       if (message.includes("how long") || message.includes("duration")) {

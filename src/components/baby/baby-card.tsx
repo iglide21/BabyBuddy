@@ -1,5 +1,5 @@
 import { Baby } from "@/types/data/babies/types";
-import { Card, CardContent, Button } from "../ui";
+import { Card, CardContent, Button, Skeleton } from "../ui";
 import { Calendar } from "lucide-react";
 import dayjs from "@/src/lib/dayjs";
 import { useRouter } from "next/navigation";
@@ -41,9 +41,9 @@ const BabyCard = ({ baby }: BabyCardProps) => {
       case "male":
         return "👶🏻";
       case "female":
-        return "👧";
+        return "👧🏻";
       case "other":
-        return "👶🏻";
+        return "👽";
       default:
         return "🥶";
     }

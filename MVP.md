@@ -149,7 +149,7 @@ babyId (string): Reference to the baby (if not using subcollection structure).
 start (timestamp): Start time of the sleep.
 end (timestamp): End time of the sleep. (If the baby is still sleeping and the user hasn’t stopped the timer yet, we might keep an entry with end null or use a separate mechanism for “ongoing” sleep in UI state.)
 duration (number, optional): Duration in minutes. This can be derived from start/end, but stored for convenience/queries. (We ensure consistency on write.)
-nap (boolean, optional): For future use, could mark whether this was a nap vs nighttime sleep. (MVP might skip this; all sleep logged is just sleep.)
+sleep (boolean, optional): For future use, could mark whether this was a sleep vs nighttime sleep. (MVP might skip this; all sleep logged is just sleep.)
 loggedBy (uid): Who logged the sleep session.
 createdAt (timestamp): When the entry was created.
 notes (string, optional): Any notes (e.g. “slept in car seat”).
@@ -166,7 +166,7 @@ meta (object, optional): Any metadata, e.g. model used, tokens, or references to
 This log allows the app to display previous Q&A pairs when the user opens the assistant page, and optionally to resend recent messages to OpenAI to maintain context. (If storing this data raises cost concerns, we could limit history or store only last N messages.) Security & Data Access: Firestore rules will ensure that only users listed in a baby’s caregiverIds can read/write that baby’s FeedLogs and SleepLogs. Each ChatLogs entry is tied to a userId so only that user can read their chats. By structuring data under baby documents (or with babyId fields), it’s straightforward to query “all feed logs for baby X” or “all logs for baby X in the last 24h”.
 Monetization Plan (Post-MVP)
 The MVP will be free to use with core features. A monetization strategy is planned for later releases, likely via a subscription (premium tier) that unlocks additional features and benefits. The goal is to provide enough value in the free version for tracking basics, while offering advanced tools for power users willing to pay. Possible premium features include:
-Advanced Analytics & Insights: Premium users get detailed analytics like long-term trend charts, pattern detection, and AI-driven insights into the baby’s routines. For example, premium could unlock a “Sleep Analysis” report that uses AI to identify patterns or suggest optimal nap schedules (similar to how Huckleberry offers paid sleep analysis)
+Advanced Analytics & Insights: Premium users get detailed analytics like long-term trend charts, pattern detection, and AI-driven insights into the baby’s routines. For example, premium could unlock a “Sleep Analysis” report that uses AI to identify patterns or suggest optimal sleep schedules (similar to how Huckleberry offers paid sleep analysis)
 reddit.com
 . Pattern recognition (e.g. average feed intervals, longest sleep stretches) gives actionable feedback to parents, and could be a paid add-on.
 Milestones & Extra Tracking: The free MVP focuses on feeds and sleep. Premium could allow tracking of additional categories such as diaper changes, pumping sessions, growth metrics (weight/height percentiles), medicine/vaccines, or developmental milestones – essentially becoming an all-in-one baby tracker. These expanded features add depth for those interested, while keeping the free version simple.

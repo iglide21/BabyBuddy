@@ -11,7 +11,7 @@ const QuickActions = () => {
         title="Feeding"
         description="Log a feed"
         icon={<Baby className="h-6 w-6" />}
-        onClick={() => showModal("feeding")}
+        onClick={() => showModal("feeding_log")}
         className="bg-gradient-to-r from-amber-200 to-amber-400"
       />
 
@@ -19,7 +19,7 @@ const QuickActions = () => {
         title="Sleep"
         description="Log sleep"
         icon={<Moon className="h-6 w-6" />}
-        onClick={() => showModal("sleep")}
+        onClick={() => showModal("sleep_log")}
         className="bg-gradient-to-r from-blue-200 to-blue-400"
       />
 
@@ -27,7 +27,7 @@ const QuickActions = () => {
         title="Diaper"
         description="Log change"
         icon={<span className="text-md">💩</span>}
-        onClick={() => showModal("diaper")}
+        onClick={() => showModal("diaper_log")}
         className="bg-gradient-to-r from-green-200 to-green-400"
       />
     </div>

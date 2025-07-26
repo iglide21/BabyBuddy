@@ -25,7 +25,7 @@ const DiaperActivity = ({ event, editEvent }: ActivityComponentProps) => {
           <div className="text-xs text-gray-500 mt-1">{event.note}</div>
         )}
       </div>
-      <EditButton onClick={() => editEvent?.(event)} />
+      <EditButton onClick={() => editEvent?.(event.id ?? 0)} />
     </>
   );
 };

@@ -1,4 +1,9 @@
-import { CreateDiaper, Diaper } from "@/types/data/diapers/types";
+import { CreateDiaper, Diaper, UpdateDiaper } from "@/types/data/diapers/types";
+
+const getDiaper = async (id: number) => {
+  const response = await fetch(`/api/events/diapers/${id}`);
+  return response.json();
+};
 
 const getDiapers = async () => {
   const response = await fetch("/api/events/diapers");
@@ -13,8 +18,11 @@ const createDiaper = async (diaper: CreateDiaper) => {
   return response.json();
 };
 
-const updateDiaper = async (diaper: Diaper) => {
+const updateDiaper = async (diaper: UpdateDiaper) => {
   const response = await fetch(`/api/events/diapers/${diaper.id}`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
     method: "PUT",
     body: JSON.stringify(diaper),
   });
@@ -28,4 +36,4 @@ const deleteDiaper = async (id: string) => {
   return response.json();
 };
 
-export { getDiapers, createDiaper, updateDiaper, deleteDiaper };
+export { getDiaper, getDiapers, createDiaper, updateDiaper, deleteDiaper };
