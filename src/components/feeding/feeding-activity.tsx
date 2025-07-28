@@ -3,8 +3,12 @@ import { formatDuration, formatTime } from "lib/dayjs";
 import { Badge } from "../ui/badge";
 import EditButton from "../edit-button";
 import { Milk } from "lucide-react";
+// import { useDeleteFeeding } from "@/src/hooks/data/mutations";
+import DeleteButton from "../delete-button";
 
 const FeedingActivity = ({ event, editEvent }: ActivityComponentProps) => {
+  // const { mutate: deleteEvent, status } = useDeleteFeeding(event.id);
+
   return (
     <>
       <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
@@ -46,7 +50,10 @@ const FeedingActivity = ({ event, editEvent }: ActivityComponentProps) => {
           <div className="text-xs text-gray-500 mt-1">{event.note}</div>
         )}
       </div>
-      <EditButton onClick={() => editEvent?.(event)} />
+      <div className="flex items-center gap-2">
+        {/* <DeleteButton onClick={() => deleteEvent(event.id)} status={status} /> */}
+        <EditButton onClick={() => editEvent?.(event.id)} />
+      </div>
     </>
   );
 };

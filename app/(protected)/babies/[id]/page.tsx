@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from "components/ui/card";
 import { EditFeedingModal, LogFeedingModal } from "components/feeding";
-import { LogSleepModal } from "components/sleeping";
+import { EditSleepModal, LogSleepModal } from "components/sleeping";
 import { EditDiaperModal, LogDiaperModal } from "components/diaper";
 import QuickStats from "@/src/components/quick-stats";
 import TodaysActivities from "@/src/components/todays-activities";
@@ -89,11 +89,8 @@ export default function BabyBuddyApp() {
       <LogSleepModal />
       <LogDiaperModal />
 
-      {/* Edit Modals */}
-      {/* <EditFeedingModal />
-
-      <EditSleepModal /> */}
-
+      <EditSleepModal />
+      <EditFeedingModal />
       <EditDiaperModal />
     </div>
   );

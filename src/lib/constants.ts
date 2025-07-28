@@ -4,4 +4,5 @@ export const QUERY_KEYS = {
   DIAPERS: "diapers",
   BABIES: "babies",
   BABY: "baby",
+  EVENTS: "events",
 };

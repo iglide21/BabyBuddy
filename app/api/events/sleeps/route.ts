@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 export const GET = async () => {
   const supabase = await createClient();
 
-  const { data, error } = await supabase.from("naps").select();
+  const { data, error } = await supabase.from("sleeps").select();
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -19,7 +19,7 @@ export const POST = async (request: NextRequest) => {
 
   const supabase = await createClient();
 
-  const { data, error } = await supabase.from("naps").insert(body).select();
+  const { data, error } = await supabase.from("sleeps").insert(body).select();
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });

@@ -17,13 +17,12 @@ import {
   FormMessage,
 } from "components/ui/form";
 import { RadioGroup, RadioGroupItem } from "components/ui/radio-group";
-import { Trash2 } from "lucide-react";
 import dayjs from "lib/dayjs";
 import DiaperModal from "./diaper-modal";
 import { useApplicationStore } from "@/src/stores/applicationStore";
 import { Diaper, UpdateDiaper } from "@/types/data/diapers/types";
-import useUpdateDiaper from "@/src/hooks/data/mutations/useUpdateDiaper";
-import useDiaper from "@/src/hooks/data/queries/useDiaper";
+import { useUpdateDiaper } from "@/src/hooks/data/mutations";
+import { useDiaper } from "@/src/hooks/data/queries";
 
 // Validation schema
 const diaperFormSchema = z.object({
@@ -44,15 +43,13 @@ const EditDiaperModal = () => {
     [openedModal]
   );
 
-  const { data: diaper, status } = useDiaper(openedModal?.data?.eventId);
+  const { data: diaper, status } = useDiaper(
+    openedModal?.data?.eventId,
+    isOpen
+  );
 
   const form = useForm<DiaperFormData>({
     resolver: zodResolver(diaperFormSchema),
-    defaultValues: {
-      type: diaper?.type,
-      occurred_at: dayjs(diaper?.occurred_at).format("YYYY-MM-DDTHH:mm"),
-      note: diaper?.note || "",
-    },
   });
 
   // Populate form when diaper changes
@@ -74,8 +71,10 @@ const EditDiaperModal = () => {
     if (!diaper) return;
 
     const updatedLog: UpdateDiaper = {
+      id: diaper.id,
       note: data.note || undefined,
       type: data.type,
+      occurred_at: dayjs(data.occurred_at).toISOString(),
     };
 
     updateDiaper(updatedLog, {
@@ -237,15 +236,6 @@ const EditDiaperModal = () => {
               disabled={status === "pending"}
             >
               Cancel
-            </Button>
-            <Button
-              type="button"
-              variant="destructive"
-              onClick={handleDelete}
-              className="px-3"
-              disabled={status === "pending"}
-            >
-              <Trash2 className="w-4 h-4" />
             </Button>
             <Button
               type="submit"

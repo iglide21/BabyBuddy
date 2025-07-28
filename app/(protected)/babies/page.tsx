@@ -20,7 +20,7 @@ const BabiesScreen = () => {
   const { data: babies, isLoading } = useBabies(user?.id ?? "");
 
   const onAddBaby = () => {
-    showModal("createBaby");
+    showModal({ type: "create_baby" });
   };
 
   return (

@@ -1,12 +1,11 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "components/ui/button";
 import { Input } from "components/ui/input";
-import { Label } from "components/ui/label";
 import { Textarea } from "components/ui/textarea";
 import {
   Dialog,
@@ -17,9 +16,9 @@ import {
 import { Moon, Trash2 } from "lucide-react";
 import dayjs from "lib/dayjs";
 import { useApplicationStore } from "@/src/stores/applicationStore";
-import { Sleep, UpdateSleep } from "@/types/data/sleeps/types";
-import useUpdateSleep from "@/src/hooks/data/mutations/useUpdateSleep";
-import useSleep from "@/src/hooks/data/queries/useSleep";
+import { UpdateSleep } from "@/types/data/sleeps/types";
+import { useUpdateSleep } from "@/src/hooks/data/mutations";
+import { useSleep } from "@/src/hooks/data/queries";
 import {
   Form,
   FormControl,
@@ -48,7 +47,7 @@ const EditSleepModal = () => {
     [openedModal]
   );
 
-  const { data: sleep, status } = useSleep(openedModal?.data?.eventId);
+  const { data: sleep, status } = useSleep(openedModal?.data?.eventId, isOpen);
 
   const form = useForm<SleepFormData>({
     resolver: zodResolver(sleepFormSchema),
@@ -88,6 +87,7 @@ const EditSleepModal = () => {
     const duration = Math.round(end.diff(start, "minute", true));
 
     const updatedLog: UpdateSleep = {
+      id: sleep.id,
       start_date: start.toISOString(),
       end_date: end.toISOString(),
       duration_minutes: duration,
@@ -129,111 +129,115 @@ const EditSleepModal = () => {
         </DialogHeader>
 
         <div className="p-4">
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Start Date and Time */}
-            <FormField
-              control={form.control}
-              name="start_date"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium">
-                    Start Time
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="datetime-local"
-                      className="text-lg"
-                      {...field}
-                      disabled={status === "pending"}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* End Date and Time */}
-            <FormField
-              control={form.control}
-              name="end_date"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium">
-                    End Time
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="datetime-local"
-                      className="text-lg"
-                      {...field}
-                      disabled={status === "pending"}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Notes */}
-            {form.watch("note") ? (
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {/* Start Date and Time */}
               <FormField
                 control={form.control}
-                name="note"
+                name="start_date"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium">Notes</FormLabel>
+                    <FormLabel className="text-sm font-medium">
+                      Start Time
+                    </FormLabel>
                     <FormControl>
-                      <Textarea
-                        disabled={status === "pending"}
-                        placeholder="e.g., sleep in crib, very fussy before sleep..."
-                        rows={3}
+                      <Input
+                        type="datetime-local"
+                        className="text-lg"
                         {...field}
+                        disabled={status === "pending"}
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            ) : (
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => form.setValue("note", "My note")}
-                className="w-full text-gray-600"
-              >
-                + Add note (optional)
-              </Button>
-            )}
 
-            {/* Actions */}
-            <div className="flex gap-3 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onClose}
-                className="flex-1 bg-transparent"
-                disabled={status === "pending"}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="button"
-                variant="destructive"
-                onClick={handleDelete}
-                className="px-3"
-                disabled={status === "pending"}
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
-              <Button
-                type="submit"
-                className="flex-1 bg-blue-500 hover:bg-blue-600 text-white"
-                disabled={status === "pending"}
-              >
-                Save Changes 🌙
-              </Button>
-            </div>
-          </form>
+              {/* End Date and Time */}
+              <FormField
+                control={form.control}
+                name="end_date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">
+                      End Time
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="datetime-local"
+                        className="text-lg"
+                        {...field}
+                        disabled={status === "pending"}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Notes */}
+              {form.watch("note") ? (
+                <FormField
+                  control={form.control}
+                  name="note"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium">
+                        Notes
+                      </FormLabel>
+                      <FormControl>
+                        <Textarea
+                          disabled={status === "pending"}
+                          placeholder="e.g., sleep in crib, very fussy before sleep..."
+                          rows={3}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ) : (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => form.setValue("note", "My note")}
+                  className="w-full text-gray-600"
+                >
+                  + Add note (optional)
+                </Button>
+              )}
+
+              {/* Actions */}
+              <div className="flex gap-3 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={onClose}
+                  className="flex-1 bg-transparent"
+                  disabled={status === "pending"}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={handleDelete}
+                  className="px-3"
+                  disabled={status === "pending"}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+                <Button
+                  type="submit"
+                  className="flex-1 bg-blue-500 hover:bg-blue-600 text-white"
+                  disabled={status === "pending"}
+                >
+                  Save Changes 🌙
+                </Button>
+              </div>
+            </form>
+          </Form>
         </div>
       </DialogContent>
     </Dialog>

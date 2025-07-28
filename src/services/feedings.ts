@@ -1,7 +1,12 @@
-import { CreateFeeding, Feeding } from "@/types/data/feeding/types";
+import { CreateFeeding, UpdateFeeding } from "@/types/data/feeding/types";
 
 const getFeedings = async () => {
   const response = await fetch("/api/events/feedings");
+  return response.json();
+};
+
+const getFeeding = async (id: number) => {
+  const response = await fetch(`/api/events/feedings/${id}`);
   return response.json();
 };
 
@@ -18,7 +23,7 @@ const createFeeding = async (feeding: CreateFeeding) => {
   return response.json();
 };
 
-const updateFeeding = async (feeding: Feeding) => {
+const updateFeeding = async (feeding: UpdateFeeding) => {
   const response = await fetch(`/api/events/feedings/${feeding.id}`, {
     method: "PUT",
     body: JSON.stringify(feeding),
@@ -35,6 +40,7 @@ const deleteFeeding = async (id: string) => {
 
 export {
   getFeedings,
+  getFeeding,
   createFeeding,
   updateFeeding,
   deleteFeeding,

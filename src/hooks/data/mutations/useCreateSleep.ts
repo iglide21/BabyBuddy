@@ -10,7 +10,7 @@ export const useCreateSleep = () => {
     mutationFn: createSleep,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["events"],
+        queryKey: [QUERY_KEYS.EVENTS],
       });
     },
   });

@@ -10,7 +10,7 @@ export const useCreateDiaper = () => {
     mutationFn: createDiaper,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["events"],
+        queryKey: [QUERY_KEYS.EVENTS],
       });
     },
   });

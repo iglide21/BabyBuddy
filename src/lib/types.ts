@@ -7,5 +7,5 @@ export type ApplicationModal = {
     | "sleep_edit"
     | "diaper_log"
     | "diaper_edit";
-  data: Record<string, any>;
+  data?: Record<string, any>;
 };

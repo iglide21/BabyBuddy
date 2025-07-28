@@ -1,4 +1,4 @@
-import { CreateDiaper, Diaper, UpdateDiaper } from "@/types/data/diapers/types";
+import { CreateDiaper, UpdateDiaper } from "@/types/data/diapers/types";
 
 const getDiaper = async (id: number) => {
   const response = await fetch(`/api/events/diapers/${id}`);

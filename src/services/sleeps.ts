@@ -1,4 +1,4 @@
-import { CreateSleep, Sleep } from "@/types/data/sleeps/types";
+import { CreateSleep, UpdateSleep } from "@/types/data/sleeps/types";
 
 const getSleeps = async () => {
   const response = await fetch("/api/events/sleeps");
@@ -18,7 +18,7 @@ const createSleep = async (sleep: CreateSleep) => {
   return response.json();
 };
 
-const updateSleep = async (sleep: Sleep) => {
+const updateSleep = async (sleep: UpdateSleep) => {
   const response = await fetch(`/api/events/sleeps/${sleep.id}`, {
     method: "PUT",
     body: JSON.stringify(sleep),
