@@ -18,12 +18,13 @@ import {
 } from "components/ui/form";
 import { RadioGroup, RadioGroupItem } from "components/ui/radio-group";
 import { Milk, Trash2 } from "lucide-react";
-import dayjs from "lib/dayjs";
+import dayjs, { getNow } from "lib/dayjs";
 import { useApplicationStore } from "@/src/stores/applicationStore";
 import { Feeding, UpdateFeeding } from "@/types/data/feeding/types";
 import { useUpdateFeeding } from "@/src/hooks/data/mutations";
 import { useFeeding } from "@/src/hooks/data/queries";
 import FeedingModal from "./feeding-modal";
+import { DateTimeField } from "@mui/x-date-pickers";
 
 // Validation schema
 const feedingFormSchema = z
@@ -85,7 +86,7 @@ const EditFeedingModal = () => {
     resolver: zodResolver(feedingFormSchema),
     defaultValues: {
       type: "bottle",
-      occurred_at: "",
+      occurred_at: getNow().toISOString(),
       amount_ml: "",
       duration_minutes: "",
       note: "",
@@ -99,7 +100,7 @@ const EditFeedingModal = () => {
     if (feeding) {
       form.reset({
         type: feeding.type,
-        occurred_at: dayjs(feeding.occurred_at).format("YYYY-MM-DDTHH:mm"),
+        occurred_at: feeding.occurred_at,
         amount_ml: feeding.amount_ml?.toString() || "",
         duration_minutes: feeding.duration_minutes?.toString() || "",
         note: feeding.note || "",
@@ -117,7 +118,7 @@ const EditFeedingModal = () => {
     const updatedLog: UpdateFeeding = {
       id: feeding.id,
       type: data.type,
-      occurred_at: dayjs(data.occurred_at).toISOString(),
+      occurred_at: data.occurred_at,
       amount_ml:
         data.type === "breast"
           ? null
@@ -175,13 +176,15 @@ const EditFeedingModal = () => {
               control={form.control}
               name="occurred_at"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex flex-col gap-2">
                   <FormLabel className="text-sm font-medium">Time</FormLabel>
                   <FormControl>
-                    <Input
-                      type="datetime-local"
-                      className="text-lg"
-                      {...field}
+                    <DateTimeField
+                      value={dayjs(field.value)}
+                      onChange={(value) => {
+                        field.onChange(value?.toISOString());
+                      }}
+                      ampm={false}
                       disabled={status === "pending"}
                     />
                   </FormControl>

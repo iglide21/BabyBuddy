@@ -23,6 +23,7 @@ import { useApplicationStore } from "@/src/stores/applicationStore";
 import { Diaper, UpdateDiaper } from "@/types/data/diapers/types";
 import { useUpdateDiaper } from "@/src/hooks/data/mutations";
 import { useDiaper } from "@/src/hooks/data/queries";
+import { DateTimeField } from "@mui/x-date-pickers";
 
 // Validation schema
 const diaperFormSchema = z.object({
@@ -57,7 +58,7 @@ const EditDiaperModal = () => {
     if (diaper) {
       form.reset({
         type: diaper.type,
-        occurred_at: dayjs(diaper.occurred_at).format("YYYY-MM-DDTHH:mm"),
+        occurred_at: diaper.occurred_at,
         note: diaper.note || "",
       });
     }
@@ -74,7 +75,7 @@ const EditDiaperModal = () => {
       id: diaper.id,
       note: data.note || undefined,
       type: data.type,
-      occurred_at: dayjs(data.occurred_at).toISOString(),
+      occurred_at: data.occurred_at,
     };
 
     updateDiaper(updatedLog, {
@@ -120,13 +121,15 @@ const EditDiaperModal = () => {
             control={form.control}
             name="occurred_at"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="flex flex-col gap-2">
                 <FormLabel className="text-sm font-medium">Time</FormLabel>
                 <FormControl>
-                  <Input
-                    type="datetime-local"
-                    className="text-lg"
-                    {...field}
+                  <DateTimeField
+                    value={dayjs(field.value)}
+                    onChange={(value) => {
+                      field.onChange(value?.toISOString());
+                    }}
+                    ampm={false}
                     disabled={status === "pending"}
                   />
                 </FormControl>

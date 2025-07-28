@@ -22,7 +22,7 @@ export const getTimeSince = (date: string | Date | dayjs.Dayjs | undefined) => {
 
 export const formatTime = (date: string | Date | dayjs.Dayjs | undefined) => {
   if (!date) return "";
-  return dayjs(date).format("h:mm A");
+  return dayjs(date).format("HH:mm");
 };
 
 export const formatDuration = (

@@ -23,6 +23,7 @@ import { useApplicationStore } from "@/src/stores/applicationStore";
 import { useCreateDiaper } from "@/src/hooks/data/mutations/useCreateDiaper";
 import { useCurrentBabyStore } from "@/src/stores/currentBabyStore";
 import DiaperModal from "./diaper-modal";
+import { DateTimeField } from "@mui/x-date-pickers";
 
 // Validation schema
 const diaperFormSchema = z.object({
@@ -44,7 +45,7 @@ const LogDiaperModal = () => {
     resolver: zodResolver(diaperFormSchema),
     defaultValues: {
       type: "wet",
-      occurred_at: getNow().format("YYYY-MM-DDTHH:mm"),
+      occurred_at: getNow().toISOString(),
       note: "",
     },
   });
@@ -53,7 +54,7 @@ const LogDiaperModal = () => {
     const { occurred_at, note, type } = data;
 
     const event: CreateDiaper = {
-      occurred_at: dayjs(occurred_at).toISOString(),
+      occurred_at: occurred_at,
       type,
       note: note || "",
       color: null,
@@ -92,10 +93,16 @@ const LogDiaperModal = () => {
             control={form.control}
             name="occurred_at"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="flex flex-col gap-2">
                 <FormLabel className="text-sm font-medium">Time</FormLabel>
                 <FormControl>
-                  <Input type="datetime-local" className="text-lg" {...field} />
+                  <DateTimeField
+                    value={dayjs(field.value)}
+                    onChange={(value) => {
+                      field.onChange(value?.toISOString());
+                    }}
+                    ampm={false}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>

@@ -23,6 +23,7 @@ import { useApplicationStore } from "@/src/stores/applicationStore";
 import { useCreateFeeding } from "@/src/hooks/data/mutations/useCreateFeeding";
 import { useCurrentBabyStore } from "@/src/stores/currentBabyStore";
 import FeedingModal from "./feeding-modal";
+import { DateTimeField } from "@mui/x-date-pickers";
 
 // Validation schema
 const feedingFormSchema = z
@@ -74,7 +75,7 @@ const LogFeedingModal = () => {
     resolver: zodResolver(feedingFormSchema),
     defaultValues: {
       type: "bottle",
-      occurred_at: getNow().format("YYYY-MM-DDTHH:mm"),
+      occurred_at: getNow().toISOString(),
       amount_ml: "",
       duration_minutes: "",
       note: "",
@@ -87,7 +88,7 @@ const LogFeedingModal = () => {
     const { occurred_at, amount_ml, duration_minutes, note, type } = data;
 
     const event: CreateFeeding = {
-      occurred_at: dayjs(occurred_at).toISOString(),
+      occurred_at: occurred_at,
       type,
       amount_ml: amount_ml ? Number(amount_ml) : null,
       duration_minutes: duration_minutes ? Number(duration_minutes) : null,
@@ -115,13 +116,15 @@ const LogFeedingModal = () => {
               control={form.control}
               name="occurred_at"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="flex flex-col gap-2">
                   <FormLabel className="text-sm font-medium">Time</FormLabel>
                   <FormControl>
-                    <Input
-                      type="datetime-local"
-                      className="text-lg"
-                      {...field}
+                    <DateTimeField
+                      value={dayjs(field.value)}
+                      onChange={(value) => {
+                        field.onChange(value?.toISOString());
+                      }}
+                      ampm={false}
                     />
                   </FormControl>
                   <FormMessage />

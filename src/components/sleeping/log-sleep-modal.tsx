@@ -29,6 +29,7 @@ import { CreateSleep } from "@/types/data/sleeps/types";
 import { useApplicationStore } from "@/src/stores/applicationStore";
 import { useCreateSleep } from "@/src/hooks/data/mutations/useCreateSleep";
 import { useCurrentBabyStore } from "@/src/stores/currentBabyStore";
+import { DateTimeField } from "@mui/x-date-pickers";
 
 // Validation schema
 const sleepFormSchema = z
@@ -69,6 +70,13 @@ const LogSleepModal = () => {
 
   const form = useForm<SleepFormData>({
     resolver: zodResolver(sleepFormSchema),
+    defaultValues: {
+      logType: "complete",
+      start_date: getNow().toString(),
+      end_date: getNow().add(1, "hour").toString(),
+      duration_minutes: 0,
+      note: "",
+    },
   });
 
   const watchedLogType = form.watch("logType");
@@ -79,7 +87,7 @@ const LogSleepModal = () => {
     if (logType === "start") {
       // Start a new sleep session
       const event: CreateSleep = {
-        start_date: data.start_date,
+        start_date: dayjs(data.start_date).toISOString(),
         duration_minutes: 0, // Will be calculated when sleep ends
         end_date: null,
         note: note || null,
@@ -188,15 +196,17 @@ const LogSleepModal = () => {
                     control={form.control}
                     name="start_date"
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="flex flex-col gap-2">
                         <FormLabel className="text-sm font-medium">
                           Start Time
                         </FormLabel>
                         <FormControl>
-                          <Input
-                            type="datetime-local"
-                            className="text-lg"
-                            {...field}
+                          <DateTimeField
+                            value={dayjs(field.value)}
+                            onChange={(value) => {
+                              field.onChange(value?.toISOString());
+                            }}
+                            ampm={false}
                           />
                         </FormControl>
                         <FormMessage />
@@ -208,15 +218,17 @@ const LogSleepModal = () => {
                     control={form.control}
                     name="end_date"
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="flex flex-col gap-2">
                         <FormLabel className="text-sm font-medium">
                           End Time
                         </FormLabel>
                         <FormControl>
-                          <Input
-                            type="datetime-local"
-                            className="text-lg"
-                            {...field}
+                          <DateTimeField
+                            value={dayjs(field.value)}
+                            onChange={(value) => {
+                              field.onChange(value?.toISOString());
+                            }}
+                            ampm={false}
                           />
                         </FormControl>
                         <FormMessage />

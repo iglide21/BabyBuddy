@@ -25,7 +25,8 @@ const QuickStats = () => {
   const feedings = events?.filter((event) => event.event_type === "feeding");
   const sleeps = events?.filter((event) => event.event_type === "sleep");
   const diapers = events?.filter((event) => event.event_type === "diaper");
-  if (isLoading) {
+
+  if (!events?.length || isLoading) {
     return (
       <div className="grid grid-cols-3 gap-3">
         <Skeleton className="w-full h-40 rounded-lg bg-gray-200" />

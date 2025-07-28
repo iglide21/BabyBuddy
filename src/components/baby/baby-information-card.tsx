@@ -7,7 +7,7 @@ const BabyInformationCard = () => {
 
   if (!currentBaby) {
     return (
-      <Skeleton className="w-full h-24 animate-pulse bg-gray-200 rounded-lg" />
+      <Skeleton className="w-full h-20 animate-pulse bg-gray-200 rounded-lg" />
     );
   }
 

@@ -1,6 +1,7 @@
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
-import { Baby, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
+import { useCurrentBabyStore } from "../stores/currentBabyStore";
 
 type QuickActionButtonProps = {
   onClick: () => void;
@@ -17,12 +18,18 @@ const QuickActionButton = ({
   description,
   className,
 }: QuickActionButtonProps) => {
+  const currentBaby = useCurrentBabyStore.use.currentBaby();
+
   return (
     <Button
       variant="default"
       size="xl"
       onClick={() => onClick()}
-      className={cn("flex-col h-24 gap-2 text-foreground shadow-sm", className)}
+      className={cn(
+        "flex-col h-24 gap-2 text-foreground shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:animate-pulse",
+        className
+      )}
+      disabled={!currentBaby}
     >
       <div className="flex items-center gap-2">
         {icon}

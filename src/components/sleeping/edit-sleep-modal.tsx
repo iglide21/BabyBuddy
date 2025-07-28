@@ -13,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "components/ui/dialog";
-import { Moon, Trash2 } from "lucide-react";
+import { Moon } from "lucide-react";
 import dayjs from "lib/dayjs";
 import { useApplicationStore } from "@/src/stores/applicationStore";
 import { UpdateSleep } from "@/types/data/sleeps/types";
@@ -27,6 +27,7 @@ import {
   FormLabel,
   FormMessage,
 } from "components/ui/form";
+import { DateTimeField } from "@mui/x-date-pickers";
 
 // Validation schema
 const sleepFormSchema = z
@@ -65,12 +66,8 @@ const EditSleepModal = () => {
   const form = useForm<SleepFormData>({
     resolver: zodResolver(sleepFormSchema),
     defaultValues: {
-      start_date: sleep?.start_date
-        ? dayjs(sleep.start_date).format("YYYY-MM-DDTHH:mm")
-        : "",
-      end_date: sleep?.end_date
-        ? dayjs(sleep.end_date).format("YYYY-MM-DDTHH:mm")
-        : "",
+      start_date: dayjs().toISOString(),
+      end_date: dayjs().add(1, "hour").toISOString(),
       note: sleep?.note || "",
     },
   });
@@ -79,10 +76,8 @@ const EditSleepModal = () => {
   useEffect(() => {
     if (sleep) {
       form.reset({
-        start_date: dayjs(sleep.start_date).format("YYYY-MM-DDTHH:mm"),
-        end_date: sleep.end_date
-          ? dayjs(sleep.end_date).format("YYYY-MM-DDTHH:mm")
-          : "",
+        start_date: sleep.start_date,
+        end_date: sleep.end_date,
         note: sleep.note || "",
       });
     }
@@ -149,15 +144,17 @@ const EditSleepModal = () => {
                 control={form.control}
                 name="start_date"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex flex-col gap-2">
                     <FormLabel className="text-sm font-medium">
                       Start Time
                     </FormLabel>
                     <FormControl>
-                      <Input
-                        type="datetime-local"
-                        className="text-lg"
-                        {...field}
+                      <DateTimeField
+                        value={dayjs(field.value)}
+                        onChange={(value) => {
+                          field.onChange(value?.toISOString());
+                        }}
+                        ampm={false}
                         disabled={status === "pending"}
                       />
                     </FormControl>
@@ -171,15 +168,17 @@ const EditSleepModal = () => {
                 control={form.control}
                 name="end_date"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="flex flex-col gap-2">
                     <FormLabel className="text-sm font-medium">
                       End Time
                     </FormLabel>
                     <FormControl>
-                      <Input
-                        type="datetime-local"
-                        className="text-lg"
-                        {...field}
+                      <DateTimeField
+                        value={dayjs(field.value)}
+                        onChange={(value) => {
+                          field.onChange(value?.toISOString());
+                        }}
+                        ampm={false}
                         disabled={status === "pending"}
                       />
                     </FormControl>

@@ -12,6 +12,8 @@ import useBaby from "@/src/hooks/data/queries/useBaby";
 import { useEffect } from "react";
 import { useCurrentBabyStore } from "@/src/stores/currentBabyStore";
 import BabyInformationCard from "@/src/components/baby/baby-information-card";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 export default function BabyBuddyApp() {
   const params = useParams();
@@ -27,14 +29,15 @@ export default function BabyBuddyApp() {
   }, [baby, setCurrentBaby]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50">
-      <div className="max-w-md mx-auto px-4 py-6 space-y-6">
-        <BabyInformationCard />
-        <QuickStats />
-        <QuickActions />
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={"de-DE"}>
+      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50">
+        <div className="max-w-md mx-auto px-4 py-6 space-y-6">
+          <BabyInformationCard />
+          <QuickStats />
+          <QuickActions />
 
-        {/* Active Sleep Alert */}
-        {/* {activeSleep && (
+          {/* Active Sleep Alert */}
+          {/* {activeSleep && (
           <Card className="bg-blue-100 border-blue-300">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -65,10 +68,10 @@ export default function BabyBuddyApp() {
           </Card>
         )} */}
 
-        <TodaysActivities />
+          <TodaysActivities />
 
-        {/* Encouraging Message */}
-        {/* {feedings && sleeps && diapers && (
+          {/* Encouraging Message */}
+          {/* {feedings && sleeps && diapers && (
           <Card className="bg-gradient-to-r from-pink-50 to-purple-50 border-pink-200">
             <CardContent className="p-4 text-center">
               <p className="text-sm text-gray-700">
@@ -83,15 +86,16 @@ export default function BabyBuddyApp() {
             </CardContent>
           </Card>
         )} */}
+        </div>
+
+        <LogFeedingModal />
+        <LogSleepModal />
+        <LogDiaperModal />
+
+        <EditSleepModal />
+        <EditFeedingModal />
+        <EditDiaperModal />
       </div>
-
-      <LogFeedingModal />
-      <LogSleepModal />
-      <LogDiaperModal />
-
-      <EditSleepModal />
-      <EditFeedingModal />
-      <EditDiaperModal />
-    </div>
+    </LocalizationProvider>
   );
 }

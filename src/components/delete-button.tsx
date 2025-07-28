@@ -3,17 +3,17 @@ import { Trash2 } from "lucide-react";
 
 type DeleteButtonProps = {
   onClick: () => void;
-  status: "idle" | "pending" | "success" | "error";
+  disabled?: boolean;
 };
 
-const DeleteButton = ({ onClick, status }: DeleteButtonProps) => {
+const DeleteButton = ({ onClick, disabled }: DeleteButtonProps) => {
   return (
     <Button
       type="button"
       variant="destructive"
       onClick={onClick}
       className="px-3"
-      disabled={status === "pending"}
+      disabled={disabled}
     >
       <Trash2 className="w-4 h-4" />
     </Button>
