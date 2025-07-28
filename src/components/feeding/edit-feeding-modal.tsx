@@ -339,15 +339,6 @@ const EditFeedingModal = () => {
                 Cancel
               </Button>
               <Button
-                type="button"
-                variant="destructive"
-                onClick={handleDelete}
-                className="px-3"
-                disabled={status === "pending"}
-              >
-                <Trash2 className="w-4 h-4" />
-              </Button>
-              <Button
                 type="submit"
                 className="flex-1 bg-orange-500 hover:bg-orange-600 text-white"
                 disabled={status === "pending"}

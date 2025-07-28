@@ -1,32 +1,34 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getTodayString, getStartOfDay, getEndOfDay } from "lib/dayjs";
+import dayjs, { getTodayString, getStartOfDay, getEndOfDay } from "lib/dayjs";
 import { createClient } from "@/src/lib/supabase/server";
 
 export const GET = async (request: NextRequest) => {
   const { searchParams } = new URL(request.url);
   const babyId = searchParams.get("babyId");
-  const date = searchParams.get("date"); // Optional date parameter
+  const startDate = searchParams.get("startDate");
+  const endDate = searchParams.get("endDate");
+
+  const tzStartDate = startDate ? dayjs(startDate).toISOString() : null;
+  const tzEndDate = endDate ? dayjs(endDate).toISOString() : null;
 
   if (!babyId) {
     return NextResponse.json({ error: "Baby ID is required" }, { status: 400 });
   }
 
-  // If no date is provided, default to today
-  const targetDate = date || getTodayString();
-
-  // Get start and end of the target date
-  const startOfDay = getStartOfDay(targetDate);
-  const endOfDay = getEndOfDay(targetDate);
-
   const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from("all_events_view")
-    .select()
-    .eq("baby_id", babyId)
-    .gte("occurred_at", startOfDay.toISOString())
-    .lte("occurred_at", endOfDay.toISOString())
-    .order("occurred_at", { ascending: false });
+  let query = supabase.from("all_events_view").select().eq("baby_id", babyId);
+
+  if (tzStartDate) {
+    query = query.gte("occurred_at", tzStartDate);
+  }
+
+  if (tzEndDate) {
+    query = query.lte("occurred_at", tzEndDate);
+  }
+
+  query = query.order("occurred_at", { ascending: false });
+  const { data, error } = await query;
 
   if (error) {
     throw new Error(error.message);

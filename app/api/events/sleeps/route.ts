@@ -19,6 +19,10 @@ export const POST = async (request: NextRequest) => {
 
   const supabase = await createClient();
 
+  if (!body.baby_id) {
+    return NextResponse.json({ error: "Baby ID is required" }, { status: 400 });
+  }
+
   const { data, error } = await supabase.from("sleeps").insert(body).select();
 
   if (error) {

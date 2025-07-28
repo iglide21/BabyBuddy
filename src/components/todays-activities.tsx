@@ -6,7 +6,7 @@ import { JSX } from "react";
 import { SleepingActivity } from "./sleeping";
 import { FeedingActivity } from "./feeding";
 import { DiaperActivity } from "./diaper";
-import { getTodayString } from "lib/dayjs";
+import { getEndOfDay, getStartOfDay, getTodayString } from "lib/dayjs";
 import { Skeleton } from "./ui/skeleton";
 import { useCurrentBabyStore } from "@/src/stores/currentBabyStore";
 import { useApplicationStore } from "../stores/applicationStore";
@@ -32,12 +32,20 @@ const TodaysActivities = () => {
   const setCurrentSelectedEvent =
     useCurrentBabyStore.use.setCurrentSelectedEvent();
   const showModal = useApplicationStore.use.showModal();
+
   const today = getTodayString();
+  const startDate = getStartOfDay(today);
+  const endDate = getEndOfDay(today);
+
   const {
     data: events,
     isLoading,
     isError,
-  } = useEvents(currentBaby?.id, today);
+  } = useEvents(
+    currentBaby?.id,
+    startDate.toISOString(),
+    endDate.toISOString()
+  );
 
   return (
     <>

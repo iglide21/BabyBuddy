@@ -3,12 +3,12 @@ import { getEventsForBaby } from "@/src/services/events";
 import { Event } from "@/types/data/events/types";
 import { QUERY_KEYS } from "@/src/lib/constants";
 
-const useEvents = (babyId?: string, date?: string) => {
+const useEvents = (babyId?: string, startDate?: string, endDate?: string) => {
   const isEnabled = !!babyId;
 
   return useQuery<Event[]>({
-    queryKey: [QUERY_KEYS.EVENTS, babyId, date],
-    queryFn: () => getEventsForBaby(babyId!, date),
+    queryKey: [QUERY_KEYS.EVENTS, babyId, startDate, endDate],
+    queryFn: () => getEventsForBaby(babyId!, startDate, endDate),
     enabled: isEnabled,
   });
 };

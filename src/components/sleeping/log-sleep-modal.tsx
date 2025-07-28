@@ -69,13 +69,6 @@ const LogSleepModal = () => {
 
   const form = useForm<SleepFormData>({
     resolver: zodResolver(sleepFormSchema),
-    defaultValues: {
-      logType: "complete",
-      start_date: getNow().subtract(1, "hour").format("YYYY-MM-DDTHH:mm"),
-      end_date: getNow().format("YYYY-MM-DDTHH:mm"),
-      duration_minutes: 0,
-      note: "",
-    },
   });
 
   const watchedLogType = form.watch("logType");
@@ -86,11 +79,11 @@ const LogSleepModal = () => {
     if (logType === "start") {
       // Start a new sleep session
       const event: CreateSleep = {
-        start_date: dayjs().toISOString(),
+        start_date: data.start_date,
         duration_minutes: 0, // Will be calculated when sleep ends
         end_date: null,
         note: note || null,
-        baby_id: currentBaby?.id ?? null,
+        baby_id: currentBaby?.id ?? "",
       };
 
       form.reset();

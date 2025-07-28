@@ -233,15 +233,6 @@ const EditSleepModal = () => {
                   Cancel
                 </Button>
                 <Button
-                  type="button"
-                  variant="destructive"
-                  onClick={handleDelete}
-                  className="px-3"
-                  disabled={status === "pending"}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-                <Button
                   type="submit"
                   className="flex-1 bg-blue-500 hover:bg-blue-600 text-white"
                   disabled={status === "pending"}

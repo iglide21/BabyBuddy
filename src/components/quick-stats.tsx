@@ -2,7 +2,7 @@
 
 import { useFeedings, useSleeps, useDiapers } from "../hooks/data/queries";
 import useEvents from "../hooks/data/queries/useEvents";
-import { getTodayString } from "../lib/dayjs";
+import { getEndOfDay, getStartOfDay, getTodayString } from "../lib/dayjs";
 import StatsCard from "./stats-card";
 import { Milk, Moon } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
@@ -12,9 +12,14 @@ import { useCurrentBabyStore } from "../stores/currentBabyStore";
 const QuickStats = () => {
   const currentBaby = useCurrentBabyStore.use.currentBaby();
 
+  const today = getTodayString();
+  const startDate = getStartOfDay(today);
+  const endDate = getEndOfDay(today);
+
   const { data: events, isLoading } = useEvents(
     currentBaby?.id,
-    getTodayString()
+    startDate.toISOString(),
+    endDate.toISOString()
   );
 
   const feedings = events?.filter((event) => event.event_type === "feeding");

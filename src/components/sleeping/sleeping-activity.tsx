@@ -2,11 +2,11 @@ import { ActivityComponentProps } from "@/types/common";
 import { Moon, Badge } from "lucide-react";
 import { formatDuration, formatTime } from "lib/dayjs";
 import EditButton from "../edit-button";
-// import { useDeleteSleep } from "@/src/hooks/data/mutations";
+import { useDeleteSleep } from "@/src/hooks/data/mutations";
 import DeleteButton from "../delete-button";
 
 const SleepingActivity = ({ event, editEvent }: ActivityComponentProps) => {
-  // const { mutate: deleteEvent, status } = useDeleteSleep(event.id);
+  const { mutate: deleteEvent, status } = useDeleteSleep();
 
   const formattedDuration = formatDuration(
     event.occurred_at || "",
@@ -50,8 +50,13 @@ const SleepingActivity = ({ event, editEvent }: ActivityComponentProps) => {
         )}
       </div>
       <div className="flex items-center gap-2">
-        {/* <DeleteButton onClick={() => deleteEvent(event.id)} status={status} /> */}
-        {event.end_date && <EditButton onClick={() => editEvent?.(event.id)} />}
+        <DeleteButton
+          onClick={() => event.id && deleteEvent(event.id.toString())}
+          status={status}
+        />
+        {event.end_date && (
+          <EditButton onClick={() => event.id && editEvent?.(event.id)} />
+        )}
       </div>
     </>
   );

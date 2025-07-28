@@ -3,10 +3,10 @@ import { formatTime } from "lib/dayjs";
 import { ActivityComponentProps } from "@/types/common";
 import EditButton from "../edit-button";
 import DeleteButton from "../delete-button";
-// import { useDeleteDiaper } from "@/src/hooks/data/mutations";
+import { useDeleteDiaper } from "@/src/hooks/data/mutations";
 
 const DiaperActivity = ({ event, editEvent }: ActivityComponentProps) => {
-  // const { mutate: deleteEvent, status } = useDeleteDiaper(event.id);
+  const { mutate: deleteEvent, status } = useDeleteDiaper();
 
   return (
     <>
@@ -30,7 +30,10 @@ const DiaperActivity = ({ event, editEvent }: ActivityComponentProps) => {
         )}
       </div>
       <div className="flex items-center gap-2">
-        {/* <DeleteButton onClick={() => deleteEvent(event.id)} status={status} /> */}
+        <DeleteButton
+          onClick={() => event.id && deleteEvent(event.id.toString())}
+          status={status}
+        />
         <EditButton onClick={() => editEvent?.(event.id ?? 0)} />
       </div>
     </>

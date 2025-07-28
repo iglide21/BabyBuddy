@@ -1,10 +1,9 @@
-import { QueryStatus } from "@tanstack/react-query";
 import { Button } from "./ui/button";
 import { Trash2 } from "lucide-react";
 
 type DeleteButtonProps = {
   onClick: () => void;
-  status: QueryStatus;
+  status: "idle" | "pending" | "success" | "error";
 };
 
 const DeleteButton = ({ onClick, status }: DeleteButtonProps) => {

@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const GET = async (
   _: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) => {
   const { id } = await params;
   const supabase = await createClient();
@@ -22,7 +22,7 @@ export const GET = async (
 
 export const PUT = async (
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) => {
   const { id } = await params;
   const body = await request.json();
@@ -41,4 +41,26 @@ export const PUT = async (
   }
 
   return NextResponse.json(updatedData);
+};
+
+export const DELETE = async (
+  _: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) => {
+  const { id } = await params;
+
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("diapers")
+    .delete()
+    .eq("id", Number(id))
+    .select()
+    .single();
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+
+  return NextResponse.json(data);
 };
