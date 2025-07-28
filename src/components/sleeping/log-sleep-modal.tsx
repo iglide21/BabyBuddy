@@ -41,13 +41,11 @@ const sleepFormSchema = z
   })
   .refine(
     (data) => {
-      if (
-        data.logType === "complete" &&
-        (!data.end_date || data.end_date.trim() === "")
-      ) {
-        return false;
-      }
-      return true;
+      const start = dayjs(data.start_date);
+      const end = dayjs(data.end_date);
+      const diff = end.diff(start, "minute", true);
+
+      return data.logType === "complete" ? diff >= 1 : true;
     },
     {
       message: "End date is required for complete sleep",

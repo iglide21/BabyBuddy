@@ -29,11 +29,24 @@ import {
 } from "components/ui/form";
 
 // Validation schema
-const sleepFormSchema = z.object({
-  start_date: z.string().min(1, "Start date is required"),
-  end_date: z.string().min(1, "End date is required"),
-  note: z.string().optional(),
-});
+const sleepFormSchema = z
+  .object({
+    start_date: z.string().min(1, "Start date is required"),
+    end_date: z.string().min(1, "End date is required"),
+    note: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      const start = dayjs(data.start_date);
+      const end = dayjs(data.end_date);
+      const diff = end.diff(start, "minute", true);
+
+      return diff >= 1;
+    },
+    {
+      message: "End date must be after start date",
+    }
+  );
 
 type SleepFormData = z.infer<typeof sleepFormSchema>;
 
