@@ -35,7 +35,7 @@ const menuItems = [
   {
     label: "Reminders",
     icon: Bell,
-    href: "/notifications",
+    href: "/reminders",
     color: "purple",
   },
   {

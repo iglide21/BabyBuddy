@@ -1,37 +1,36 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "components/ui/button";
-import { Input } from "components/ui/input";
-import { Label } from "components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "components/ui/card";
-import { Badge } from "components/ui/badge";
+import { CardTitle, DialogHeader } from "@/src/components/ui";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardHeader from "@mui/material/CardHeader";
+import Input from "@mui/material/Input";
+import { Dialog, DialogContent, DialogTitle } from "@radix-ui/react-dialog";
+import { RadioGroup, RadioGroupItem } from "@radix-ui/react-radio-group";
 import {
-  ArrowLeft,
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@radix-ui/react-select";
+import { Switch } from "@radix-ui/react-switch";
+import {
+  Milk,
+  Moon,
   Bell,
+  ArrowLeft,
   Plus,
   Trash2,
   Clock,
-  Milk,
-  Moon,
   AlertCircle,
 } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "components/ui/dialog";
-import { RadioGroup, RadioGroupItem } from "components/ui/radio-group";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "components/ui/select";
-import { getTwoHoursAgo, getNow, getTomorrow, generateId } from "lib/dayjs";
-import dayjs from "lib/dayjs";
+import { useState } from "react";
+import { Label } from "components/ui/label";
+import { Button } from "components/ui/button";
+import { Badge } from "components/ui/badge";
+import { toast } from "@/src/hooks/use-toast";
+import { useRouter } from "next/navigation";
 
 interface Reminder {
   id: string;
@@ -44,7 +43,8 @@ interface Reminder {
   lastTriggered?: Date;
 }
 
-const NotificationsPage = () => {
+const NotificationsView = () => {
+  const router = useRouter();
   const [reminders, setReminders] = useState<Reminder[]>([
     {
       id: "1",
@@ -60,8 +60,8 @@ const NotificationsPage = () => {
       activity: "feeding",
       title: "Feeding reminder",
       intervalHours: 3,
-      enabled: true,
-      lastTriggered: getTwoHoursAgo().toDate(), // 2 hours ago
+      enabled: false,
+      lastTriggered: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
     },
   ]);
 
@@ -73,10 +73,32 @@ const NotificationsPage = () => {
   });
 
   const addReminder = () => {
-    if (!newReminder.title) return;
+    if (!newReminder.title) {
+      toast({
+        title: "Please enter a reminder title",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (newReminder.type === "scheduled" && !newReminder.time) {
+      toast({
+        title: "Please select a time for scheduled reminder",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (newReminder.type === "interval" && !newReminder.intervalHours) {
+      toast({
+        title: "Please enter interval hours",
+        variant: "destructive",
+      });
+      return;
+    }
 
     const reminder: Reminder = {
-      id: generateId(),
+      id: Date.now().toString(),
       type: newReminder.type || "scheduled",
       activity: newReminder.activity || "feeding",
       title: newReminder.title,
@@ -92,15 +114,33 @@ const NotificationsPage = () => {
       enabled: true,
     });
     setShowAddModal(false);
+    toast({
+      title: "Reminder added successfully!",
+      variant: "default",
+    });
   };
 
   const deleteReminder = (id: string) => {
     setReminders((prev) => prev.filter((r) => r.id !== id));
+    toast({
+      title: "Reminder deleted",
+      variant: "default",
+    });
   };
 
   const toggleReminder = (id: string) => {
     setReminders((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, enabled: !r.enabled } : r))
+      prev.map((r) => {
+        if (r.id === id) {
+          const newEnabled = !r.enabled;
+          toast({
+            title: `Reminder ${newEnabled ? "enabled" : "disabled"}`,
+            variant: newEnabled ? "default" : "default",
+          });
+          return { ...r, enabled: newEnabled };
+        }
+        return r;
+      })
     );
   };
 
@@ -120,54 +160,60 @@ const NotificationsPage = () => {
   const getActivityColor = (activity: string) => {
     switch (activity) {
       case "feeding":
-        return "bg-orange-100 text-orange-700 border-orange-200";
+        return "text-orange-600";
       case "sleep":
-        return "bg-blue-100 text-blue-700 border-blue-200";
+        return "text-blue-600";
       case "diaper":
-        return "bg-green-100 text-green-700 border-green-200";
+        return "text-green-600";
       default:
-        return "bg-gray-100 text-gray-700 border-gray-200";
+        return "text-gray-600";
     }
   };
 
   const getNextTrigger = (reminder: Reminder) => {
     if (reminder.type === "scheduled" && reminder.time) {
       const [hours, minutes] = reminder.time.split(":").map(Number);
-      const now = getNow();
-      const today = now.hour(hours).minute(minutes).second(0).millisecond(0);
-      const tomorrow = getTomorrow()
-        .hour(hours)
-        .minute(minutes)
-        .second(0)
-        .millisecond(0);
+      const now = new Date();
+      const today = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        hours,
+        minutes
+      );
+      const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
 
-      return today.isAfter(now) ? today.toDate() : tomorrow.toDate();
+      return today > now ? today : tomorrow;
     } else if (
       reminder.type === "interval" &&
       reminder.intervalHours &&
       reminder.lastTriggered
     ) {
-      return dayjs(reminder.lastTriggered)
-        .add(reminder.intervalHours, "hour")
-        .toDate();
+      return new Date(
+        reminder.lastTriggered.getTime() +
+          reminder.intervalHours * 60 * 60 * 1000
+      );
     }
     return null;
   };
 
   const formatTimeUntil = (date: Date) => {
-    const now = getNow();
-    const diff = dayjs(date).diff(now, "minute");
+    const now = new Date();
+    const diff = date.getTime() - now.getTime();
 
     if (diff < 0) return "Overdue";
 
-    const hours = Math.floor(diff / 60);
-    const minutes = diff % 60;
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
 
     if (hours > 0) {
       return `in ${hours}h ${minutes}m`;
     }
     return `in ${minutes}m`;
   };
+
+  const activeReminders = reminders.filter((r) => r.enabled);
+  const inactiveReminders = reminders.filter((r) => !r.enabled);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50">
@@ -182,51 +228,114 @@ const NotificationsPage = () => {
         </Button>
 
         {/* Active Reminders */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertCircle className="w-5 h-5 text-purple-600" />
-              Active Reminders
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {reminders.filter((r) => r.enabled).length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <Bell className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                <p className="text-sm">No active reminders.</p>
-                <p className="text-xs mt-1">
-                  Add some reminders to stay on track! 🔔
-                </p>
-              </div>
-            ) : (
-              reminders
-                .filter((r) => r.enabled)
-                .map((reminder) => {
-                  const nextTrigger = getNextTrigger(reminder);
-                  return (
-                    <div
-                      key={reminder.id}
-                      className="flex items-center gap-3 p-3 rounded-lg bg-gray-50"
-                    >
-                      <div
-                        className={`w-10 h-10 rounded-full flex items-center justify-center ${getActivityColor(
-                          reminder.activity
-                        )}`}
+        {activeReminders.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Bell className="w-5 h-5 text-green-600" />
+                Active Reminders
+                <Badge className="bg-green-100 text-green-700">
+                  {activeReminders.length}
+                </Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {activeReminders.map((reminder) => {
+                const nextTrigger = getNextTrigger(reminder);
+                return (
+                  <div
+                    key={reminder.id}
+                    className="p-4 rounded-lg border border-green-200 bg-green-50"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-3 flex-1">
+                        <div
+                          className={`${getActivityColor(reminder.activity)}`}
+                        >
+                          {getActivityIcon(reminder.activity)}
+                        </div>
+                        <div className="flex-1">
+                          <div className="font-medium text-gray-800">
+                            {reminder.title}
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            {reminder.type === "scheduled" && reminder.time && (
+                              <>Daily at {reminder.time}</>
+                            )}
+                            {reminder.type === "interval" &&
+                              reminder.intervalHours && (
+                                <>Every {reminder.intervalHours} hours</>
+                              )}
+                            {nextTrigger && (
+                              <span className="ml-2 text-purple-600 font-medium">
+                                • {formatTimeUntil(nextTrigger)}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Switch
+                          checked={reminder.enabled}
+                          onCheckedChange={() => toggleReminder(reminder.id)}
+                          className="data-[state=checked]:bg-green-600"
+                        />
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => deleteReminder(reminder.id)}
+                          className="text-red-500 hover:bg-red-50 p-1"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs">
+                      <Badge variant="secondary" className="bg-white">
+                        {reminder.type === "scheduled"
+                          ? "Scheduled"
+                          : "Interval"}
+                      </Badge>
+                      <Badge
+                        variant="secondary"
+                        className="bg-white capitalize"
                       >
+                        {reminder.activity}
+                      </Badge>
+                    </div>
+                  </div>
+                );
+              })}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Inactive Reminders */}
+        {inactiveReminders.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-gray-500">
+                <Clock className="w-5 h-5" />
+                Disabled Reminders
+                <Badge variant="secondary">{inactiveReminders.length}</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {inactiveReminders.map((reminder) => (
+                <div
+                  key={reminder.id}
+                  className="p-4 rounded-lg border border-gray-200 bg-gray-50 opacity-75"
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className="text-gray-400">
                         {getActivityIcon(reminder.activity)}
                       </div>
                       <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-gray-800">
-                            {reminder.title}
-                          </span>
-                          <Badge variant="secondary" className="text-xs">
-                            {reminder.type === "scheduled"
-                              ? "Scheduled"
-                              : "Interval"}
-                          </Badge>
+                        <div className="font-medium text-gray-600">
+                          {reminder.title}
                         </div>
-                        <div className="text-sm text-gray-600">
+                        <div className="text-sm text-gray-500">
                           {reminder.type === "scheduled" && reminder.time && (
                             <>Daily at {reminder.time}</>
                           )}
@@ -234,101 +343,47 @@ const NotificationsPage = () => {
                             reminder.intervalHours && (
                               <>Every {reminder.intervalHours} hours</>
                             )}
-                          {nextTrigger && (
-                            <span className="ml-2 text-purple-600">
-                              • {formatTimeUntil(nextTrigger)}
-                            </span>
-                          )}
                         </div>
                       </div>
-                      <div className="flex gap-1">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => toggleReminder(reminder.id)}
-                          className="text-gray-500"
-                        >
-                          <Clock className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => deleteReminder(reminder.id)}
-                          className="text-red-500"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
                     </div>
-                  );
-                })
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Disabled Reminders */}
-        {reminders.filter((r) => !r.enabled).length > 0 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-gray-500">
-                <Clock className="w-5 h-5" />
-                Disabled Reminders
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {reminders
-                .filter((r) => !r.enabled)
-                .map((reminder) => (
-                  <div
-                    key={reminder.id}
-                    className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 opacity-60"
-                  >
-                    <div
-                      className={`w-10 h-10 rounded-full flex items-center justify-center ${getActivityColor(
-                        reminder.activity
-                      )}`}
-                    >
-                      {getActivityIcon(reminder.activity)}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-gray-800">
-                          {reminder.title}
-                        </span>
-                        <Badge variant="secondary" className="text-xs">
-                          Disabled
-                        </Badge>
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        {reminder.type === "scheduled" && reminder.time && (
-                          <>Daily at {reminder.time}</>
-                        )}
-                        {reminder.type === "interval" &&
-                          reminder.intervalHours && (
-                            <>Every {reminder.intervalHours} hours</>
-                          )}
-                      </div>
-                    </div>
-                    <div className="flex gap-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => toggleReminder(reminder.id)}
-                        className="text-green-500"
-                      >
-                        <Clock className="w-4 h-4" />
-                      </Button>
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={reminder.enabled}
+                        onCheckedChange={() => toggleReminder(reminder.id)}
+                      />
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => deleteReminder(reminder.id)}
-                        className="text-red-500"
+                        className="text-red-500 hover:bg-red-50 p-1"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
                   </div>
-                ))}
+                  <div className="flex items-center gap-2 text-xs">
+                    <Badge variant="secondary" className="bg-white">
+                      Disabled
+                    </Badge>
+                    <Badge variant="secondary" className="bg-white capitalize">
+                      {reminder.activity}
+                    </Badge>
+                  </div>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Empty State */}
+        {reminders.length === 0 && (
+          <Card>
+            <CardContent className="p-8 text-center">
+              <Bell className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+              <p className="text-gray-500">No reminders set up yet.</p>
+              <p className="text-sm text-gray-400 mt-1">
+                Add some reminders to stay on track! 🔔
+              </p>
             </CardContent>
           </Card>
         )}
@@ -337,18 +392,18 @@ const NotificationsPage = () => {
         <Card className="bg-gradient-to-r from-purple-50 to-blue-50 border-purple-200">
           <CardContent className="p-4">
             <h3 className="font-medium text-gray-800 mb-2">
-              🔔 About Notifications
+              🔔 About Reminders
             </h3>
             <ul className="text-sm text-gray-600 space-y-1">
               <li>
-                • <strong>Scheduled:</strong> Reminders at specific times daily
+                • <strong>Scheduled:</strong> Daily reminders at specific times
               </li>
               <li>
                 • <strong>Interval:</strong> Reminders based on time since last
                 activity
               </li>
-              <li>• Enable browser notifications for alerts</li>
-              <li>• Reminders help maintain consistent routines</li>
+              <li>• Use the switch to quickly enable/disable reminders</li>
+              <li>• Reminders help maintain consistent baby care routines</li>
             </ul>
           </CardContent>
         </Card>
@@ -460,8 +515,6 @@ const NotificationsPage = () => {
                 <Input
                   id="interval"
                   type="number"
-                  min="1"
-                  max="24"
                   placeholder="3"
                   value={newReminder.intervalHours || ""}
                   onChange={(e) =>
@@ -498,4 +551,4 @@ const NotificationsPage = () => {
   );
 };
 
-export default NotificationsPage;
+export default NotificationsView;

@@ -171,6 +171,56 @@ export type Database = {
           },
         ]
       }
+      reminders: {
+        Row: {
+          baby_id: string
+          created_at: string
+          end_time: string
+          id: string
+          interval_minutes: number | null
+          is_active: boolean
+          label: string
+          last_triggered: string | null
+          start_time: string
+          time_of_day: string | null
+          type: Database["public"]["Enums"]["Reminder type"]
+        }
+        Insert: {
+          baby_id: string
+          created_at: string
+          end_time: string
+          id?: string
+          interval_minutes?: number | null
+          is_active: boolean
+          label: string
+          last_triggered?: string | null
+          start_time: string
+          time_of_day?: string | null
+          type: Database["public"]["Enums"]["Reminder type"]
+        }
+        Update: {
+          baby_id?: string
+          created_at?: string
+          end_time?: string
+          id?: string
+          interval_minutes?: number | null
+          is_active?: boolean
+          label?: string
+          last_triggered?: string | null
+          start_time?: string
+          time_of_day?: string | null
+          type?: Database["public"]["Enums"]["Reminder type"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reminders_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sleeps: {
         Row: {
           baby_id: string
@@ -244,6 +294,7 @@ export type Database = {
       DiaperType: "wet" | "dirty" | "both"
       "Feeding type": "breast" | "bottle" | "solid"
       Gender: "male" | "female" | "other"
+      "Reminder type": "daily" | "interval"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -387,6 +438,7 @@ export const Constants = {
       DiaperType: ["wet", "dirty", "both"],
       "Feeding type": ["breast", "bottle", "solid"],
       Gender: ["male", "female", "other"],
+      "Reminder type": ["daily", "interval"],
     },
   },
 } as const

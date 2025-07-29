@@ -5,4 +5,5 @@ export const QUERY_KEYS = {
   BABIES: "babies",
   BABY: "baby",
   EVENTS: "events",
+  REMINDERS: "reminders",
 };

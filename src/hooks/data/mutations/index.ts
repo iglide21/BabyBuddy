@@ -1,6 +1,7 @@
 import { useCreateFeeding } from "./useCreateFeeding";
 import { useCreateDiaper } from "./useCreateDiaper";
 import { useCreateSleep } from "./useCreateSleep";
+import { useCreateReminder } from "./useCreateReminder";
 import { useUpdateDiaper } from "./useUpdateDiaper";
 import { useUpdateSleep } from "./useUpdateSleep";
 import { useUpdateFeeding } from "./useUpdateFeeding";
@@ -12,6 +13,7 @@ export {
   useCreateFeeding,
   useCreateDiaper,
   useCreateSleep,
+  useCreateReminder,
   useUpdateDiaper,
   useUpdateSleep,
   useUpdateFeeding,
