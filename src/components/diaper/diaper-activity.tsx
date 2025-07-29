@@ -30,7 +30,12 @@ const DiaperActivity = ({ event, editEvent }: ActivityComponentProps) => {
             </Badge>
           </div>
           <div className="text-sm text-gray-600">
-            {event.occurred_at && formatTime(event.occurred_at)}
+            {event.occurred_at && (
+              <div>
+                <span className="font-medium text-gray-700">Time: </span>
+                <span>{formatTime(event.occurred_at)}</span>
+              </div>
+            )}
           </div>
           {event.note && (
             <div className="text-xs text-gray-500 mt-1">{event.note}</div>
@@ -38,12 +43,12 @@ const DiaperActivity = ({ event, editEvent }: ActivityComponentProps) => {
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <DeleteButton
-          onClick={() => event.id && deleteEvent(event.id.toString())}
-          disabled={status === "pending"}
-        />
         <EditButton
           onClick={() => event.id && editEvent?.(event.id)}
+          disabled={status === "pending"}
+        />
+        <DeleteButton
+          onClick={() => event.id && deleteEvent(event.id.toString())}
           disabled={status === "pending"}
         />
       </div>

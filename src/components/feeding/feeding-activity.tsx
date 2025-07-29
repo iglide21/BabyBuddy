@@ -59,12 +59,12 @@ const FeedingActivity = ({ event, editEvent }: ActivityComponentProps) => {
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <DeleteButton
-          onClick={() => event.id && deleteEvent(event.id.toString())}
-          disabled={status === "pending"}
-        />
         <EditButton
           onClick={() => event.id && editEvent?.(event.id)}
+          disabled={status === "pending"}
+        />
+        <DeleteButton
+          onClick={() => event.id && deleteEvent(event.id.toString())}
           disabled={status === "pending"}
         />
       </div>

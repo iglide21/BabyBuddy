@@ -13,7 +13,7 @@ const EditButton = ({
 
   return (
     <Button
-      variant="ghost"
+      variant="outline"
       size="sm"
       onClick={onClick}
       className={`transition-opacity ${

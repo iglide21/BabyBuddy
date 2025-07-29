@@ -54,7 +54,7 @@ const TodaysActivities = () => {
         <h2 className="text-xl font-medium">Today's Activities</h2>
       </div>
 
-      {isLoading ? (
+      {!events || isLoading ? (
         <div className="flex flex-col gap-4">
           <Skeleton className="w-full h-20 rounded-lg bg-gray-200" />
           <Skeleton className="w-full h-20 rounded-lg bg-gray-200" />

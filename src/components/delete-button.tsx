@@ -1,5 +1,5 @@
 import { Button } from "./ui/button";
-import { Trash2 } from "lucide-react";
+import { Trash } from "lucide-react";
 
 type DeleteButtonProps = {
   onClick: () => void;
@@ -10,12 +10,12 @@ const DeleteButton = ({ onClick, disabled }: DeleteButtonProps) => {
   return (
     <Button
       type="button"
+      size="sm"
       variant="destructive"
       onClick={onClick}
-      className="px-3"
       disabled={disabled}
     >
-      <Trash2 className="w-4 h-4" />
+      <Trash className="w-4 h-4" />
     </Button>
   );
 };
