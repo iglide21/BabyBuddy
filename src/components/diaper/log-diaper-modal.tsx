@@ -24,6 +24,7 @@ import { useCreateDiaper } from "@/src/hooks/data/mutations/useCreateDiaper";
 import { useBabyFromUrl } from "@/src/hooks/useBabyFromUrl";
 import DiaperModal from "./diaper-modal";
 import { DateTimeField } from "@mui/x-date-pickers";
+import AddNoteButton from "../add-note-button";
 
 // Validation schema
 const diaperFormSchema = z.object({
@@ -160,14 +161,10 @@ const LogDiaperModal = () => {
 
           {/* Notes Toggle */}
           {!showNotes && (
-            <Button
-              type="button"
-              variant="ghost"
-              onClick={() => setShowNotes(true)}
-              className="w-full text-gray-600"
-            >
-              + Add note (optional)
-            </Button>
+            <AddNoteButton
+              setShowNotes={setShowNotes}
+              className="border-green-300 text-green-600"
+            />
           )}
 
           {/* Notes */}

@@ -25,6 +25,25 @@ export const formatTime = (date: string | Date | dayjs.Dayjs | undefined) => {
   return dayjs(date).format("HH:mm");
 };
 
+export const formatDurationInMinutes = (durationInMinutes: number) => {
+  const hours = Math.floor(durationInMinutes / 60);
+  const minutes = durationInMinutes % 60;
+
+  if (hours > 0) {
+    if (hours === 1) {
+      return `${hours}hr ${minutes}mins`;
+    }
+
+    return `${hours}hrs ${minutes}mins`;
+  }
+
+  if (minutes === 1) {
+    return `${minutes}min`;
+  }
+
+  return `${minutes}mins`;
+};
+
 export const formatDuration = (
   startTime: string | Date | dayjs.Dayjs,
   endTime: string | Date | dayjs.Dayjs

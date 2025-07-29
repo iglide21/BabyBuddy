@@ -29,14 +29,11 @@ const DiaperActivity = ({ event, editEvent }: ActivityComponentProps) => {
               Diaper
             </Badge>
           </div>
-          <div className="text-sm text-gray-600">
-            {event.occurred_at && (
-              <div>
-                <span className="font-medium text-gray-700">Time: </span>
-                <span>{formatTime(event.occurred_at)}</span>
-              </div>
-            )}
-          </div>
+          {event.occurred_at && (
+            <span className="text-sm text-gray-700">
+              {formatTime(event.occurred_at)}
+            </span>
+          )}
           {event.note && (
             <div className="text-xs text-gray-500 mt-1">{event.note}</div>
           )}

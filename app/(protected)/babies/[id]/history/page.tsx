@@ -17,10 +17,12 @@ import { useBabyFromUrl } from "@/src/hooks/useBabyFromUrl";
 import { eventTypeToComponent } from "@/src/lib/components";
 
 export function HistoryPage() {
-  const { currentBaby } = useBabyFromUrl();
+  const { currentBaby, isLoading: isBabyLoading } = useBabyFromUrl();
 
   const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
-  const { data: events, isLoading } = useEvents(currentBaby?.id ?? "");
+  const { data: events, isLoading: isEventsLoading } = useEvents(
+    currentBaby?.id ?? ""
+  );
 
   const feedings = useMemo(
     () => events?.filter((event) => event.event_type === "feeding"),
@@ -113,118 +115,127 @@ export function HistoryPage() {
     return { totalFeedings, totalSleepHours, totalDiapers };
   };
 
+  if (isBabyLoading || isEventsLoading) {
+    return (
+      <div className="flex flex-col gap-4 m-4">
+        <Skeleton className="w-full h-8" />
+        <div className="flex flex-col gap-4">
+          <Skeleton className="w-full h-28" />
+          <Skeleton className="w-full h-28" />
+          <Skeleton className="w-full h-28" />
+          <Skeleton className="w-full h-28" />
+          <Skeleton className="w-full h-28" />
+          <Skeleton className="w-full h-28" />
+          <Skeleton className="w-full h-28" />
+        </div>
+      </div>
+    );
+  }
+
+  if (groupedLogs.length === 0) {
+    return (
+      <Card>
+        <CardContent className="p-4 text-center">
+          <Calendar className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+          <p className="text-gray-500">No history yet.</p>
+          <p className="text-sm text-gray-400 mt-1">
+            Start logging feeds and sleep to see your history here! 📊
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <div className="space-y-4 px-4">
-      {isLoading ? (
-        <div className="flex flex-col gap-4">
-          <Skeleton className="w-full h-24" />
-          <Skeleton className="w-full h-24" />
-          <Skeleton className="w-full h-24" />
-          <Skeleton className="w-full h-24" />
-          <Skeleton className="w-full h-24" />
-          <Skeleton className="w-full h-24" />
-          <Skeleton className="w-full h-24" />
-        </div>
-      ) : groupedLogs.length === 0 ? (
-        <Card>
-          <CardContent className="p-4 text-center">
-            <Calendar className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-            <p className="text-gray-500">No history yet.</p>
-            <p className="text-sm text-gray-400 mt-1">
-              Start logging feeds and sleep to see your history here! 📊
-            </p>
-          </CardContent>
-        </Card>
-      ) : (
-        groupedLogs.map(([dateKey, { feedings, sleeps, diapers }]) => {
-          const isExpanded = expandedDays.has(dateKey);
-          const { totalFeedings, totalSleepHours, totalDiapers } = getDayStats(
-            feedings,
-            sleeps,
-            diapers
-          );
+      {groupedLogs.map(([dateKey, { feedings, sleeps, diapers }]) => {
+        const isExpanded = expandedDays.has(dateKey);
+        const { totalFeedings, totalSleepHours, totalDiapers } = getDayStats(
+          feedings,
+          sleeps,
+          diapers
+        );
 
-          // Combine and sort activities for the day
-          const dayActivities = [
-            ...feedings.map((log) => ({
-              ...log,
-              event_type: "feeding" as const,
-            })),
-            ...sleeps.map((log) => ({ ...log, event_type: "sleep" as const })),
-            ...diapers.map((log) => ({
-              ...log,
-              event_type: "diaper" as const,
-            })),
-          ].sort((a, b) => {
-            const timeA =
-              a.event_type === "feeding"
-                ? a.occurred_at
-                : a.event_type === "diaper"
-                ? a.occurred_at
-                : a.occurred_at;
-            const timeB =
-              b.event_type === "feeding"
-                ? b.occurred_at
-                : b.event_type === "diaper"
-                ? b.occurred_at
-                : b.occurred_at;
-            return dayjs(timeB).diff(dayjs(timeA), "millisecond");
-          });
+        // Combine and sort activities for the day
+        const dayActivities = [
+          ...feedings.map((log) => ({
+            ...log,
+            event_type: "feeding" as const,
+          })),
+          ...sleeps.map((log) => ({ ...log, event_type: "sleep" as const })),
+          ...diapers.map((log) => ({
+            ...log,
+            event_type: "diaper" as const,
+          })),
+        ].sort((a, b) => {
+          const timeA =
+            a.event_type === "feeding"
+              ? a.occurred_at
+              : a.event_type === "diaper"
+              ? a.occurred_at
+              : a.occurred_at;
+          const timeB =
+            b.event_type === "feeding"
+              ? b.occurred_at
+              : b.event_type === "diaper"
+              ? b.occurred_at
+              : b.occurred_at;
+          return dayjs(timeB).diff(dayjs(timeA), "millisecond");
+        });
 
-          return (
-            <Card key={dateKey}>
-              <CardHeader
-                className="cursor-pointer"
-                onClick={() => toggleDay(dateKey)}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-lg">
-                      {formatDate(dateKey)}
-                    </CardTitle>
-                    <div className="flex items-center gap-4 mt-2">
-                      <div className="flex items-center gap-1 text-sm text-orange-600">
-                        <Milk className="w-4 h-4" />
-                        <span>{totalFeedings} feeds</span>
-                      </div>
-                      <div className="flex items-center gap-1 text-sm text-blue-600">
-                        <Moon className="w-4 h-4" />
-                        <span>{totalSleepHours}h sleep</span>
-                      </div>
-                      <div className="flex items-center gap-1 text-sm text-green-600">
-                        <span className="text-sm">💩</span>
-                        <span>{totalDiapers} diapers</span>
-                      </div>
+        return (
+          <Card key={dateKey}>
+            <CardHeader
+              className="cursor-pointer"
+              onClick={() => toggleDay(dateKey)}
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="text-lg">
+                    {formatDate(dateKey)}
+                  </CardTitle>
+                  <div className="flex items-center gap-4 mt-2">
+                    <div className="flex items-center gap-1 text-sm text-orange-600">
+                      <Milk className="w-4 h-4" />
+                      <span>{totalFeedings} feeds</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-sm text-blue-600">
+                      <Moon className="w-4 h-4" />
+                      <span>{totalSleepHours}h sleep</span>
+                    </div>
+                    <div className="flex items-center gap-1 text-sm text-green-600">
+                      <span className="text-sm">💩</span>
+                      <span>{totalDiapers} diapers</span>
                     </div>
                   </div>
-                  {isExpanded ? (
-                    <ChevronDown className="w-5 h-5 text-gray-400" />
-                  ) : (
-                    <ChevronRight className="w-5 h-5 text-gray-400" />
-                  )}
                 </div>
-              </CardHeader>
+                {isExpanded ? (
+                  <ChevronDown className="w-5 h-5 text-gray-400" />
+                ) : (
+                  <ChevronRight className="w-5 h-5 text-gray-400" />
+                )}
+              </div>
+            </CardHeader>
 
-              {isExpanded && (
-                <CardContent className="pt-0 space-y-3">
-                  {dayActivities.map((activity) => {
-                    const EventComponent =
-                      eventTypeToComponent[
-                        activity.event_type as keyof typeof eventTypeToComponent
-                      ];
+            {isExpanded && (
+              <CardContent className="pt-0 space-y-3">
+                {dayActivities.map((activity) => {
+                  const EventComponent =
+                    eventTypeToComponent[
+                      activity.event_type as keyof typeof eventTypeToComponent
+                    ];
 
-                    return (
-                      <div className="border px-2 py-2 rounded-md">
-                        <EventComponent key={activity.id} event={activity} />
-                      </div>
-                    );
-                  })}
-                </CardContent>
-              )}
-            </Card>
-          );
-        })
-      )}
+                  return (
+                    <div className="border px-2 py-2 rounded-md">
+                      <EventComponent key={activity.id} event={activity} />
+                    </div>
+                  );
+                })}
+              </CardContent>
+            )}
+          </Card>
+        );
+      })}
     </div>
   );
 }

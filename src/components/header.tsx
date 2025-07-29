@@ -3,8 +3,10 @@
 import { Baby } from "lucide-react";
 import { useRouter } from "next/navigation";
 import HamburgerMenu from "./hamburger-menu";
+import { useBabyFromUrl } from "../hooks/useBabyFromUrl";
 
 const Header = () => {
+  const { currentBaby } = useBabyFromUrl();
   const router = useRouter();
 
   return (
@@ -13,13 +15,16 @@ const Header = () => {
         <div className="flex items-center justify-between">
           <div
             className="flex items-center gap-2"
-            onClick={() => router.push("/babies")}
+            onClick={() => router.push(`/babies/${currentBaby?.id}`)}
           >
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-pink-400 rounded-full flex items-center justify-center">
-              <Baby className="w-5 h-5 text-white" />
+            <div className="text-2xl">
+              {currentBaby?.gender === "male" ? "👶🏻" : "👧🏻"}
             </div>
             <div>
-              <h1 className="text-lg font-bold text-gray-800">BabyBuddy</h1>
+              <h1 className="text-lg font-bold text-gray-800">
+                {currentBaby?.name}
+              </h1>
+              <p className="text-xs text-gray-600">Tracking activities</p>
             </div>
           </div>
           <HamburgerMenu />

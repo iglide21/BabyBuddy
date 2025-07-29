@@ -30,6 +30,7 @@ import { useApplicationStore } from "@/src/stores/applicationStore";
 import { useCreateSleep } from "@/src/hooks/data/mutations/useCreateSleep";
 import { useBabyFromUrl } from "@/src/hooks/useBabyFromUrl";
 import { DateTimeField } from "@mui/x-date-pickers";
+import AddNoteButton from "../add-note-button";
 
 // Validation schema
 const sleepFormSchema = z
@@ -240,14 +241,10 @@ const LogSleepModal = () => {
 
               {/* Notes Toggle */}
               {!showNotes && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  onClick={() => setShowNotes(true)}
-                  className="w-full text-gray-600"
-                >
-                  + Add note (optional)
-                </Button>
+                <AddNoteButton
+                  setShowNotes={setShowNotes}
+                  className="border-blue-300 text-blue-600"
+                />
               )}
 
               {/* Notes */}

@@ -1,5 +1,5 @@
 import { ActivityComponentProps } from "@/types/common";
-import { Moon, Badge } from "lucide-react";
+import { Moon, Badge, ArrowRight } from "lucide-react";
 import { formatDuration, formatTime } from "lib/dayjs";
 import EditButton from "../edit-button";
 import { useDeleteSleep } from "@/src/hooks/data/mutations";
@@ -33,23 +33,24 @@ const SleepingActivity = ({ event, editEvent }: ActivityComponentProps) => {
             )}
           </div>
           <div className="flex flex-col">
-            {event.occurred_at && (
-              <div className="text-sm text-gray-600">
-                <span className="font-medium">Start:</span>{" "}
-                {formatTime(event.occurred_at)}
-              </div>
-            )}
+            <div className="flex items-center gap-2">
+              {event.occurred_at && (
+                <div className="text-sm text-gray-600">
+                  {formatTime(event.occurred_at)}
+                </div>
+              )}
+
+              {event.end_date && (
+                <>
+                  <ArrowRight className="w-4 h-4 text-gray-500" />
+                  <div className="text-sm text-gray-600">
+                    {formatTime(event.end_date)}
+                  </div>
+                </>
+              )}
+            </div>
             {event.end_date && (
-              <div className="text-sm text-gray-600">
-                <span className="font-medium">End:</span>{" "}
-                {formatTime(event.end_date)}
-              </div>
-            )}
-            {event.end_date && (
-              <div className="text-sm text-gray-600">
-                <span className="font-medium">Duration:</span>{" "}
-                {formattedDuration}
-              </div>
+              <div className="text-sm text-blue-400">{formattedDuration}</div>
             )}
           </div>
 

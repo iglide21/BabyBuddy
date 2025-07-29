@@ -24,6 +24,7 @@ import { useCreateFeeding } from "@/src/hooks/data/mutations/useCreateFeeding";
 import { useBabyFromUrl } from "@/src/hooks/useBabyFromUrl";
 import FeedingModal from "./feeding-modal";
 import { DateTimeField } from "@mui/x-date-pickers";
+import AddNoteButton from "../add-note-button";
 
 // Validation schema
 const feedingFormSchema = z
@@ -228,14 +229,10 @@ const LogFeedingModal = () => {
 
             {/* Notes Toggle */}
             {!showNotes && (
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => setShowNotes(true)}
-                className="w-full text-gray-600"
-              >
-                + Add note (optional)
-              </Button>
+              <AddNoteButton
+                setShowNotes={setShowNotes}
+                className="border-orange-300 text-orange-700"
+              />
             )}
 
             {/* Notes */}
