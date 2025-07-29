@@ -6,7 +6,6 @@ import { EditDiaperModal, LogDiaperModal } from "components/diaper";
 import QuickStats from "@/src/components/quick-stats";
 import TodaysActivities from "@/src/components/todays-activities";
 import QuickActions from "@/src/components/quick-actions";
-import BabyInformationCard from "@/src/components/baby/baby-information-card";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
