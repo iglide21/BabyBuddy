@@ -1,16 +1,14 @@
 "use client";
 
-import { useFeedings, useSleeps, useDiapers } from "../hooks/data/queries";
 import useEvents from "../hooks/data/queries/useEvents";
 import { getEndOfDay, getStartOfDay, getTodayString } from "../lib/dayjs";
 import StatsCard from "./stats-card";
 import { Milk, Moon } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
-import { useAuth } from "../hooks/useAuth";
-import { useCurrentBabyStore } from "../stores/currentBabyStore";
+import { useBabyFromUrl } from "../hooks/useBabyFromUrl";
 
 const QuickStats = () => {
-  const currentBaby = useCurrentBabyStore.use.currentBaby();
+  const { currentBaby } = useBabyFromUrl();
 
   const today = getTodayString();
   const startDate = getStartOfDay(today);

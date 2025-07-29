@@ -10,24 +10,12 @@ import QuickActions from "@/src/components/quick-actions";
 import { useParams } from "next/navigation";
 import useBaby from "@/src/hooks/data/queries/useBaby";
 import { useEffect } from "react";
-import { useCurrentBabyStore } from "@/src/stores/currentBabyStore";
 import BabyInformationCard from "@/src/components/baby/baby-information-card";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { useBabyFromUrl } from "@/src/hooks/useBabyFromUrl";
 
 export default function BabyBuddyApp() {
-  const params = useParams();
-  const babyId = params.id as string;
-  const setCurrentBaby = useCurrentBabyStore.use.setCurrentBaby();
-
-  const { data: baby } = useBaby(babyId);
-
-  useEffect(() => {
-    if (baby) {
-      setCurrentBaby(baby);
-    }
-  }, [baby, setCurrentBaby]);
-
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={"de-DE"}>
       <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50">

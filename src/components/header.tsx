@@ -1,21 +1,11 @@
 "use client";
 
-import { Baby, Bell, History, Settings } from "lucide-react";
-import { Button } from "./ui/button";
+import { Baby } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCurrentBabyStore } from "../stores/currentBabyStore";
-import { createClient } from "../lib/supabase/client";
 import HamburgerMenu from "./hamburger-menu";
 
 const Header = () => {
   const router = useRouter();
-  const currentBaby = useCurrentBabyStore.use.currentBaby();
-
-  const handleSignOut = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/login");
-  };
 
   return (
     <div className="bg-white/80 backdrop-blur-sm border-b border-pink-100 sticky top-0 z-10">
@@ -33,38 +23,6 @@ const Header = () => {
             </div>
           </div>
           <HamburgerMenu />
-          {/* <Button variant="outline" onClick={handleSignOut}>
-            Sign Out
-          </Button> */}
-          {/* <div className="flex gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => router.push("/notifications")}
-              className="text-gray-600 flex flex-col items-center"
-            >
-              <Bell className="w-4 h-4" />
-              <span className="text-xs mt-1">Alerts</span>
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => router.push("/history")}
-              className="text-gray-600 flex flex-col items-center"
-            >
-              <History className="w-4 h-4" />
-              <span className="text-xs mt-1">History</span>
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => router.push("/settings")}
-              className="text-gray-600 flex flex-col items-center"
-            >
-              <Settings className="w-4 h-4" />
-              <span className="text-xs mt-1">Settings</span>
-            </Button>
-          </div> */}
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 import { cn } from "../lib/utils";
 import { Button } from "./ui/button";
 import { Plus } from "lucide-react";
-import { useCurrentBabyStore } from "../stores/currentBabyStore";
+import { useBabyFromUrl } from "../hooks/useBabyFromUrl";
 
 type QuickActionButtonProps = {
   onClick: () => void;
@@ -18,7 +18,7 @@ const QuickActionButton = ({
   description,
   className,
 }: QuickActionButtonProps) => {
-  const currentBaby = useCurrentBabyStore.use.currentBaby();
+  const { currentBaby } = useBabyFromUrl();
 
   return (
     <Button

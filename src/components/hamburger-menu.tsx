@@ -20,10 +20,10 @@ import {
   Baby,
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
-import { useCurrentBabyStore } from "../stores/currentBabyStore";
 import { useApplicationStore } from "../stores/applicationStore";
 import { useRouter } from "next/navigation";
 import { createClient } from "../lib/supabase/client";
+import { useBabyFromUrl } from "../hooks/useBabyFromUrl";
 
 const menuItems = [
   {
@@ -51,22 +51,24 @@ const HamburgerMenu = () => {
   const router = useRouter();
 
   const session = useAuth();
-  const currentBaby = useCurrentBabyStore.use.currentBaby();
+  const { currentBaby } = useBabyFromUrl();
   const isHamburgerMenuOpen = useApplicationStore.use.isHamburgerMenuOpen();
   const toggleHamburgerMenu = useApplicationStore.use.toggleHamburgerMenu();
 
   const handleSignOut = async () => {
+    toggleHamburgerMenu();
     await supabase.auth.signOut();
     router.push("/login");
   };
 
-  const beforeNavigate = () => {
+  const handleSwitchBaby = () => {
     toggleHamburgerMenu();
+    router.push("/babies");
   };
 
-  const handleSwitchBaby = () => {
-    beforeNavigate();
-    router.push("/babies");
+  const handleNavigate = (href: string) => {
+    toggleHamburgerMenu();
+    router.push(`/babies/${currentBaby?.id}${href}`);
   };
 
   return (
@@ -101,7 +103,10 @@ const HamburgerMenu = () => {
 
           {/* Current Baby */}
           {currentBaby && (
-            <div className="p-4 bg-gradient-to-r from-pink-50 to-blue-50 rounded-lg border border-pink-200">
+            <div
+              className="p-4 bg-gradient-to-r from-pink-50 to-blue-50 rounded-lg border border-pink-200"
+              onClick={() => handleNavigate(`/babies/${currentBaby?.id}`)}
+            >
               <div className="flex items-center gap-3">
                 <Baby className="w-5 h-5 text-pink-600" />
                 <div>
@@ -124,7 +129,8 @@ const HamburgerMenu = () => {
               <Button
                 variant="ghost"
                 key={item.label}
-                onClick={() => router.push(item.href)}
+                onClick={() => handleNavigate(item.href)}
+                disabled={!currentBaby}
                 className={`w-full justify-start h-12 text-left hover:bg-${item.color}-50`}
               >
                 <item.icon className={`w-5 h-5 mr-3 text-${item.color}-600`} />

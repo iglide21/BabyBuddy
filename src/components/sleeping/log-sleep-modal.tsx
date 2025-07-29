@@ -28,7 +28,7 @@ import dayjs, { getNow } from "lib/dayjs";
 import { CreateSleep } from "@/types/data/sleeps/types";
 import { useApplicationStore } from "@/src/stores/applicationStore";
 import { useCreateSleep } from "@/src/hooks/data/mutations/useCreateSleep";
-import { useCurrentBabyStore } from "@/src/stores/currentBabyStore";
+import { useBabyFromUrl } from "@/src/hooks/useBabyFromUrl";
 import { DateTimeField } from "@mui/x-date-pickers";
 
 // Validation schema
@@ -57,7 +57,7 @@ const sleepFormSchema = z
 type SleepFormData = z.infer<typeof sleepFormSchema>;
 
 const LogSleepModal = () => {
-  const currentBaby = useCurrentBabyStore.use.currentBaby();
+  const { currentBaby } = useBabyFromUrl();
   const [showNotes, setShowNotes] = useState(false);
   const openedModal = useApplicationStore.use.currentModal();
   const isOpen = useMemo(

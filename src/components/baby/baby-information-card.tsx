@@ -1,9 +1,9 @@
 import { Edit2 } from "lucide-react";
 import { Button, Card, CardHeader, CardTitle, Skeleton } from "../ui";
-import { useCurrentBabyStore } from "../../stores/currentBabyStore";
+import { useBabyFromUrl } from "../../hooks/useBabyFromUrl";
 
 const BabyInformationCard = () => {
-  const currentBaby = useCurrentBabyStore.use.currentBaby();
+  const { currentBaby } = useBabyFromUrl();
 
   if (!currentBaby) {
     return (

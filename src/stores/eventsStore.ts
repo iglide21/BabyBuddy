@@ -1,36 +1,27 @@
 import { create } from "zustand";
-
 import type { Nullable } from "@/types/common";
-import type { Baby } from "@/types/data/babies/types";
 import type { Event } from "@/types/data/events/types";
 import { createSelectors } from "../lib/createSelectors";
 import { immer } from "zustand/middleware/immer";
 
-type CurrentBabyStoreState = {
-  currentBaby: Nullable<Baby>;
+type EventsStoreState = {
   currentSelectedEvent: Nullable<Event>;
-  setCurrentBaby: (baby: Baby) => void;
   setCurrentSelectedEvent: (event: Event) => void;
   resetState: () => void;
 };
 
-export const useCurrentBabyStoreBase = create<CurrentBabyStoreState>()(
+export const eventsStore = create<EventsStoreState>()(
   immer((set) => ({
-    currentBaby: null,
     currentSelectedEvent: null,
-    setCurrentBaby: (baby) =>
-      set((state) => {
-        state.currentBaby = baby;
-      }),
     setCurrentSelectedEvent: (event) =>
       set((state) => {
         state.currentSelectedEvent = event;
       }),
     resetState: () =>
       set((state) => {
-        state.currentBaby = null;
+        state.currentSelectedEvent = null;
       }),
   }))
 );
 
-export const useCurrentBabyStore = createSelectors(useCurrentBabyStoreBase);
+export const useEventsStore = createSelectors(eventsStore);

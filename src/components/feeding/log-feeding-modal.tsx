@@ -21,7 +21,7 @@ import dayjs, { getNow } from "lib/dayjs";
 import { CreateFeeding } from "@/types/data/feeding/types";
 import { useApplicationStore } from "@/src/stores/applicationStore";
 import { useCreateFeeding } from "@/src/hooks/data/mutations/useCreateFeeding";
-import { useCurrentBabyStore } from "@/src/stores/currentBabyStore";
+import { useBabyFromUrl } from "@/src/hooks/useBabyFromUrl";
 import FeedingModal from "./feeding-modal";
 import { DateTimeField } from "@mui/x-date-pickers";
 
@@ -66,7 +66,7 @@ const feedingFormSchema = z
 type FeedingFormData = z.infer<typeof feedingFormSchema>;
 
 const LogFeedingModal = () => {
-  const currentBaby = useCurrentBabyStore.use.currentBaby();
+  const { currentBaby } = useBabyFromUrl();
   const [showNotes, setShowNotes] = useState(false);
   const { mutate: createFeeding } = useCreateFeeding();
   const closeModal = useApplicationStore.use.closeModal();

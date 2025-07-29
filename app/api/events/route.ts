@@ -28,7 +28,7 @@ export const GET = async (request: NextRequest) => {
   }
 
   query = query.order("occurred_at", { ascending: false });
-  const { data, error } = await query;
+  const { data, error } = await query.select();
 
   if (error) {
     throw new Error(error.message);

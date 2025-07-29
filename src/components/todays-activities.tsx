@@ -1,37 +1,17 @@
-import { Calendar, Baby, Milk, Edit, Loader2 } from "lucide-react";
-import { Card, CardHeader, CardTitle, CardContent } from "./ui/card";
+import { Calendar, Baby } from "lucide-react";
 import useEvents from "../hooks/data/queries/useEvents";
-import { Event } from "@/types/data/events/types";
-import { JSX } from "react";
-import { SleepingActivity } from "./sleeping";
-import { FeedingActivity } from "./feeding";
-import { DiaperActivity } from "./diaper";
 import { getEndOfDay, getStartOfDay, getTodayString } from "lib/dayjs";
 import { Skeleton } from "./ui/skeleton";
-import { useCurrentBabyStore } from "@/src/stores/currentBabyStore";
 import { useApplicationStore } from "../stores/applicationStore";
 import { ApplicationModal } from "../lib/types";
-
-const eventTypeToComponent: Record<
-  "diaper" | "sleep" | "feeding",
-  ({
-    event,
-    editEvent,
-  }: {
-    event: Event;
-    editEvent?: (eventId: number) => void;
-  }) => JSX.Element
-> = {
-  feeding: FeedingActivity,
-  sleep: SleepingActivity,
-  diaper: DiaperActivity,
-};
+import { eventTypeToComponent } from "../lib/components";
+import { useBabyFromUrl } from "../hooks/useBabyFromUrl";
+import { useEventsStore } from "../stores";
 
 const TodaysActivities = () => {
-  const currentBaby = useCurrentBabyStore.use.currentBaby();
-  const setCurrentSelectedEvent =
-    useCurrentBabyStore.use.setCurrentSelectedEvent();
+  const { currentBaby } = useBabyFromUrl();
   const showModal = useApplicationStore.use.showModal();
+  const setCurrentSelectedEvent = useEventsStore.use.setCurrentSelectedEvent();
 
   const today = getTodayString();
   const startDate = getStartOfDay(today);

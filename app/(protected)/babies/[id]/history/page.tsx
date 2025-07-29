@@ -1,0 +1,232 @@
+"use client";
+
+import useEvents from "@/src/hooks/data/queries/useEvents";
+import dayjs from "@/src/lib/dayjs";
+import { useMemo, useState } from "react";
+import { Event } from "@/types/data/events/types";
+import { Calendar, ChevronDown, ChevronRight, Milk, Moon } from "lucide-react";
+import { formatDateForDisplay } from "@/src/lib/dayjs";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/src/components/ui/card";
+import { Skeleton } from "@/src/components/ui/skeleton";
+import { useBabyFromUrl } from "@/src/hooks/useBabyFromUrl";
+import { eventTypeToComponent } from "@/src/lib/components";
+
+export function HistoryPage() {
+  const { currentBaby } = useBabyFromUrl();
+
+  const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
+  const { data: events, isLoading } = useEvents(currentBaby?.id ?? "");
+
+  const feedings = useMemo(
+    () => events?.filter((event) => event.event_type === "feeding"),
+    [events]
+  );
+  const sleeps = useMemo(
+    () => events?.filter((event) => event.event_type === "sleep"),
+    [events]
+  );
+  const diapers = useMemo(
+    () => events?.filter((event) => event.event_type === "diaper"),
+    [events]
+  );
+
+  // Group logs by date
+  const groupLogsByDate = () => {
+    const groups: {
+      [key: string]: {
+        feedings: Event[];
+        sleeps: Event[];
+        diapers: Event[];
+      };
+    } = {};
+
+    feedings?.forEach((log) => {
+      const dateKey = dayjs(log.occurred_at).format("YYYY-MM-DD");
+      if (!groups[dateKey]) {
+        groups[dateKey] = { feedings: [], sleeps: [], diapers: [] };
+      }
+      groups[dateKey].feedings.push(log);
+    });
+
+    sleeps?.forEach((log) => {
+      const dateKey = dayjs(log.occurred_at).format("YYYY-MM-DD");
+      if (!groups[dateKey]) {
+        groups[dateKey] = { feedings: [], sleeps: [], diapers: [] };
+      }
+      groups[dateKey].sleeps.push(log);
+    });
+
+    diapers?.forEach((log) => {
+      const dateKey = dayjs(log.occurred_at).format("YYYY-MM-DD");
+      if (!groups[dateKey]) {
+        groups[dateKey] = { feedings: [], sleeps: [], diapers: [] };
+      }
+      groups[dateKey].diapers.push(log);
+    });
+
+    // Sort by date (newest first)
+    return Object.entries(groups).sort(
+      ([a], [b]) => dayjs(b).valueOf() - dayjs(a).valueOf()
+    );
+  };
+
+  const groupedLogs = groupLogsByDate();
+
+  const toggleDay = (dateKey: string) => {
+    const newExpanded = new Set(expandedDays);
+    if (newExpanded.has(dateKey)) {
+      newExpanded.delete(dateKey);
+    } else {
+      newExpanded.add(dateKey);
+    }
+    setExpandedDays(newExpanded);
+  };
+
+  const formatDate = (dateString: string) => {
+    return formatDateForDisplay(dateString);
+  };
+
+  const getDayStats = (
+    feedings: Event[],
+    sleeps: Event[],
+    diapers: Event[]
+  ) => {
+    const totalFeedings = feedings.length;
+    const totalDiapers = diapers.length;
+    const totalSleep = sleeps.reduce((total, log) => {
+      if (log.end_date) {
+        return (
+          total +
+          dayjs(log.end_date).diff(dayjs(log.occurred_at), "millisecond")
+        );
+      }
+      return total;
+    }, 0);
+    const totalSleepHours =
+      Math.round((totalSleep / (1000 * 60 * 60)) * 10) / 10;
+
+    return { totalFeedings, totalSleepHours, totalDiapers };
+  };
+
+  return (
+    <div className="space-y-4 px-4">
+      {isLoading ? (
+        <div className="flex flex-col gap-4">
+          <Skeleton className="w-full h-24" />
+          <Skeleton className="w-full h-24" />
+          <Skeleton className="w-full h-24" />
+          <Skeleton className="w-full h-24" />
+          <Skeleton className="w-full h-24" />
+          <Skeleton className="w-full h-24" />
+          <Skeleton className="w-full h-24" />
+        </div>
+      ) : groupedLogs.length === 0 ? (
+        <Card>
+          <CardContent className="p-4 text-center">
+            <Calendar className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+            <p className="text-gray-500">No history yet.</p>
+            <p className="text-sm text-gray-400 mt-1">
+              Start logging feeds and sleep to see your history here! 📊
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        groupedLogs.map(([dateKey, { feedings, sleeps, diapers }]) => {
+          const isExpanded = expandedDays.has(dateKey);
+          const { totalFeedings, totalSleepHours, totalDiapers } = getDayStats(
+            feedings,
+            sleeps,
+            diapers
+          );
+
+          // Combine and sort activities for the day
+          const dayActivities = [
+            ...feedings.map((log) => ({
+              ...log,
+              event_type: "feeding" as const,
+            })),
+            ...sleeps.map((log) => ({ ...log, event_type: "sleep" as const })),
+            ...diapers.map((log) => ({
+              ...log,
+              event_type: "diaper" as const,
+            })),
+          ].sort((a, b) => {
+            const timeA =
+              a.event_type === "feeding"
+                ? a.occurred_at
+                : a.event_type === "diaper"
+                ? a.occurred_at
+                : a.occurred_at;
+            const timeB =
+              b.event_type === "feeding"
+                ? b.occurred_at
+                : b.event_type === "diaper"
+                ? b.occurred_at
+                : b.occurred_at;
+            return dayjs(timeB).diff(dayjs(timeA), "millisecond");
+          });
+
+          return (
+            <Card key={dateKey}>
+              <CardHeader
+                className="cursor-pointer"
+                onClick={() => toggleDay(dateKey)}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-lg">
+                      {formatDate(dateKey)}
+                    </CardTitle>
+                    <div className="flex items-center gap-4 mt-2">
+                      <div className="flex items-center gap-1 text-sm text-orange-600">
+                        <Milk className="w-4 h-4" />
+                        <span>{totalFeedings} feeds</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-sm text-blue-600">
+                        <Moon className="w-4 h-4" />
+                        <span>{totalSleepHours}h sleep</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-sm text-green-600">
+                        <span className="text-sm">💩</span>
+                        <span>{totalDiapers} diapers</span>
+                      </div>
+                    </div>
+                  </div>
+                  {isExpanded ? (
+                    <ChevronDown className="w-5 h-5 text-gray-400" />
+                  ) : (
+                    <ChevronRight className="w-5 h-5 text-gray-400" />
+                  )}
+                </div>
+              </CardHeader>
+
+              {isExpanded && (
+                <CardContent className="pt-0 space-y-3">
+                  {dayActivities.map((activity) => {
+                    const EventComponent =
+                      eventTypeToComponent[
+                        activity.event_type as keyof typeof eventTypeToComponent
+                      ];
+
+                    return (
+                      <div className="border px-2 py-2 rounded-md">
+                        <EventComponent key={activity.id} event={activity} />
+                      </div>
+                    );
+                  })}
+                </CardContent>
+              )}
+            </Card>
+          );
+        })
+      )}
+    </div>
+  );
+}
+
+export default HistoryPage;

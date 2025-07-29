@@ -21,7 +21,7 @@ import dayjs, { getNow } from "lib/dayjs";
 import { CreateDiaper } from "@/types/data/diapers/types";
 import { useApplicationStore } from "@/src/stores/applicationStore";
 import { useCreateDiaper } from "@/src/hooks/data/mutations/useCreateDiaper";
-import { useCurrentBabyStore } from "@/src/stores/currentBabyStore";
+import { useBabyFromUrl } from "@/src/hooks/useBabyFromUrl";
 import DiaperModal from "./diaper-modal";
 import { DateTimeField } from "@mui/x-date-pickers";
 
@@ -35,7 +35,7 @@ const diaperFormSchema = z.object({
 type DiaperFormData = z.infer<typeof diaperFormSchema>;
 
 const LogDiaperModal = () => {
-  const currentBaby = useCurrentBabyStore.use.currentBaby();
+  const { currentBaby } = useBabyFromUrl();
   const [showNotes, setShowNotes] = useState(false);
 
   const { mutate: createDiaper } = useCreateDiaper();

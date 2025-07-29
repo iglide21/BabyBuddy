@@ -32,7 +32,7 @@ const SleepingActivity = ({ event, editEvent }: ActivityComponentProps) => {
               <Badge className="bg-blue-100 text-blue-700">Active</Badge>
             )}
           </div>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col">
             {event.occurred_at && (
               <div className="text-sm text-gray-600">
                 <span className="font-medium">Start:</span>{" "}
