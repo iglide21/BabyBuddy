@@ -23,7 +23,12 @@ const PageHeader = () => {
         >
           <ArrowLeft className="w-4 h-4 text-gray-400" />
         </Button>
-        <Button variant="ghost" size="sm" className="font-bold text-gray-500">
+        <Button
+          onClick={() => router.push(`/babies/${currentBaby.id}`)}
+          variant="ghost"
+          size="sm"
+          className="font-bold text-gray-500 focus:bg-transparent"
+        >
           {currentBaby.name}
         </Button>
         <ArrowLeft className="w-4 h-4 text-gray-400" />
@@ -34,7 +39,7 @@ const PageHeader = () => {
     );
   }
 
-  return <div>PageHeader</div>;
+  return null;
 };
 
 export default PageHeader;
