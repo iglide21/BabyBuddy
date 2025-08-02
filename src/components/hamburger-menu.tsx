@@ -105,7 +105,10 @@ const HamburgerMenu = () => {
           {currentBaby && (
             <div
               className="p-4 bg-gradient-to-r from-pink-50 to-blue-50 rounded-lg border border-pink-200"
-              onClick={() => handleNavigate(`/babies/${currentBaby?.id}`)}
+              onClick={() => {
+                toggleHamburgerMenu();
+                router.push(`/babies/${currentBaby?.id}`);
+              }}
             >
               <div className="flex items-center gap-3">
                 <Baby className="w-5 h-5 text-pink-600" />
