@@ -27,3 +27,37 @@ export const GET = async (
 
   return NextResponse.json(data);
 };
+
+export const PATCH = async (
+  request: NextRequest,
+  { params }: { params: { babyId: string } }
+) => {
+  const babyId = (await params).babyId;
+
+  if (!babyId) {
+    return NextResponse.json({ error: "Baby ID is required" }, { status: 400 });
+  }
+
+  try {
+    const body = await request.json();
+    const supabase = await createClient();
+
+    const { data, error } = await supabase
+      .from("babies")
+      .update(body)
+      .eq("id", babyId)
+      .select()
+      .single();
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json(data);
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Invalid request body" },
+      { status: 400 }
+    );
+  }
+};

@@ -18,6 +18,7 @@ import {
   LogOut,
   User,
   Baby,
+  BabyIcon,
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { useApplicationStore } from "../stores/applicationStore";
@@ -26,6 +27,12 @@ import { createClient } from "../lib/supabase/client";
 import { useBabyFromUrl } from "../hooks/useBabyFromUrl";
 
 const menuItems = [
+  {
+    label: "Baby Settings",
+    icon: BabyIcon,
+    href: "/settings",
+    color: "pink",
+  },
   {
     label: "History",
     icon: History,

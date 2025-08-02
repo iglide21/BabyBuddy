@@ -1,4 +1,4 @@
-import type { CreateBaby } from "@/types/data/babies/types";
+import type { CreateBaby, UpdateBaby } from "@/types/data/babies/types";
 
 export const getBaby = async (babyId: string) => {
   const response = await fetch(`/api/babies/${babyId}`);
@@ -26,4 +26,21 @@ const createBaby = async (
   return response.json();
 };
 
-export { getBabies, createBaby };
+const updateBaby = async (
+  babyId: string,
+  baby: UpdateBaby,
+  userId: string,
+  accessToken: string
+) => {
+  const response = await fetch(`/api/babies/${babyId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    },
+    body: JSON.stringify(baby),
+  });
+  return response.json();
+};
+
+export { getBabies, createBaby, updateBaby };

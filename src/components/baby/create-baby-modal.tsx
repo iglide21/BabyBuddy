@@ -13,10 +13,11 @@ import {
   FormMessage,
 } from "../ui/form";
 import { DialogFooter } from "../ui/dialog";
-import dayjs from "lib/dayjs";
+import dayjs, { getNow } from "lib/dayjs";
 import type { CreateBaby } from "@/types/data/babies/types";
 import { useCreateBaby } from "@/src/hooks/data/mutations/useCreateBaby";
 import { cn } from "@/src/lib/utils";
+import { DateTimeField } from "@mui/x-date-pickers";
 
 // Validation schema
 const babyFormSchema = z
@@ -54,7 +55,7 @@ const CreateBabyModal = () => {
     resolver: zodResolver(babyFormSchema),
     defaultValues: {
       name: "",
-      birthDate: dayjs().format("YYYY-MM-DDTHH:mm"),
+      birthDate: getNow().toISOString(),
       gender: "male",
     },
   });
@@ -117,17 +118,17 @@ const CreateBabyModal = () => {
                 control={form.control}
                 name="birthDate"
                 render={({ field }) => (
-                  <FormItem className="space-y-3">
+                  <FormItem className="flex flex-col gap-2">
                     <FormLabel className="text-sm font-medium">
                       Birth Date
                     </FormLabel>
                     <FormControl>
-                      <Input
-                        id="birthDate"
-                        type="datetime-local"
-                        required
-                        className="pl-10 border-gray-300 focus:border-gray-400"
-                        {...field}
+                      <DateTimeField
+                        value={dayjs(field.value)}
+                        onChange={(value) => {
+                          field.onChange(value?.toISOString());
+                        }}
+                        ampm={false}
                       />
                     </FormControl>
                     <FormMessage />

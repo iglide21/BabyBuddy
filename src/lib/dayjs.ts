@@ -25,6 +25,35 @@ export const formatTime = (date: string | Date | dayjs.Dayjs | undefined) => {
   return dayjs(date).format("HH:mm");
 };
 
+export const calculateAge = (birthDate: string | Date | dayjs.Dayjs) => {
+  const birth = dayjs(birthDate);
+  const now = dayjs();
+
+  if (!birth.isValid()) return "Invalid date";
+
+  const years = now.diff(birth, "year");
+  const months = now.diff(birth, "month") % 12;
+  const days = now.diff(birth, "day") % 30;
+
+  if (years > 0) {
+    if (months > 0) {
+      return `${years} year${years > 1 ? "s" : ""} ${months} month${
+        months > 1 ? "s" : ""
+      }`;
+    }
+    return `${years} year${years > 1 ? "s" : ""}`;
+  } else if (months > 0) {
+    if (days > 0) {
+      return `${months} month${months > 1 ? "s" : ""} ${days} day${
+        days > 1 ? "s" : ""
+      }`;
+    }
+    return `${months} month${months > 1 ? "s" : ""}`;
+  } else {
+    return `${days} day${days > 1 ? "s" : ""}`;
+  }
+};
+
 export const formatDurationInMinutes = (durationInMinutes: number) => {
   const hours = Math.floor(durationInMinutes / 60);
   const minutes = durationInMinutes % 60;

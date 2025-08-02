@@ -4,14 +4,7 @@ import useEvents from "@/src/hooks/data/queries/useEvents";
 import dayjs from "@/src/lib/dayjs";
 import { useMemo, useState } from "react";
 import { Event, HistoryFilterType } from "@/types/data/events/types";
-import {
-  Calendar,
-  ChevronDown,
-  ChevronRight,
-  Milk,
-  Moon,
-  Filter,
-} from "lucide-react";
+import { Calendar, ChevronDown, ChevronRight, Milk, Moon } from "lucide-react";
 import { formatDateForDisplay } from "@/src/lib/dayjs";
 import {
   Card,
@@ -23,9 +16,15 @@ import { Skeleton } from "@/src/components/ui/skeleton";
 import { useBabyFromUrl } from "@/src/hooks/useBabyFromUrl";
 import { eventTypeToComponent } from "@/src/lib/components";
 import HistoryFilterSection from "@/src/components/history-filter-section";
+import { useApplicationStore } from "@/src/stores";
+import { ApplicationModal } from "@/src/lib/types";
+import { EditDiaperModal, LogDiaperModal } from "@/src/components/diaper";
+import { EditFeedingModal, LogFeedingModal } from "@/src/components/feeding";
+import { EditSleepModal, LogSleepModal } from "@/src/components/sleeping";
 
 export function HistoryPage() {
   const { currentBaby, isLoading: isBabyLoading } = useBabyFromUrl();
+  const showModal = useApplicationStore.use.showModal();
 
   const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
   const [activeFilters, setActiveFilters] = useState<Set<HistoryFilterType>>(
@@ -158,6 +157,7 @@ export function HistoryPage() {
       </div>
     );
   }
+
   return (
     <div className="space-y-4 px-4 py-4">
       {/* Filter Section */}
@@ -267,7 +267,17 @@ export function HistoryPage() {
                         key={activity.id}
                         className="border px-2 py-2 rounded-md"
                       >
-                        <EventComponent event={activity} />
+                        <EventComponent
+                          event={activity}
+                          editEvent={() => {
+                            showModal({
+                              type: `${activity.event_type}_edit` as ApplicationModal["type"],
+                              data: {
+                                eventId: activity.id,
+                              },
+                            });
+                          }}
+                        />
                       </div>
                     );
                   })}
