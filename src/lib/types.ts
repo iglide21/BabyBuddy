@@ -1,6 +1,6 @@
 export type ApplicationModal = {
   type:
-    | "createBaby"
+    | "create_baby"
     | "feeding_log"
     | "feeding_edit"
     | "sleep_log"

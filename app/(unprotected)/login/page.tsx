@@ -1,7 +1,7 @@
 "use server";
 
 import type React from "react";
-import { Baby } from "lucide-react";
+import { Baby, Mail } from "lucide-react";
 import {
   Card,
   CardHeader,
@@ -10,9 +10,19 @@ import {
 } from "@/src/components/ui/card";
 import { Separator } from "@/src/components/ui/separator";
 import { Button } from "@/src/components/ui/button";
-import { signInWithGoogle } from "@/src/lib/auth";
-import LoginForm from "@/src/components/login-form";
-import SignUpSignInToggle from "@/src/components/sign-in-sign-up-toggle";
+import { signInWithEmailOtp, signInWithGoogle } from "@/src/lib/auth";
+import { Input } from "@/src/components/ui/input";
+import { Label } from "@/src/components/ui/label";
+import { redirect } from "next/navigation";
+
+async function handleEmailLogin(formData: FormData) {
+  "use server";
+  console.log("handleEmailLogin");
+  console.log(formData);
+  const email = formData.get("email") as string;
+  await signInWithEmailOtp(email);
+  redirect("/otp-confirmation");
+}
 
 const LoginPage = () => {
   return (
@@ -31,10 +41,30 @@ const LoginPage = () => {
         </CardHeader>
 
         <CardContent className="p-6 space-y-6">
-          {/* Toggle Login/Signup */}
-          <SignUpSignInToggle />
+          {/* Email Login */}
+          <form action={handleEmailLogin} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="Enter your email"
+                  required
+                  className="pl-10 border-pink-200 focus:border-pink-400"
+                />
+              </div>
+            </div>
 
-          <LoginForm />
+            <Button
+              type="submit"
+              className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white"
+            >
+              Sign In
+            </Button>
+          </form>
 
           <div className="relative">
             <Separator />

@@ -13,20 +13,34 @@ const Header = () => {
     <div className="bg-white/80 backdrop-blur-sm border-b border-pink-100 sticky top-0 z-10">
       <div className="max-w-md mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <div
-            className="flex items-center gap-2"
-            onClick={() => router.push(`/babies/${currentBaby?.id}`)}
-          >
-            <div className="text-2xl">
-              {currentBaby?.gender === "male" ? "👶🏻" : "👧🏻"}
+          {currentBaby ? (
+            <div
+              className="flex items-center gap-2"
+              onClick={() => router.push(`/babies/${currentBaby?.id}`)}
+            >
+              <div className="text-2xl">
+                {currentBaby.gender === "male" ? "👶🏻" : "👧🏻"}
+              </div>
+              <div>
+                <h1 className="text-lg font-bold text-gray-800">Baby Buddy</h1>
+                <p className="text-xs text-gray-600">
+                  Tracking for {currentBaby.name}
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-lg font-bold text-gray-800">
-                {currentBaby?.name}
-              </h1>
-              <p className="text-xs text-gray-600">Tracking activities</p>
+          ) : (
+            <div className="flex items-center gap-2">
+              <div className="text-2xl">
+                <Baby className="w-8 h-8 text-gray-800" />
+              </div>
+              <div>
+                <h1 className="text-lg font-bold text-gray-800">Baby Buddy</h1>
+                <p className="text-xs text-gray-600">
+                  Track your baby's journey
+                </p>
+              </div>
             </div>
-          </div>
+          )}
           <HamburgerMenu />
         </div>
       </div>

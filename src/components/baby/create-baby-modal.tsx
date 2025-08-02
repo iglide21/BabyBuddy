@@ -14,9 +14,6 @@ import {
 } from "../ui/form";
 import { DialogFooter } from "../ui/dialog";
 import dayjs from "lib/dayjs";
-import { useAuth } from "@/src/hooks/useAuth";
-import { useToast } from "@/src/hooks/use-toast";
-import { useQueryClient } from "@tanstack/react-query";
 import type { CreateBaby } from "@/types/data/babies/types";
 import { useCreateBaby } from "@/src/hooks/data/mutations/useCreateBaby";
 import { cn } from "@/src/lib/utils";
@@ -83,7 +80,7 @@ const CreateBabyModal = () => {
   ];
 
   return (
-    <Dialog open={modal === "createBaby"} onOpenChange={onClose}>
+    <Dialog open={modal?.type === "create_baby"} onOpenChange={onClose}>
       <DialogContent className="max-w-sm mx-auto p-0 border-none">
         <DialogHeader className="bg-gradient-to-r from-pink-400 to-purple-400 text-white p-6">
           <DialogTitle className="flex items-center gap-2">

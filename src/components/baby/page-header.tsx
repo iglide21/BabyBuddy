@@ -16,23 +16,20 @@ const PageHeader = () => {
     return (
       <div className="flex items-center gap-3 my-2">
         <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => router.back()}
-          className="p-2"
-        >
-          <ArrowLeft className="w-4 h-4 text-gray-400" />
-        </Button>
-        <Button
           onClick={() => router.push(`/babies/${currentBaby.id}`)}
           variant="ghost"
           size="sm"
-          className="font-bold text-gray-500 focus:bg-transparent"
+          className="font-bold text-gray-500 focus:bg-transparent focus:text-gray-500 flex items-center gap-2"
         >
+          <ArrowLeft className="w-4 h-4 text-gray-400" />
           {currentBaby.name}
         </Button>
-        <ArrowLeft className="w-4 h-4 text-gray-400" />
-        <Button variant="ghost" size="sm" className="font-bold text-gray-800">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="font-bold text-gray-800 focus:bg-transparent focus:text-gray-800 flex items-center gap-2"
+        >
+          <ArrowLeft className="w-4 h-4 text-gray-400" />
           Reminders
         </Button>
       </div>
