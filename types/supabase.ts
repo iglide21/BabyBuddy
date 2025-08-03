@@ -41,25 +41,70 @@ export type Database = {
     Tables: {
       babies: {
         Row: {
+          allergies: string[] | null
           birth_date: string
+          birth_length: number | null
+          birth_weight: number | null
+          blood_type: Database["public"]["Enums"]["BloodType"] | null
           created_at: string
+          current_length: number | null
+          current_weight: number | null
+          emergency_contact_name: string | null
+          emergency_contact_phone: string | null
+          emergency_contact_relationship: string | null
           gender: Database["public"]["Enums"]["Gender"]
+          head_circumference: number | null
           id: string
+          medications: string[] | null
           name: string
+          notes: string | null
+          pediatrician_email: string | null
+          pediatrician_name: string | null
+          pediatrician_phone: string | null
         }
         Insert: {
+          allergies?: string[] | null
           birth_date: string
+          birth_length?: number | null
+          birth_weight?: number | null
+          blood_type?: Database["public"]["Enums"]["BloodType"] | null
           created_at?: string
+          current_length?: number | null
+          current_weight?: number | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          emergency_contact_relationship?: string | null
           gender: Database["public"]["Enums"]["Gender"]
+          head_circumference?: number | null
           id?: string
+          medications?: string[] | null
           name: string
+          notes?: string | null
+          pediatrician_email?: string | null
+          pediatrician_name?: string | null
+          pediatrician_phone?: string | null
         }
         Update: {
+          allergies?: string[] | null
           birth_date?: string
+          birth_length?: number | null
+          birth_weight?: number | null
+          blood_type?: Database["public"]["Enums"]["BloodType"] | null
           created_at?: string
+          current_length?: number | null
+          current_weight?: number | null
+          emergency_contact_name?: string | null
+          emergency_contact_phone?: string | null
+          emergency_contact_relationship?: string | null
           gender?: Database["public"]["Enums"]["Gender"]
+          head_circumference?: number | null
           id?: string
+          medications?: string[] | null
           name?: string
+          notes?: string | null
+          pediatrician_email?: string | null
+          pediatrician_name?: string | null
+          pediatrician_phone?: string | null
         }
         Relationships: []
       }
@@ -282,6 +327,19 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      BloodType:
+        | "A"
+        | "B"
+        | "AB"
+        | "O"
+        | "A+"
+        | "A-"
+        | "B+"
+        | "B-"
+        | "AB+"
+        | "AB-"
+        | "O+"
+        | "O-"
       DiaperColor:
         | "yellow"
         | "green"
@@ -425,6 +483,20 @@ export const Constants = {
   },
   public: {
     Enums: {
+      BloodType: [
+        "A",
+        "B",
+        "AB",
+        "O",
+        "A+",
+        "A-",
+        "B+",
+        "B-",
+        "AB+",
+        "AB-",
+        "O+",
+        "O-",
+      ],
       DiaperColor: [
         "yellow",
         "green",

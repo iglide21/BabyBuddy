@@ -1,765 +1,516 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Button } from "@/src/components/ui/button";
-import { Input } from "@/src/components/ui/input";
-import { Label } from "@/src/components/ui/label";
-import { Textarea } from "@/src/components/ui/textarea";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "@/src/components/ui/card";
+import { Button } from "@/src/components/ui/button";
 import { Badge } from "@/src/components/ui/badge";
-import { Separator } from "@/src/components/ui/separator";
 import {
-  ArrowLeft,
-  Baby,
-  Calendar,
   Ruler,
   Weight,
   Heart,
+  Stethoscope,
+  TrendingUp,
   User,
-  History,
-  Save,
-  Edit3,
+  Phone,
+  Mail,
+  AlertTriangle,
+  Pill,
+  Baby,
+  FileText,
+  Edit,
 } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/src/components/ui/dialog";
-import { RadioGroup, RadioGroupItem } from "@/src/components/ui/radio-group";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/src/components/ui/select";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/src/components/ui/form";
-import { useBabyFromUrl } from "@/src/hooks/useBabyFromUrl";
-import { useUpdateBaby } from "@/src/hooks/data/mutations/useUpdateBaby";
-import { calculateAge } from "@/src/lib/dayjs";
-import dayjs from "@/src/lib/dayjs";
-import { DateTimeField } from "@mui/x-date-pickers";
+import EditBabySettingModal from "@/src/components/baby/edit-baby-setting-modal";
+import { useBabyFromUrl } from "@/src/hooks";
+import dayjs, { calculateAge } from "@/src/lib/dayjs";
+import { useApplicationStore } from "@/src/stores";
+import { BabySettingSection } from "@/types/baby";
 
-// Extended validation schema including all profile fields
-const babyFormSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  birth_date: z.string().min(1, "Birth date is required"),
-  gender: z.enum(["male", "female", "other"]),
-  // Birth information
-  birth_weight: z.number().optional(),
-  birth_length: z.number().optional(),
-  blood_type: z.string().optional(),
-  // Current measurements
-  current_weight: z.number().optional(),
-  current_length: z.number().optional(),
-  head_circumference: z.number().optional(),
-  // Medical information
-  allergies: z.array(z.string()).optional(),
-  medications: z.array(z.string()).optional(),
-  // Pediatrician information
-  pediatrician_name: z.string().optional(),
-  pediatrician_phone: z.string().optional(),
-  pediatrician_email: z
-    .string()
-    .email("Invalid email")
-    .optional()
-    .or(z.literal("")),
-  // Emergency contact
-  emergency_contact_name: z.string().optional(),
-  emergency_contact_relationship: z.string().optional(),
-  emergency_contact_phone: z.string().optional(),
-  // Notes
-  notes: z.string().optional(),
-});
-
-type BabyFormData = z.infer<typeof babyFormSchema>;
-
-const BabySettingsView = () => {
+const BabySettings = () => {
   const { currentBaby } = useBabyFromUrl();
-  const { mutate: updateBaby, isPending } = useUpdateBaby();
-  const [showHistory, setShowHistory] = useState(false);
+  const showModal = useApplicationStore.use.showModal() as (modal: {
+    type: "edit_baby_setting";
+    data: {
+      babyId: string;
+      sectionType: BabySettingSection;
+    };
+  }) => void;
 
-  const form = useForm<BabyFormData>({
-    resolver: zodResolver(babyFormSchema),
-    defaultValues: {
-      name: currentBaby?.name || "",
-      birth_date: currentBaby?.birth_date || "",
-      gender: currentBaby?.gender || "male",
-      birth_weight: currentBaby?.birth_weight || undefined,
-      birth_length: currentBaby?.birth_length || undefined,
-      blood_type: currentBaby?.blood_type || "",
-      current_weight: currentBaby?.current_weight || undefined,
-      current_length: currentBaby?.current_length || undefined,
-      head_circumference: currentBaby?.head_circumference || undefined,
-      allergies: currentBaby?.allergies || [],
-      medications: currentBaby?.medications || [],
-      pediatrician_name: currentBaby?.pediatrician_name || "",
-      pediatrician_phone: currentBaby?.pediatrician_phone || "",
-      pediatrician_email: currentBaby?.pediatrician_email || "",
-      emergency_contact_name: currentBaby?.emergency_contact_name || "",
-      emergency_contact_relationship:
-        currentBaby?.emergency_contact_relationship || "",
-      emergency_contact_phone: currentBaby?.emergency_contact_phone || "",
-      notes: currentBaby?.notes || "",
-    },
-  });
+  // const renderHistoryChart = () => {
+  //   if (!selectedSection) return null;
 
-  // Reset form when currentBaby changes
-  useEffect(() => {
-    if (currentBaby) {
-      form.reset({
-        name: currentBaby.name,
-        birth_date: currentBaby.birth_date,
-        gender: currentBaby.gender,
-        birth_weight: currentBaby.birth_weight || undefined,
-        birth_length: currentBaby.birth_length || undefined,
-        blood_type: currentBaby.blood_type || "",
-        current_weight: currentBaby.current_weight || undefined,
-        current_length: currentBaby.current_length || undefined,
-        head_circumference: currentBaby.head_circumference || undefined,
-        allergies: currentBaby.allergies || [],
-        medications: currentBaby.medications || [],
-        pediatrician_name: currentBaby.pediatrician_name || "",
-        pediatrician_phone: currentBaby.pediatrician_phone || "",
-        pediatrician_email: currentBaby.pediatrician_email || "",
-        emergency_contact_name: currentBaby.emergency_contact_name || "",
-        emergency_contact_relationship:
-          currentBaby.emergency_contact_relationship || "",
-        emergency_contact_phone: currentBaby.emergency_contact_phone || "",
-        notes: currentBaby.notes || "",
-      });
-    }
-  }, [currentBaby, form]);
+  //   const data = generateGrowthData(selectedSection);
+  //   if (data.length === 0) {
+  //     return (
+  //       <div className="text-center py-8 text-gray-500">
+  //         <TrendingUp className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+  //         <p>No history data available for this section.</p>
+  //       </div>
+  //     );
+  //   }
+  //   return (
+  //     <div className="space-y-4">
+  //       <ResponsiveContainer width="100%" height={300}>
+  //         <AreaChart data={data}>
+  //           <CartesianGrid strokeDasharray="3 3" />
+  //           <XAxis dataKey="date" />
+  //           <YAxis />
+  //           <Tooltip />
+  //           <Area
+  //             type="monotone"
+  //             dataKey="value"
+  //             stroke="#8884d8"
+  //             fill="#8884d8"
+  //             fillOpacity={0.3}
+  //           />
+  //         </AreaChart>
+  //       </ResponsiveContainer>
 
-  const onSubmit = (data: BabyFormData) => {
-    if (!currentBaby?.id) return;
-
-    updateBaby({
-      babyId: currentBaby.id,
-      baby: data,
-    });
-  };
-
-  if (!currentBaby) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50 flex items-center justify-center">
-        <div className="text-center">
-          <Baby className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-          <p className="text-gray-600">Loading baby information...</p>
-        </div>
-      </div>
-    );
-  }
+  //       <div className="space-y-2">
+  //         <h4 className="font-semibold">Change History</h4>
+  //         {getFieldHistory(selectedSection).map((change) => (
+  //           <div
+  //             key={change.id}
+  //             className="flex justify-between items-center p-2 bg-gray-50 rounded"
+  //           >
+  //             <div>
+  //               <span className="font-medium">{change.newValue}</span>
+  //               <span className="text-sm text-gray-500 ml-2">
+  //                 by {change.changedBy}
+  //               </span>
+  //             </div>
+  //             <span className="text-xs text-gray-400">
+  //               {new Date(change.changedAt).toLocaleDateString()}
+  //             </span>
+  //           </div>
+  //         ))}
+  //       </div>
+  //     </div>
+  //   );
+  // };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50">
-      <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Baby Profile Overview */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <User className="w-5 h-5 text-pink-600" />
-                  Profile Information
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Basic Info Display */}
-                <div className="text-center p-6 bg-gradient-to-r from-pink-50 to-blue-50 rounded-2xl">
-                  <div className="text-6xl mb-4">
-                    {currentBaby.avatar || "👶"}
-                  </div>
-                  <div className="text-2xl font-bold text-gray-800 mb-2">
-                    {currentBaby.name}
-                  </div>
-                  <div className="text-lg text-gray-600 mb-1">
-                    {calculateAge(currentBaby.birth_date)}
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    Born: {dayjs(currentBaby.birth_date).format("MMMM D, YYYY")}
-                  </div>
-                </div>
-
-                {/* Editable Basic Info */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem className="space-y-2">
-                        <FormLabel className="text-sm font-semibold flex items-center gap-2">
-                          <Edit3 className="w-4 h-4" />
-                          Baby's Name
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            className="border-pink-200 focus:border-pink-400"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="birth_date"
-                    render={({ field }) => (
-                      <FormItem className="space-y-2">
-                        <FormLabel className="text-sm font-semibold flex items-center gap-2">
-                          <Calendar className="w-4 h-4" />
-                          Birth Date
-                        </FormLabel>
-                        <FormControl>
-                          <DateTimeField
-                            value={dayjs(field.value)}
-                            onChange={(value) => {
-                              field.onChange(value?.toISOString());
-                            }}
-                            ampm={false}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="gender"
-                    render={({ field }) => (
-                      <FormItem className="space-y-2 md:col-span-2">
-                        <FormLabel className="text-sm font-semibold">
-                          Gender
-                        </FormLabel>
-                        <FormControl>
-                          <RadioGroup
-                            onValueChange={field.onChange}
-                            value={field.value}
-                            className="flex gap-6"
-                          >
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="male" id="male" />
-                              <Label htmlFor="male">👶🏻 Boy</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="female" id="female" />
-                              <Label htmlFor="female">👶🏻 Girl</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <RadioGroupItem value="other" id="other" />
-                              <Label htmlFor="other">👶 Other</Label>
-                            </div>
-                          </RadioGroup>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Birth Information */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Heart className="w-5 h-5 text-red-500" />
-                  Birth Information
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <FormField
-                  control={form.control}
-                  name="birth_weight"
-                  render={({ field }) => (
-                    <FormItem className="space-y-2">
-                      <FormLabel className="text-sm font-semibold flex items-center gap-2">
-                        <Weight className="w-4 h-4" />
-                        Birth Weight (lbs)
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          type="number"
-                          step="0.1"
-                          placeholder="e.g., 7.5"
-                          value={field.value || ""}
-                          onChange={(e) =>
-                            field.onChange(
-                              e.target.value
-                                ? Number.parseFloat(e.target.value)
-                                : undefined
-                            )
-                          }
-                          className="border-red-200 focus:border-red-400"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="birth_length"
-                  render={({ field }) => (
-                    <FormItem className="space-y-2">
-                      <FormLabel className="text-sm font-semibold flex items-center gap-2">
-                        <Ruler className="w-4 h-4" />
-                        Birth Length (inches)
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          type="number"
-                          step="0.1"
-                          placeholder="e.g., 20.5"
-                          value={field.value || ""}
-                          onChange={(e) =>
-                            field.onChange(
-                              e.target.value
-                                ? Number.parseFloat(e.target.value)
-                                : undefined
-                            )
-                          }
-                          className="border-red-200 focus:border-red-400"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="blood_type"
-                  render={({ field }) => (
-                    <FormItem className="space-y-2">
-                      <FormLabel className="text-sm font-semibold">
-                        Blood Type
-                      </FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value || ""}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="border-red-200 focus:border-red-400">
-                            <SelectValue placeholder="Select blood type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="A+">A+</SelectItem>
-                          <SelectItem value="A-">A-</SelectItem>
-                          <SelectItem value="B+">B+</SelectItem>
-                          <SelectItem value="B-">B-</SelectItem>
-                          <SelectItem value="AB+">AB+</SelectItem>
-                          <SelectItem value="AB-">AB-</SelectItem>
-                          <SelectItem value="O+">O+</SelectItem>
-                          <SelectItem value="O-">O-</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </CardContent>
-            </Card>
-
-            {/* Current Measurements */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Ruler className="w-5 h-5 text-blue-500" />
-                  Current Measurements
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <FormField
-                  control={form.control}
-                  name="current_weight"
-                  render={({ field }) => (
-                    <FormItem className="space-y-2">
-                      <FormLabel className="text-sm font-semibold">
-                        Current Weight (lbs)
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          type="number"
-                          step="0.1"
-                          placeholder="e.g., 15.2"
-                          value={field.value || ""}
-                          onChange={(e) =>
-                            field.onChange(
-                              e.target.value
-                                ? Number.parseFloat(e.target.value)
-                                : undefined
-                            )
-                          }
-                          className="border-blue-200 focus:border-blue-400"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="current_length"
-                  render={({ field }) => (
-                    <FormItem className="space-y-2">
-                      <FormLabel className="text-sm font-semibold">
-                        Current Length (inches)
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          type="number"
-                          step="0.1"
-                          placeholder="e.g., 28.5"
-                          value={field.value || ""}
-                          onChange={(e) =>
-                            field.onChange(
-                              e.target.value
-                                ? Number.parseFloat(e.target.value)
-                                : undefined
-                            )
-                          }
-                          className="border-blue-200 focus:border-blue-400"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="head_circumference"
-                  render={({ field }) => (
-                    <FormItem className="space-y-2">
-                      <FormLabel className="text-sm font-semibold">
-                        Head Circumference (inches)
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          type="number"
-                          step="0.1"
-                          placeholder="e.g., 16.8"
-                          value={field.value || ""}
-                          onChange={(e) =>
-                            field.onChange(
-                              e.target.value
-                                ? Number.parseFloat(e.target.value)
-                                : undefined
-                            )
-                          }
-                          className="border-blue-200 focus:border-blue-400"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </CardContent>
-            </Card>
-
-            {/* Medical Information */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Heart className="w-5 h-5 text-green-500" />
-                  Medical Information
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <FormField
-                  control={form.control}
-                  name="allergies"
-                  render={({ field }) => (
-                    <FormItem className="space-y-2">
-                      <FormLabel className="text-sm font-semibold">
-                        Allergies
-                      </FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="List any known allergies (e.g., milk, eggs, peanuts)"
-                          value={field.value?.join(", ") || ""}
-                          onChange={(e) =>
-                            field.onChange(
-                              e.target.value
-                                .split(",")
-                                .map((s) => s.trim())
-                                .filter((s) => s)
-                            )
-                          }
-                          className="border-green-200 focus:border-green-400"
-                          rows={2}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="medications"
-                  render={({ field }) => (
-                    <FormItem className="space-y-2">
-                      <FormLabel className="text-sm font-semibold">
-                        Current Medications
-                      </FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="List any current medications or supplements"
-                          value={field.value?.join(", ") || ""}
-                          onChange={(e) =>
-                            field.onChange(
-                              e.target.value
-                                .split(",")
-                                .map((s) => s.trim())
-                                .filter((s) => s)
-                            )
-                          }
-                          className="border-green-200 focus:border-green-400"
-                          rows={2}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <Separator />
-
-                <div className="space-y-4">
-                  <h4 className="font-semibold text-gray-800">
-                    Pediatrician Information
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="pediatrician_name"
-                      render={({ field }) => (
-                        <FormItem className="space-y-2">
-                          <FormLabel className="text-sm font-semibold">
-                            Doctor's Name
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              placeholder="Dr. Smith"
-                              className="border-green-200 focus:border-green-400"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="pediatrician_phone"
-                      render={({ field }) => (
-                        <FormItem className="space-y-2">
-                          <FormLabel className="text-sm font-semibold">
-                            Phone Number
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              placeholder="(555) 123-4567"
-                              className="border-green-200 focus:border-green-400"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="pediatrician_email"
-                      render={({ field }) => (
-                        <FormItem className="space-y-2">
-                          <FormLabel className="text-sm font-semibold">
-                            Email
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              type="email"
-                              placeholder="doctor@clinic.com"
-                              className="border-green-200 focus:border-green-400"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </div>
-
-                <Separator />
-
-                <div className="space-y-4">
-                  <h4 className="font-semibold text-gray-800">
-                    Emergency Contact
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="emergency_contact_name"
-                      render={({ field }) => (
-                        <FormItem className="space-y-2">
-                          <FormLabel className="text-sm font-semibold">
-                            Contact Name
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              placeholder="Grandma Jane"
-                              className="border-green-200 focus:border-green-400"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="emergency_contact_relationship"
-                      render={({ field }) => (
-                        <FormItem className="space-y-2">
-                          <FormLabel className="text-sm font-semibold">
-                            Relationship
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              placeholder="Grandmother"
-                              className="border-green-200 focus:border-green-400"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="emergency_contact_phone"
-                      render={({ field }) => (
-                        <FormItem className="space-y-2">
-                          <FormLabel className="text-sm font-semibold">
-                            Phone Number
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              placeholder="(555) 987-6543"
-                              className="border-green-200 focus:border-green-400"
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Notes */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Edit3 className="w-5 h-5 text-purple-500" />
-                  Additional Notes
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <FormField
-                  control={form.control}
-                  name="notes"
-                  render={({ field }) => (
-                    <FormItem className="space-y-2">
-                      <FormLabel className="text-sm font-semibold">
-                        General Notes
-                      </FormLabel>
-                      <FormControl>
-                        <Textarea
-                          {...field}
-                          placeholder="Any additional information about your baby (preferences, habits, special needs, etc.)"
-                          className="border-purple-200 focus:border-purple-400"
-                          rows={4}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </CardContent>
-            </Card>
-
-            {/* Save Button */}
-            <div className="flex justify-end">
-              <Button
-                type="submit"
-                disabled={isPending}
-                className="flex items-center gap-2 bg-gradient-to-r from-pink-500 to-blue-500 hover:from-pink-600 hover:to-blue-600"
-              >
-                <Save className="w-4 h-4" />
-                {isPending ? "Saving..." : "Save Changes"}
-              </Button>
+    <div className="space-y-6 px-4">
+      {/* Profile Overview */}
+      <Card className="bg-gradient-to-r from-pink-50 to-blue-50 border-pink-200">
+        <CardContent className="p-6">
+          <div className="text-center space-y-4">
+            <div className="text-6xl">
+              {currentBaby?.gender === "male" ? "👦" : "👧"}
             </div>
-          </form>
-        </Form>
-      </div>
-
-      {/* Change History Modal */}
-      <Dialog open={showHistory} onOpenChange={setShowHistory}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <History className="w-5 h-5 text-blue-600" />
-              Change History for {currentBaby.name}
-            </DialogTitle>
-          </DialogHeader>
-
-          <div className="space-y-4">
-            <div className="text-center py-8 text-gray-500">
-              <History className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-              <p>No changes recorded yet.</p>
-              <p className="text-sm mt-1">
-                Changes will appear here as you update {currentBaby.name}'s
-                information.
+            <div>
+              <h2 className="text-2xl font-bold text-gray-800">
+                {currentBaby?.name}
+              </h2>
+              <p className="text-lg text-gray-600">
+                {currentBaby?.birth_date &&
+                  calculateAge(currentBaby?.birth_date)}
+              </p>
+              <p className="text-sm text-gray-500">
+                Born: {dayjs(currentBaby?.birth_date).format("DD MMM YYYY")}
               </p>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Birth Information */}
+      <Card className="bg-gradient-to-r from-red-50 to-pink-50 border-red-200">
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Heart className="w-5 h-5 text-red-500" />
+              Birth Information
+            </div>
+            <div className="flex gap-2">
+              {/* <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  showModal({
+                    type: "edit_baby_setting",
+                    data: {
+                      babyId: currentBaby?.id || "",
+                      sectionType: "birth",
+                    },
+                  })
+                }
+                className="bg-white hover:bg-red-50"
+              >
+                <TrendingUp className="w-4 h-4 mr-2" />
+                History
+              </Button> */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  showModal({
+                    type: "edit_baby_setting",
+                    data: {
+                      babyId: currentBaby?.id || "",
+                      sectionType: "birth",
+                    },
+                  })
+                }
+                className="bg-white hover:bg-red-50"
+              >
+                <Edit className="w-4 h-4 mr-2" />
+                Edit
+              </Button>
+            </div>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="text-center p-4 bg-white rounded-lg border border-red-200">
+              <Weight className="w-6 h-6 mx-auto mb-2 text-red-500" />
+              <div className="text-2xl font-bold text-gray-800">
+                {currentBaby?.birth_weight
+                  ? `${currentBaby?.birth_weight} kg`
+                  : "Not set"}
+              </div>
+              <div className="text-sm text-gray-600">Birth Weight</div>
+            </div>
+            <div className="text-center p-4 bg-white rounded-lg border border-red-200">
+              <Ruler className="w-6 h-6 mx-auto mb-2 text-red-500" />
+              <div className="text-2xl font-bold text-gray-800">
+                {currentBaby?.birth_length
+                  ? `${currentBaby?.birth_length}"`
+                  : "Not set"}
+              </div>
+              <div className="text-sm text-gray-600">Birth Length</div>
+            </div>
+            <div className="text-center p-4 bg-white rounded-lg border border-red-200">
+              <div className="text-2xl font-bold text-red-500 mb-2">🩸</div>
+              <div className="text-2xl font-bold text-gray-800">
+                {currentBaby?.blood_type || "Not set"}
+              </div>
+              <div className="text-sm text-gray-600">Blood Type</div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Current Measurements */}
+      <Card className="bg-gradient-to-r from-blue-50 to-cyan-50 border-blue-200">
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Ruler className="w-5 h-5 text-blue-500" />
+              Current Measurements
+            </div>
+            <div className="flex gap-2">
+              {/* <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  showModal({
+                    type: "edit_baby_setting",
+                    data: {
+                      babyId: currentBaby?.id || "",
+                      sectionType: "current_measurements",
+                    },
+                  })
+                }
+                className="bg-white hover:bg-blue-50"
+              >
+                <TrendingUp className="w-4 h-4 mr-2" />
+                History
+              </Button> */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  showModal({
+                    type: "edit_baby_setting",
+                    data: {
+                      babyId: currentBaby?.id || "",
+                      sectionType: "current_measurements",
+                    },
+                  })
+                }
+                className="bg-white hover:bg-blue-50"
+              >
+                <Edit className="w-4 h-4 mr-2" />
+                Edit
+              </Button>
+            </div>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="text-center p-4 bg-white rounded-lg border border-blue-200">
+              <Weight className="w-6 h-6 mx-auto mb-2 text-blue-500" />
+              <div className="text-2xl font-bold text-gray-800">
+                {currentBaby?.current_weight
+                  ? `${currentBaby?.current_weight} kg`
+                  : "Not set"}
+              </div>
+              <div className="text-sm text-gray-600">Current Weight</div>
+            </div>
+            <div className="text-center p-4 bg-white rounded-lg border border-blue-200">
+              <Ruler className="w-6 h-6 mx-auto mb-2 text-blue-500" />
+              <div className="text-2xl font-bold text-gray-800">
+                {currentBaby?.current_length
+                  ? `${currentBaby?.current_length}"`
+                  : "Not set"}
+              </div>
+              <div className="text-sm text-gray-600">Current Length</div>
+            </div>
+            <div className="text-center p-4 bg-white rounded-lg border border-blue-200">
+              <Baby className="w-6 h-6 mx-auto mb-2 text-blue-500" />
+              <div className="text-2xl font-bold text-gray-800">
+                {currentBaby?.head_circumference
+                  ? `${currentBaby?.head_circumference}"`
+                  : "Not set"}
+              </div>
+              <div className="text-sm text-gray-600">Head Circumference</div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Medical Information */}
+      <Card className="bg-gradient-to-r from-green-50 to-emerald-50 border-green-200">
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Stethoscope className="w-5 h-5 text-green-500" />
+              Medical Information
+            </div>
+            <div className="flex gap-2">
+              {/* <Button
+                variant="outline"
+                size="sm"
+                onClick={() => showModal({
+                    type: "edit_baby_setting",
+                    data: {
+                      babyId: currentBaby?.id || "",
+                      sectionType: "medical",
+                    },
+                  })
+                }
+                className="bg-white hover:bg-green-50"
+              >
+                <TrendingUp className="w-4 h-4 mr-2" />
+                History
+              </Button> */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  showModal({
+                    type: "edit_baby_setting",
+                    data: {
+                      babyId: currentBaby?.id || "",
+                      sectionType: "medical",
+                    },
+                  })
+                }
+                className="bg-white hover:bg-green-50"
+              >
+                <Edit className="w-4 h-4 mr-2" />
+                Edit
+              </Button>
+            </div>
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Allergies & Medications */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-orange-500" />
+                <h4 className="font-semibold text-gray-800">Allergies</h4>
+              </div>
+              <div className="bg-white p-4 rounded-lg border border-green-200">
+                {currentBaby?.allergies && currentBaby?.allergies.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {currentBaby?.allergies.map((allergy, index) => (
+                      <Badge
+                        key={index}
+                        variant="secondary"
+                        className="bg-orange-100 text-orange-700"
+                      >
+                        {allergy}
+                      </Badge>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 text-sm">No known allergies</p>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Pill className="w-4 h-4 text-blue-500" />
+                <h4 className="font-semibold text-gray-800">Medications</h4>
+              </div>
+              <div className="bg-white p-4 rounded-lg border border-green-200">
+                {currentBaby?.medications &&
+                currentBaby?.medications.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {currentBaby?.medications.map((medication, index) => (
+                      <Badge
+                        key={index}
+                        variant="secondary"
+                        className="bg-blue-100 text-blue-700"
+                      >
+                        {medication}
+                      </Badge>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 text-sm">
+                    No current medications
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <User className="w-4 h-4 text-green-500" />
+              <h4 className="font-semibold text-gray-800">Pediatrician</h4>
+            </div>
+            <div className="bg-white p-4 rounded-lg border border-green-200">
+              {currentBaby?.pediatrician_name ||
+              currentBaby?.pediatrician_phone ||
+              currentBaby?.pediatrician_email ? (
+                <div className="space-y-2">
+                  {currentBaby?.pediatrician_name && (
+                    <div className="font-medium text-gray-800">
+                      {currentBaby?.pediatrician_name}
+                    </div>
+                  )}
+                  {currentBaby?.pediatrician_phone && (
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <Phone className="w-3 h-3" />
+                      {currentBaby?.pediatrician_phone}
+                    </div>
+                  )}
+                  {currentBaby?.pediatrician_email && (
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <Mail className="w-3 h-3" />
+                      {currentBaby?.pediatrician_email}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p className="text-gray-500 text-sm">
+                  No pediatrician information
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-red-500" />
+              <h4 className="font-semibold text-gray-800">Emergency Contact</h4>
+            </div>
+            <div className="bg-white p-4 rounded-lg border border-green-200">
+              {currentBaby?.emergency_contact_name ? (
+                <div className="space-y-2">
+                  <div className="font-medium text-gray-800">
+                    {currentBaby?.emergency_contact_name}
+                  </div>
+                  {currentBaby?.emergency_contact_relationship && (
+                    <div className="text-sm text-gray-600">
+                      {currentBaby?.emergency_contact_relationship}
+                    </div>
+                  )}
+                  {currentBaby?.emergency_contact_phone && (
+                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                      <Phone className="w-3 h-3" />
+                      {currentBaby?.emergency_contact_phone}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p className="text-gray-500 text-sm">
+                  No emergency contact information
+                </p>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Additional Notes */}
+      <Card className="bg-gradient-to-r from-purple-50 to-indigo-50 border-purple-200">
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <FileText className="w-5 h-5 text-purple-500" />
+              Additional Notes
+            </div>
+            <div className="flex gap-2">
+              {/* <Button
+                variant="outline"
+                size="sm"
+                onClick={() => showSectionHistory("notes")}
+                className="bg-white hover:bg-purple-50"
+              >
+                <TrendingUp className="w-4 h-4 mr-2" />
+                History
+              </Button> */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  showModal({
+                    type: "edit_baby_setting",
+                    data: {
+                      babyId: currentBaby?.id || "",
+                      sectionType: "notes",
+                    },
+                  })
+                }
+                className="bg-white hover:bg-purple-50"
+              >
+                <Edit className="w-4 h-4 mr-2" />
+                Edit
+              </Button>
+            </div>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="bg-white p-4 rounded-lg border border-purple-200">
+            {currentBaby?.notes ? (
+              <p className="text-gray-700 whitespace-pre-wrap">
+                {currentBaby?.notes}
+              </p>
+            ) : (
+              <p className="text-gray-500 text-sm">No additional notes</p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* History Modal */}
+      {/* <Dialog open={showHistoryModal} onOpenChange={setShowHistoryModal}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-blue-600" />
+              Change History -{" "}
+              {selectedSection.charAt(0).toUpperCase() +
+                selectedSection.slice(1)}
+            </DialogTitle>
+          </DialogHeader>
+          {renderHistoryChart()}
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
+
+      <EditBabySettingModal />
     </div>
   );
 };
 
-export default BabySettingsView;
+export default BabySettings;

@@ -13,7 +13,7 @@ export const useUpdateBaby = () => {
 
   return useMutation({
     mutationFn: ({ babyId, baby }: { babyId: string; baby: UpdateBaby }) =>
-      updateBaby(babyId, baby, userId || "", accessToken || ""),
+      updateBaby(babyId, baby, accessToken || ""),
     onSuccess: (_, { babyId }) => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.BABY, babyId],

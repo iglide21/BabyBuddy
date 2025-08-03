@@ -29,7 +29,6 @@ const createBaby = async (
 const updateBaby = async (
   babyId: string,
   baby: UpdateBaby,
-  userId: string,
   accessToken: string
 ) => {
   const response = await fetch(`/api/babies/${babyId}`, {

@@ -20,6 +20,8 @@ import {
   DialogDescription,
 } from "./dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "./popover";
+import { Separator } from "./separator";
+import { Textarea } from "./textarea";
 
 export {
   Button,
@@ -46,4 +48,6 @@ export {
   Popover,
   PopoverContent,
   PopoverTrigger,
+  Separator,
+  Textarea,
 };

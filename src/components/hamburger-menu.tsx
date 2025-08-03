@@ -22,11 +22,11 @@ import {
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { useApplicationStore } from "../stores/applicationStore";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "../lib/supabase/client";
 import { useBabyFromUrl } from "../hooks/useBabyFromUrl";
 
-const menuItems = [
+const babyMenuItems = [
   {
     label: "Baby Settings",
     icon: BabyIcon,
@@ -45,6 +45,9 @@ const menuItems = [
     href: "/reminders",
     color: "purple",
   },
+];
+
+const userMenuItems = [
   {
     label: "Account Settings",
     icon: Settings,
@@ -56,6 +59,7 @@ const menuItems = [
 const HamburgerMenu = () => {
   const supabase = createClient();
   const router = useRouter();
+  const pathname = usePathname();
 
   const session = useAuth();
   const { currentBaby } = useBabyFromUrl();
@@ -74,9 +78,18 @@ const HamburgerMenu = () => {
   };
 
   const handleNavigate = (href: string) => {
+    if (session?.user) {
+      toggleHamburgerMenu();
+      router.push(`${session.user.id}${href}`);
+    }
+  };
+
+  const handleBabyNavigate = (href: string) => {
     toggleHamburgerMenu();
     router.push(`/babies/${currentBaby?.id}${href}`);
   };
+
+  const showBabyMenus = pathname.includes("/babies/");
 
   return (
     <Sheet open={isHamburgerMenuOpen} onOpenChange={toggleHamburgerMenu}>
@@ -88,7 +101,6 @@ const HamburgerMenu = () => {
       <SheetContent side="right" className="w-80">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2 text-left">
-            <User className="w-5 h-5 text-purple-600" />
             Menu
           </SheetTitle>
         </SheetHeader>
@@ -108,58 +120,62 @@ const HamburgerMenu = () => {
             </div>
           </div>
 
-          {/* Current Baby */}
-          {currentBaby && (
-            <div
-              className="p-4 bg-gradient-to-r from-pink-50 to-blue-50 rounded-lg border border-pink-200"
-              onClick={() => {
-                toggleHamburgerMenu();
-                router.push(`/babies/${currentBaby?.id}`);
-              }}
-            >
-              <div className="flex items-center gap-3">
-                <Baby className="w-5 h-5 text-pink-600" />
-                <div>
-                  <div className="text-sm text-gray-600">
-                    Currently tracking
-                  </div>
-                  <div className="font-medium text-gray-800">
-                    {currentBaby?.name}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
           <Separator />
 
           {/* Menu Items */}
           <div className="space-y-2">
-            {menuItems.map((item) => (
-              <Button
-                variant="ghost"
-                key={item.label}
-                onClick={() => handleNavigate(item.href)}
-                disabled={!currentBaby}
-                className={`w-full justify-start h-12 text-left hover:bg-${item.color}-50`}
-              >
-                <item.icon className={`w-5 h-5 mr-3 text-${item.color}-600`} />
-                <div>
-                  <div className="font-medium">{item.label}</div>
-                </div>
-              </Button>
-            ))}
+            {/* User Menu Items */}
+            {userMenuItems.map((item) => {
+              return (
+                <Button
+                  variant="ghost"
+                  key={item.label}
+                  onClick={() => handleNavigate(item.href)}
+                >
+                  <item.icon
+                    className={`w-5 h-5 mr-3 text-${item.color}-600`}
+                  />
+                  <div>
+                    <div className="font-medium">{item.label}</div>
+                  </div>
+                </Button>
+              );
+            })}
+
+            {/* Baby Menu Items */}
+            {babyMenuItems.map((item) => {
+              if (!pathname.includes("/babies")) {
+                return null;
+              }
+
+              return (
+                <Button
+                  variant="ghost"
+                  key={item.label}
+                  onClick={() => handleBabyNavigate(item.href)}
+                  disabled={!currentBaby}
+                  className={`w-full justify-start h-12 text-left hover:bg-${item.color}-50`}
+                >
+                  <item.icon
+                    className={`w-5 h-5 mr-3 text-${item.color}-600`}
+                  />
+                  <div>
+                    <div className="font-medium">{item.label}</div>
+                  </div>
+                </Button>
+              );
+            })}
           </div>
 
           <Separator />
 
           {/* Navigation */}
           <div className="space-y-2">
-            {currentBaby && (
+            {showBabyMenus && (
               <Button
                 variant="ghost"
                 onClick={handleSwitchBaby}
-                className="w-full justify-start h-12 text-left hover:bg-orange-50"
+                className="w-full justify-start h-12 text-left hover:bg-orange-50 bg-orange-50 border border-orange-200"
               >
                 <Baby className="w-5 h-5 mr-3 text-orange-600" />
                 <div>

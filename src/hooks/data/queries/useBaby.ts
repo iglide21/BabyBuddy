@@ -1,9 +1,10 @@
 import { QUERY_KEYS } from "@/src/lib/constants";
 import { getBaby } from "@/src/services/babies";
+import { Baby } from "@/types/data/babies/types";
 import { useQuery } from "@tanstack/react-query";
 
 const useBaby = (babyId?: string, enabled = true) => {
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError } = useQuery<Baby>({
     queryKey: [QUERY_KEYS.BABY, babyId],
     queryFn: () => getBaby(babyId!),
     enabled: !!babyId && enabled,
