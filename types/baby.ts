@@ -1,5 +1,8 @@
 export type BabySettingSection =
   | "birth"
   | "current_measurements"
+  | "history_current_measurements"
   | "medical"
-  | "notes";
+  | "history_medical"
+  | "notes"
+  | "history_notes";

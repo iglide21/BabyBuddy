@@ -13,7 +13,6 @@ import {
   Weight,
   Heart,
   Stethoscope,
-  TrendingUp,
   User,
   Phone,
   Mail,
@@ -22,6 +21,7 @@ import {
   Baby,
   FileText,
   Edit,
+  TrendingUp,
 } from "lucide-react";
 import EditBabySettingModal from "@/src/components/baby/edit-baby-setting-modal";
 import { useBabyFromUrl } from "@/src/hooks";
@@ -125,42 +125,6 @@ const BabySettings = () => {
               <Heart className="w-5 h-5 text-red-500" />
               Birth Information
             </div>
-            <div className="flex gap-2">
-              {/* <Button
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  showModal({
-                    type: "edit_baby_setting",
-                    data: {
-                      babyId: currentBaby?.id || "",
-                      sectionType: "birth",
-                    },
-                  })
-                }
-                className="bg-white hover:bg-red-50"
-              >
-                <TrendingUp className="w-4 h-4 mr-2" />
-                History
-              </Button> */}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  showModal({
-                    type: "edit_baby_setting",
-                    data: {
-                      babyId: currentBaby?.id || "",
-                      sectionType: "birth",
-                    },
-                  })
-                }
-                className="bg-white hover:bg-red-50"
-              >
-                <Edit className="w-4 h-4 mr-2" />
-                Edit
-              </Button>
-            </div>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -178,7 +142,7 @@ const BabySettings = () => {
               <Ruler className="w-6 h-6 mx-auto mb-2 text-red-500" />
               <div className="text-2xl font-bold text-gray-800">
                 {currentBaby?.birth_length
-                  ? `${currentBaby?.birth_length}"`
+                  ? `${currentBaby?.birth_length} cm`
                   : "Not set"}
               </div>
               <div className="text-sm text-gray-600">Birth Length</div>
@@ -203,7 +167,7 @@ const BabySettings = () => {
               Current Measurements
             </div>
             <div className="flex gap-2">
-              {/* <Button
+              <Button
                 variant="outline"
                 size="sm"
                 onClick={() =>
@@ -211,7 +175,7 @@ const BabySettings = () => {
                     type: "edit_baby_setting",
                     data: {
                       babyId: currentBaby?.id || "",
-                      sectionType: "current_measurements",
+                      sectionType: "history_current_measurements",
                     },
                   })
                 }
@@ -219,7 +183,7 @@ const BabySettings = () => {
               >
                 <TrendingUp className="w-4 h-4 mr-2" />
                 History
-              </Button> */}
+              </Button>
               <Button
                 variant="outline"
                 size="sm"
@@ -255,7 +219,7 @@ const BabySettings = () => {
               <Ruler className="w-6 h-6 mx-auto mb-2 text-blue-500" />
               <div className="text-2xl font-bold text-gray-800">
                 {currentBaby?.current_length
-                  ? `${currentBaby?.current_length}"`
+                  ? `${currentBaby?.current_length} cm`
                   : "Not set"}
               </div>
               <div className="text-sm text-gray-600">Current Length</div>
@@ -264,7 +228,7 @@ const BabySettings = () => {
               <Baby className="w-6 h-6 mx-auto mb-2 text-blue-500" />
               <div className="text-2xl font-bold text-gray-800">
                 {currentBaby?.head_circumference
-                  ? `${currentBaby?.head_circumference}"`
+                  ? `${currentBaby?.head_circumference} cm`
                   : "Not set"}
               </div>
               <div className="text-sm text-gray-600">Head Circumference</div>

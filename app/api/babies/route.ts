@@ -2,19 +2,12 @@ import { createClient } from "@/src/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export const GET = async (request: NextRequest) => {
-  const { searchParams } = new URL(request.url);
-  const userId = searchParams.get("userId");
-
-  if (!userId) {
-    return NextResponse.json({ error: "User ID is required" }, { status: 400 });
-  }
-
   const supabase = await createClient();
 
   const { data: user, error: userError } = await supabase.auth.getUser();
 
-  if (!user?.user) {
-    return NextResponse.json({ error: "User not found" }, { status: 404 });
+  if (!user?.user || userError) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const { data, error } = await supabase
@@ -39,13 +32,7 @@ export const GET = async (request: NextRequest) => {
 };
 
 export const POST = async (request: NextRequest) => {
-  const { searchParams } = new URL(request.url);
   const body = await request.json();
-  const userId = searchParams.get("userId");
-
-  if (!userId) {
-    return NextResponse.json({ error: "User ID is required" }, { status: 400 });
-  }
 
   const supabase = await createClient();
 

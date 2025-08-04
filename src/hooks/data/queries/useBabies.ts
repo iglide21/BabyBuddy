@@ -3,11 +3,10 @@ import { getBabies } from "@/src/services/babies";
 import { useQuery } from "@tanstack/react-query";
 import { Baby } from "@/types/data/babies/types";
 
-const useBabies = (userId: string) => {
+const useBabies = () => {
   const { data, isLoading, isError } = useQuery<Baby[]>({
-    queryKey: [QUERY_KEYS.BABIES, userId],
-    queryFn: () => getBabies(userId),
-    enabled: !!userId,
+    queryKey: [QUERY_KEYS.BABIES],
+    queryFn: () => getBabies(),
   });
 
   return { data, isLoading, isError };

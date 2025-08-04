@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { QUERY_KEYS } from "@/src/lib/constants";
-import { updateBaby } from "@/src/services/babies";
-import type { UpdateBaby } from "@/types/data/babies/types";
+import { updateBabyWithHistory } from "@/src/services/babies";
+import type { UpdateBabyWithHistory } from "@/types/data/babies/types";
 import { toast } from "sonner";
 import { useAuth } from "@/src/hooks/useAuth";
 
@@ -12,8 +12,21 @@ export const useUpdateBaby = () => {
   const accessToken = session?.access_token;
 
   return useMutation({
-    mutationFn: ({ babyId, baby }: { babyId: string; baby: UpdateBaby }) =>
-      updateBaby(babyId, baby, accessToken || ""),
+    mutationFn: ({
+      babyId,
+      currentValues,
+      previousValues,
+    }: {
+      babyId: string;
+      currentValues: Partial<UpdateBabyWithHistory["currentValues"]>;
+      previousValues: Partial<UpdateBabyWithHistory["previousValues"]>;
+    }) => {
+      return updateBabyWithHistory({
+        babyId,
+        currentValues,
+        previousValues,
+      });
+    },
     onSuccess: (_, { babyId }) => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.BABY, babyId],

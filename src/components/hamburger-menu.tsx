@@ -19,6 +19,8 @@ import {
   User,
   Baby,
   BabyIcon,
+  ArrowLeftRight,
+  ChartLine,
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { useApplicationStore } from "../stores/applicationStore";
@@ -32,18 +34,7 @@ const babyMenuItems = [
     icon: BabyIcon,
     href: "/settings",
     color: "pink",
-  },
-  {
-    label: "History",
-    icon: History,
-    href: "/history",
-    color: "blue",
-  },
-  {
-    label: "Reminders",
-    icon: Bell,
-    href: "/reminders",
-    color: "purple",
+    caption: "Manage your baby's settings",
   },
 ];
 
@@ -53,6 +44,31 @@ const userMenuItems = [
     icon: Settings,
     href: "/settings",
     color: "green",
+    caption: "Manage your account settings",
+  },
+  {
+    label: "Reminders",
+    icon: Bell,
+    href: "/reminders",
+    color: "purple",
+    caption: "Set up reminders for important events",
+  },
+];
+
+const dataAndAnalyticsMenuItems = [
+  {
+    label: "Analytics",
+    icon: ChartLine,
+    href: "/analytics",
+    color: "purple",
+    caption: "View your baby's analytics",
+  },
+  {
+    label: "History",
+    icon: History,
+    href: "/history",
+    color: "blue",
+    caption: "View your baby's growth history",
   },
 ];
 
@@ -124,25 +140,24 @@ const HamburgerMenu = () => {
 
           {/* Menu Items */}
           <div className="space-y-2">
-            {/* User Menu Items */}
-            {userMenuItems.map((item) => {
-              return (
-                <Button
-                  variant="ghost"
-                  key={item.label}
-                  onClick={() => handleNavigate(item.href)}
-                >
-                  <item.icon
-                    className={`w-5 h-5 mr-3 text-${item.color}-600`}
-                  />
-                  <div>
-                    <div className="font-medium">{item.label}</div>
+            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-2">
+              Baby Management
+            </h3>
+            {showBabyMenus && (
+              <Button
+                variant="ghost"
+                onClick={handleSwitchBaby}
+                className="w-full justify-start h-12 text-left"
+              >
+                <ArrowLeftRight className="w-5 h-5 mr-3 text-orange-600" />
+                <div>
+                  <div className="font-medium">Switch Baby</div>
+                  <div className="text-xs text-gray-500">
+                    Switch between your babies
                   </div>
-                </Button>
-              );
-            })}
-
-            {/* Baby Menu Items */}
+                </div>
+              </Button>
+            )}
             {babyMenuItems.map((item) => {
               if (!pathname.includes("/babies")) {
                 return null;
@@ -161,6 +176,52 @@ const HamburgerMenu = () => {
                   />
                   <div>
                     <div className="font-medium">{item.label}</div>
+                    <div className="text-xs text-gray-500">{item.caption}</div>
+                  </div>
+                </Button>
+              );
+            })}
+
+            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-2">
+              Data and analytics
+            </h3>
+            {/* User Menu Items */}
+            {dataAndAnalyticsMenuItems.map((item) => {
+              return (
+                <Button
+                  variant="ghost"
+                  key={item.label}
+                  onClick={() => handleNavigate(item.href)}
+                  className="w-full justify-start h-12 text-left"
+                >
+                  <item.icon
+                    className={`w-5 h-5 mr-3 text-${item.color}-600`}
+                  />
+                  <div>
+                    <div className="font-medium">{item.label}</div>
+                    <div className="text-xs text-gray-500">{item.caption}</div>
+                  </div>
+                </Button>
+              );
+            })}
+
+            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-2">
+              Settings
+            </h3>
+            {userMenuItems.map((item) => {
+              return (
+                <Button
+                  variant="ghost"
+                  key={item.label}
+                  onClick={() => handleNavigate(item.href)}
+                  className="w-full justify-start h-12 text-left"
+                >
+                  <item.icon
+                    className={`w-5 h-5 mr-3 text-${item.color}-600`}
+                  />
+                  <div>
+                    <div className="font-medium">{item.label}</div>
+                    <div className="text-xs text-gray-500">{item.caption}</div>
                   </div>
                 </Button>
               );
@@ -169,33 +230,17 @@ const HamburgerMenu = () => {
 
           <Separator />
 
-          {/* Navigation */}
-          <div className="space-y-2">
-            {showBabyMenus && (
-              <Button
-                variant="ghost"
-                onClick={handleSwitchBaby}
-                className="w-full justify-start h-12 text-left hover:bg-orange-50 bg-orange-50 border border-orange-200"
-              >
-                <Baby className="w-5 h-5 mr-3 text-orange-600" />
-                <div>
-                  <div className="font-medium">Switch Baby</div>
-                </div>
-              </Button>
-            )}
-
-            <Button
-              variant="ghost"
-              onClick={handleSignOut}
-              className="w-full justify-start h-12 text-left hover:bg-red-50 text-red-600"
-            >
-              <LogOut className="w-5 h-5 mr-3" />
-              <div>
-                <div className="font-medium">Sign Out</div>
-                <div className="text-xs text-red-400">End current session</div>
-              </div>
-            </Button>
-          </div>
+          <Button
+            variant="ghost"
+            onClick={handleSignOut}
+            className="w-full justify-start h-12 text-left hover:bg-red-50 text-red-600"
+          >
+            <LogOut className="w-5 h-5 mr-3" />
+            <div>
+              <div className="font-medium">Sign Out</div>
+              <div className="text-xs text-red-400">End current session</div>
+            </div>
+          </Button>
 
           {/* App Info */}
           <div className="pt-4 border-t">

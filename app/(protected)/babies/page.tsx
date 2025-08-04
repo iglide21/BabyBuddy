@@ -17,7 +17,7 @@ const BabiesScreen = () => {
   const user = session?.user;
 
   const showModal = useApplicationStore.use.showModal();
-  const { data: babies, isLoading } = useBabies(user?.id ?? "");
+  const { data: babies, isLoading } = useBabies();
 
   const onAddBaby = () => {
     showModal({ type: "create_baby" });

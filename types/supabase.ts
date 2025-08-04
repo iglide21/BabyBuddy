@@ -137,6 +137,88 @@ export type Database = {
           },
         ]
       }
+      baby_measurements: {
+        Row: {
+          baby_id: string
+          "head-circumference_cm": number | null
+          id: number
+          length_cm: number | null
+          measured_at: string
+          user_id: string
+          weight_kg: number | null
+        }
+        Insert: {
+          baby_id: string
+          "head-circumference_cm"?: number | null
+          id?: number
+          length_cm?: number | null
+          measured_at: string
+          user_id: string
+          weight_kg?: number | null
+        }
+        Update: {
+          baby_id?: string
+          "head-circumference_cm"?: number | null
+          id?: number
+          length_cm?: number | null
+          measured_at?: string
+          user_id?: string
+          weight_kg?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "baby_measurements_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      baby_profile_history: {
+        Row: {
+          baby_id: string
+          changed_at: string
+          field: string
+          id: string
+          new_value: Json
+          old_value: Json
+          section: Database["public"]["Enums"]["BabySettingsSections"]
+          user_id: string
+          value_type: Database["public"]["Enums"]["SettingValueType"]
+        }
+        Insert: {
+          baby_id: string
+          changed_at: string
+          field: string
+          id?: string
+          new_value: Json
+          old_value: Json
+          section: Database["public"]["Enums"]["BabySettingsSections"]
+          user_id: string
+          value_type?: Database["public"]["Enums"]["SettingValueType"]
+        }
+        Update: {
+          baby_id?: string
+          changed_at?: string
+          field?: string
+          id?: string
+          new_value?: Json
+          old_value?: Json
+          section?: Database["public"]["Enums"]["BabySettingsSections"]
+          user_id?: string
+          value_type?: Database["public"]["Enums"]["SettingValueType"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "baby_profile_history_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       diapers: {
         Row: {
           baby_id: string
@@ -327,6 +409,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      BabySettingsSections: "birth" | "measurements" | "medical" | "notes"
       BloodType:
         | "A"
         | "B"
@@ -353,6 +436,7 @@ export type Database = {
       "Feeding type": "breast" | "bottle" | "solid"
       Gender: "male" | "female" | "other"
       "Reminder type": "daily" | "interval"
+      SettingValueType: "string" | "array" | "number"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -483,6 +567,7 @@ export const Constants = {
   },
   public: {
     Enums: {
+      BabySettingsSections: ["birth", "measurements", "medical", "notes"],
       BloodType: [
         "A",
         "B",
@@ -511,6 +596,7 @@ export const Constants = {
       "Feeding type": ["breast", "bottle", "solid"],
       Gender: ["male", "female", "other"],
       "Reminder type": ["daily", "interval"],
+      SettingValueType: ["string", "array", "number"],
     },
   },
 } as const

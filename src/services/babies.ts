@@ -1,45 +1,54 @@
-import type { CreateBaby, UpdateBaby } from "@/types/data/babies/types";
+import type {
+  Baby,
+  CreateBaby,
+  UpdateBaby,
+  UpdateBabyWithHistory,
+} from "@/types/data/babies/types";
 
 export const getBaby = async (babyId: string) => {
   const response = await fetch(`/api/babies/${babyId}`);
   return response.json();
 };
 
-const getBabies = async (userId: string) => {
-  const response = await fetch(`/api/babies?userId=${userId}`);
+const getBabies = async () => {
+  const response = await fetch("/api/babies");
   return response.json();
 };
 
-const createBaby = async (
-  baby: CreateBaby,
-  userId: string,
-  accessToken: string
-) => {
-  const response = await fetch(`/api/babies?userId=${userId}`, {
+const createBaby = async (baby: CreateBaby) => {
+  const response = await fetch("/api/babies", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
     },
     body: JSON.stringify(baby),
   });
   return response.json();
 };
 
-const updateBaby = async (
-  babyId: string,
-  baby: UpdateBaby,
-  accessToken: string
-) => {
+const updateBaby = async (babyId: string, baby: UpdateBaby) => {
   const response = await fetch(`/api/babies/${babyId}`, {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${accessToken}`,
     },
     body: JSON.stringify(baby),
   });
   return response.json();
 };
 
-export { getBabies, createBaby, updateBaby };
+const updateBabyWithHistory = async (updateData: UpdateBabyWithHistory) => {
+  const response = await fetch(`/api/babies/${updateData.babyId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      currentValues: updateData.currentValues,
+      previousValues: updateData.previousValues,
+    }),
+  });
+  return response.json();
+};
+
+export { getBabies, createBaby, updateBaby, updateBabyWithHistory };

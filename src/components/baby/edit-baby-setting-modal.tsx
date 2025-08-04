@@ -17,6 +17,7 @@ import {
 } from "./setting-sectionts";
 import { BabySettingSection } from "@/types/baby";
 import type { UpdateBaby } from "@/types/data/babies/types";
+import { useBabyFromUrl } from "@/src/hooks/useBabyFromUrl";
 
 const EditBabySettingModal = () => {
   const modal = useApplicationStore.use.currentModal() as {
@@ -27,6 +28,7 @@ const EditBabySettingModal = () => {
     };
   };
   const closeModal = useApplicationStore.use.closeModal();
+  const { currentBaby } = useBabyFromUrl();
 
   const { mutate: updateBabySetting, isPending } = useUpdateBaby();
 
@@ -36,10 +38,16 @@ const EditBabySettingModal = () => {
       return;
     }
 
+    if (!currentBaby) {
+      console.error("No current baby data available");
+      return;
+    }
+
     updateBabySetting(
       {
         babyId: modal?.data?.babyId,
-        baby: data,
+        currentValues: data,
+        previousValues: currentBaby,
       },
       {
         onSuccess: () => {
