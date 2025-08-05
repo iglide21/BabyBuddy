@@ -2,22 +2,57 @@
 
 import * as React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { DayPicker } from "react-day-picker";
+import {
+  DateRange,
+  DayPicker,
+  SelectRangeEventHandler,
+} from "react-day-picker";
 
 import { cn } from "lib/utils";
 import { buttonVariants } from "components/ui/button";
 
-export type CalendarProps = React.ComponentProps<typeof DayPicker>;
+export type CalendarProps = Omit<
+  React.ComponentProps<typeof DayPicker>,
+  "mode" | "selected" | "onSelect"
+> & {
+  mode?: "range";
+  selected?: DateRange;
+  onSelect?: SelectRangeEventHandler;
+  onDayClick?: (day: Date) => void;
+  disabled?: boolean;
+};
 
 function Calendar({
   className,
   classNames,
   showOutsideDays = true,
+  mode = "range",
+  selected,
+  onSelect,
+  onDayClick,
+  disabled = false,
   ...props
 }: CalendarProps) {
+  const handleSelect: SelectRangeEventHandler = (
+    range,
+    selectedDay,
+    activeModifiers,
+    e
+  ) => {
+    if (onDayClick && selectedDay) {
+      onDayClick(selectedDay);
+    } else {
+      onSelect?.(range, selectedDay, activeModifiers, e);
+    }
+  };
+
   return (
     <DayPicker
-      showOutsideDays={showOutsideDays}
+      showOutsideDays={false}
+      mode={mode}
+      selected={selected}
+      onSelect={handleSelect}
+      disabled={disabled}
       className={cn("p-3", className)}
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",

@@ -28,50 +28,6 @@ import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "../lib/supabase/client";
 import { useBabyFromUrl } from "../hooks/useBabyFromUrl";
 
-const babyMenuItems = [
-  {
-    label: "Baby Settings",
-    icon: BabyIcon,
-    href: "/settings",
-    color: "pink",
-    caption: "Manage your baby's settings",
-  },
-];
-
-const userMenuItems = [
-  {
-    label: "Account Settings",
-    icon: Settings,
-    href: "/settings",
-    color: "green",
-    caption: "Manage your account settings",
-  },
-  {
-    label: "Reminders",
-    icon: Bell,
-    href: "/reminders",
-    color: "purple",
-    caption: "Set up reminders for important events",
-  },
-];
-
-const dataAndAnalyticsMenuItems = [
-  {
-    label: "Analytics",
-    icon: ChartLine,
-    href: "/analytics",
-    color: "purple",
-    caption: "View your baby's analytics",
-  },
-  {
-    label: "History",
-    icon: History,
-    href: "/history",
-    color: "blue",
-    caption: "View your baby's growth history",
-  },
-];
-
 const HamburgerMenu = () => {
   const supabase = createClient();
   const router = useRouter();
@@ -96,7 +52,7 @@ const HamburgerMenu = () => {
   const handleNavigate = (href: string) => {
     if (session?.user) {
       toggleHamburgerMenu();
-      router.push(`${session.user.id}${href}`);
+      router.push(`/${session.user.id}${href}`);
     }
   };
 
@@ -104,6 +60,50 @@ const HamburgerMenu = () => {
     toggleHamburgerMenu();
     router.push(`/babies/${currentBaby?.id}${href}`);
   };
+
+  const babyMenuItems = [
+    {
+      label: "Baby Settings",
+      icon: BabyIcon,
+      navigate: () => handleBabyNavigate("/settings"),
+      color: "pink",
+      caption: "Manage your baby's settings",
+    },
+  ];
+
+  const userMenuItems = [
+    {
+      label: "Account Settings",
+      icon: Settings,
+      navigate: () => handleNavigate("/settings"),
+      color: "green",
+      caption: "Manage your account settings",
+    },
+    {
+      label: "Reminders",
+      icon: Bell,
+      navigate: () => handleBabyNavigate("/reminders"),
+      color: "purple",
+      caption: "Set up reminders for important events",
+    },
+  ];
+
+  const dataAndAnalyticsMenuItems = [
+    {
+      label: "Analytics",
+      icon: ChartLine,
+      navigate: () => handleBabyNavigate("/analytics"),
+      color: "purple",
+      caption: "View your baby's analytics",
+    },
+    {
+      label: "History",
+      icon: History,
+      navigate: () => handleBabyNavigate("/history"),
+      color: "blue",
+      caption: "View your baby's growth history",
+    },
+  ];
 
   const showBabyMenus = pathname.includes("/babies/");
 
@@ -167,7 +167,7 @@ const HamburgerMenu = () => {
                 <Button
                   variant="ghost"
                   key={item.label}
-                  onClick={() => handleBabyNavigate(item.href)}
+                  onClick={item.navigate}
                   disabled={!currentBaby}
                   className={`w-full justify-start h-12 text-left hover:bg-${item.color}-50`}
                 >
@@ -191,7 +191,7 @@ const HamburgerMenu = () => {
                 <Button
                   variant="ghost"
                   key={item.label}
-                  onClick={() => handleNavigate(item.href)}
+                  onClick={item.navigate}
                   className="w-full justify-start h-12 text-left"
                 >
                   <item.icon
@@ -213,7 +213,7 @@ const HamburgerMenu = () => {
                 <Button
                   variant="ghost"
                   key={item.label}
-                  onClick={() => handleNavigate(item.href)}
+                  onClick={item.navigate}
                   className="w-full justify-start h-12 text-left"
                 >
                   <item.icon

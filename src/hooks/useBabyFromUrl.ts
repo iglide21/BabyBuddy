@@ -11,6 +11,5 @@ export const useBabyFromUrl = () => {
     currentBaby,
     isLoading,
     isError,
-    babyId,
   };
 };

@@ -18,9 +18,6 @@ import { eventTypeToComponent } from "@/src/lib/components";
 import HistoryFilterSection from "@/src/components/history-filter-section";
 import { useApplicationStore } from "@/src/stores";
 import { ApplicationModal } from "@/src/lib/types";
-import { EditDiaperModal, LogDiaperModal } from "@/src/components/diaper";
-import { EditFeedingModal, LogFeedingModal } from "@/src/components/feeding";
-import { EditSleepModal, LogSleepModal } from "@/src/components/sleeping";
 
 export function HistoryPage() {
   const { currentBaby, isLoading: isBabyLoading } = useBabyFromUrl();
