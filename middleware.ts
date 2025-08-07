@@ -6,7 +6,9 @@ export const middleware = async (
   request: NextRequest,
   response: NextResponse
 ) => {
-  if (request.nextUrl.pathname.startsWith("/login")) {
+  const noAuthPaths = ["/login", "/otp-confirmation"];
+
+  if (noAuthPaths.includes(request.nextUrl.pathname)) {
     return NextResponse.next();
   }
 

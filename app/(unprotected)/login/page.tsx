@@ -17,11 +17,9 @@ import { redirect } from "next/navigation";
 
 async function handleEmailLogin(formData: FormData) {
   "use server";
-  console.log("handleEmailLogin");
-  console.log(formData);
   const email = formData.get("email") as string;
   await signInWithEmailOtp(email);
-  redirect("/otp-confirmation");
+  redirect("/otp-confirmation?email=" + email);
 }
 
 const LoginPage = () => {
