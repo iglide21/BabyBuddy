@@ -1,10 +1,11 @@
 import { useMemo } from "react";
 import { Event } from "@/types/data/events/types";
 import dayjs from "dayjs";
+import { DateRange } from "@/types/date-range";
 
 export const useOverviewAnalytics = (
   events: Event[] | undefined,
-  dateRange?: { from: Date; to: Date }
+  dateRange: DateRange
 ) => {
   const feedings = useMemo(
     () => events?.filter((event) => event.event_type === "feeding") ?? [],

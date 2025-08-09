@@ -5,6 +5,7 @@ import timezone from "dayjs/plugin/timezone";
 import isToday from "dayjs/plugin/isToday";
 import isYesterday from "dayjs/plugin/isYesterday";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+import duration from "dayjs/plugin/duration";
 
 // Extend dayjs with plugins
 dayjs.extend(relativeTime);
@@ -13,6 +14,7 @@ dayjs.extend(timezone);
 dayjs.extend(isToday);
 dayjs.extend(isYesterday);
 dayjs.extend(isSameOrBefore);
+dayjs.extend(duration);
 
 // Utility functions using dayjs
 export const getTimeSince = (date: string | Date | dayjs.Dayjs | undefined) => {
@@ -74,29 +76,19 @@ export const formatDurationInMinutes = (durationInMinutes: number) => {
 };
 
 export const formatDuration = (
-  startTime: string | Date | dayjs.Dayjs,
-  endTime: string | Date | dayjs.Dayjs
+  duration: number,
+  durationType: "minutes" | "hours"
 ) => {
-  const start = dayjs(startTime);
-  const end = dayjs(endTime);
+  const durationObject = dayjs.duration(duration, durationType);
 
-  if (!start.isValid() || !end.isValid()) {
-    return "Invalid duration";
-  }
-
-  const diff = end.diff(start, "minute");
-
-  if (diff < 0) {
-    return "Invalid duration";
-  }
-
-  const hours = Math.floor(diff / 60);
-  const minutes = diff % 60;
+  const hours = durationObject.hours();
+  const minutes = durationObject.minutes();
 
   if (hours > 0) {
-    return `${hours}h ${minutes}m`;
+    return `${hours} hr ${minutes > 0 ? `${minutes} min` : ""}`;
+  } else {
+    return `${minutes} min`;
   }
-  return `${minutes}m`;
 };
 
 export const getTodayString = () => {

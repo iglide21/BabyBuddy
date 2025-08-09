@@ -45,7 +45,7 @@ export const useSleepAnalytics = (
   }, [dateRange]);
 
   // Daily averages (for overview)
-  const avgSleepPerDay = (totalSleepHours / daysInRange).toFixed(1);
+  const avgSleepPerDay = totalSleepHours / daysInRange;
 
   // Generate sleep data for charts
   const generateSleepData = (days?: number) => {
@@ -89,9 +89,9 @@ export const useSleepAnalytics = (
       const daySleep = sleeps.filter(
         (log) =>
           log.occurred_at &&
+          log.end_date &&
           dayjs(log.occurred_at).isAfter(dayjs(dayStart)) &&
-          dayjs(log.occurred_at).isBefore(dayjs(dayEnd)) &&
-          log.end_date
+          dayjs(log.occurred_at).isBefore(dayjs(dayEnd))
       );
 
       const totalSleepMinutes = daySleep.reduce((total, log) => {
@@ -108,9 +108,9 @@ export const useSleepAnalytics = (
 
       return {
         date: day.displayDate,
-        totalHours: Math.round((totalSleepMinutes / 60) * 10) / 10,
+        totalHours: (totalSleepMinutes / 60).toFixed(2),
         sessions: sessions,
-        avgSession: Math.round(avgSessionLength),
+        avgSessionHrs: (avgSessionLength / 60).toFixed(2),
       };
     });
   };

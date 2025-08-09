@@ -1,10 +1,11 @@
 import { useMemo } from "react";
 import { Event } from "@/types/data/events/types";
 import dayjs from "dayjs";
+import { DateRange } from "@/types/date-range";
 
 export const useDiaperAnalytics = (
   events: Event[] | undefined,
-  dateRange?: { from: Date; to: Date }
+  dateRange?: DateRange
 ) => {
   const diapers = useMemo(
     () => events?.filter((event) => event.event_type === "diaper") ?? [],
@@ -13,11 +14,12 @@ export const useDiaperAnalytics = (
 
   // Basic stats
   const totalDiapers = diapers.length;
-  const wetDiapers = diapers.filter(
-    (log) => log.diaper_type === "wet" || log.diaper_type === "both"
-  ).length;
+  const wetDiapers = diapers.filter((log) => log.diaper_type === "wet").length;
   const dirtyDiapers = diapers.filter(
-    (log) => log.diaper_type === "dirty" || log.diaper_type === "both"
+    (log) => log.diaper_type === "dirty"
+  ).length;
+  const bothDiapers = diapers.filter(
+    (log) => log.diaper_type === "both"
   ).length;
 
   // Calculate days in range
@@ -60,29 +62,31 @@ export const useDiaperAnalytics = (
     }
 
     return dateArray.map((day) => {
-      const dayStart = new Date(day.fullDate);
-      dayStart.setHours(0, 0, 0, 0);
-      const dayEnd = new Date(day.fullDate);
-      dayEnd.setHours(23, 59, 59, 999);
+      const dayStart = dayjs(day.fullDate).startOf("day");
+      const dayEnd = dayjs(day.fullDate).endOf("day");
 
       const dayDiapers = diapers.filter(
         (log) =>
           log.occurred_at &&
-          dayjs(log.occurred_at).isAfter(dayjs(dayStart)) &&
-          dayjs(log.occurred_at).isBefore(dayjs(dayEnd))
+          dayjs(log.occurred_at).isAfter(dayStart) &&
+          dayjs(log.occurred_at).isBefore(dayEnd)
       );
 
       const wetCount = dayDiapers.filter(
-        (log) => log.diaper_type === "wet" || log.diaper_type === "both"
+        (log) => log.diaper_type === "wet"
       ).length;
       const dirtyCount = dayDiapers.filter(
-        (log) => log.diaper_type === "dirty" || log.diaper_type === "both"
+        (log) => log.diaper_type === "dirty"
+      ).length;
+      const bothCount = dayDiapers.filter(
+        (log) => log.diaper_type === "both"
       ).length;
 
       return {
         date: day.displayDate,
         wet: wetCount,
         dirty: dirtyCount,
+        both: bothCount,
         total: dayDiapers.length,
       };
     });
@@ -93,6 +97,7 @@ export const useDiaperAnalytics = (
     totalDiapers,
     wetDiapers,
     dirtyDiapers,
+    bothDiapers,
     daysInRange,
     generateDiaperData,
   };

@@ -1,10 +1,11 @@
 import { useMemo } from "react";
 import { Event } from "@/types/data/events/types";
 import dayjs from "dayjs";
+import { DateRange } from "@/types/date-range";
 
 export const useFeedingAnalytics = (
   events: Event[] | undefined,
-  dateRange?: { from: Date; to: Date }
+  dateRange: DateRange
 ) => {
   const feedings = useMemo(
     () => events?.filter((event) => event.event_type === "feeding") ?? [],
@@ -23,11 +24,9 @@ export const useFeedingAnalytics = (
   // Averages
   const avgFeedingDuration =
     feedingsWithDuration.length > 0
-      ? (
-          feedingsWithDuration.reduce((sum, f) => sum + (f.duration ?? 0), 0) /
-          feedingsWithDuration.length
-        ).toFixed(1)
-      : "0.0";
+      ? feedingsWithDuration.reduce((sum, f) => sum + (f.duration ?? 0), 0) /
+        feedingsWithDuration.length
+      : 0;
 
   const avgFeedingAmount =
     feedingsWithAmount.length > 0
