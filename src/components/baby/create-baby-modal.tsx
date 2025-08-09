@@ -48,7 +48,7 @@ type BabyFormData = z.infer<typeof babyFormSchema>;
 const CreateBabyModal = () => {
   const modal = useApplicationStore.use.currentModal();
   const closeModal = useApplicationStore.use.closeModal();
-
+  const showModal = useApplicationStore.use.showModal();
   const { mutate: createBaby, isPending } = useCreateBaby();
 
   const form = useForm<BabyFormData>({
@@ -66,7 +66,14 @@ const CreateBabyModal = () => {
       birth_date: data.birthDate,
       gender: data.gender,
     };
+
     createBaby(baby);
+    showModal({
+      type: "onboarding_quiz",
+      data: {
+        baby,
+      },
+    });
   };
 
   const onClose = () => {

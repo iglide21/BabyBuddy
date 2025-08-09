@@ -15,7 +15,7 @@ const getBabies = async () => {
   return response.json();
 };
 
-const createBaby = async (baby: CreateBaby) => {
+const createBaby = async (baby: CreateBaby): Promise<Baby> => {
   const response = await fetch("/api/babies", {
     method: "POST",
     headers: {
@@ -23,6 +23,7 @@ const createBaby = async (baby: CreateBaby) => {
     },
     body: JSON.stringify(baby),
   });
+
   return response.json();
 };
 

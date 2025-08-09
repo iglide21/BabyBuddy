@@ -5,17 +5,14 @@ import type React from "react";
 import { Plus, Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/src/components/ui/card";
 import { Button } from "@/src/components/ui/button";
-import { useAuth } from "@/src/hooks/useAuth";
 import useBabies from "@/src/hooks/data/queries/useBabies";
 import { Skeleton } from "@/src/components/ui/skeleton";
 import BabyCard from "@/src/components/baby/baby-card";
 import CreateBabyModal from "@/src/components/baby/create-baby-modal";
 import { useApplicationStore } from "@/src/stores/applicationStore";
+import { BabyOnboardingQuiz } from "@/src/components/baby/onboarding-quiz";
 
 const BabiesScreen = () => {
-  const session = useAuth();
-  const user = session?.user;
-
   const showModal = useApplicationStore.use.showModal();
   const { data: babies, isLoading } = useBabies();
 
@@ -63,10 +60,7 @@ const BabiesScreen = () => {
               {babies?.map((baby) => (
                 <BabyCard key={baby.id} baby={baby} />
               ))}
-              <Card
-                className="cursor-pointer hover:shadow-lg transition-all duration-200 border-2 hover:border-pink-300"
-                // onClick={() => onSelectBaby(baby)}
-              >
+              <Card className="cursor-pointer hover:shadow-lg transition-all duration-200 border-2 hover:border-pink-300">
                 <CardContent
                   className="p-6 flex flex-col items-center justify-center"
                   onClick={onAddBaby}
@@ -90,6 +84,7 @@ const BabiesScreen = () => {
         )}
 
         <CreateBabyModal />
+        <BabyOnboardingQuiz />
 
         {/* Empty State */}
         {babies?.length === 0 && (

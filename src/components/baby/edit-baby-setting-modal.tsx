@@ -1,13 +1,7 @@
-import { Edit, X, Save } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogHeader,
-  Button,
-} from "../ui";
+import { Edit } from "lucide-react";
+import { Dialog, DialogContent, DialogTitle, DialogHeader } from "../ui";
 import { useApplicationStore } from "@/src/stores";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useUpdateBaby } from "@/src/hooks/data/mutations";
 import {
   EditBirthInformationSection,

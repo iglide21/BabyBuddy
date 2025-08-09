@@ -3,11 +3,9 @@ import { createClient } from "@/src/lib/supabase/server";
 import { BabyProfileHistory, UpdateBaby } from "@/types/data/babies/types";
 
 export const GET = async (
-  request: NextRequest,
+  _: NextRequest,
   { params }: { params: { babyId: string } }
 ) => {
-  // const { searchParams } = new URL(request.url);
-  // const userId = searchParams.get("userId");
   const babyId = (await params).babyId;
 
   if (!babyId) {
@@ -43,9 +41,9 @@ export const PATCH = async (
     const body = await request.json();
     const { currentValues, previousValues } = body;
 
-    if (!currentValues || !previousValues) {
+    if (!currentValues) {
       return NextResponse.json(
-        { error: "currentValues and previousValues are required" },
+        { error: "You should provide current values!" },
         { status: 400 }
       );
     }
@@ -90,7 +88,7 @@ export const PATCH = async (
     for (const field of measurementFields) {
       const currentValue = currentValues[field as keyof typeof currentValues];
       const previousValue =
-        previousValues[field as keyof typeof previousValues];
+        previousValues?.[field as keyof typeof previousValues];
 
       console.log("currentValue", currentValue);
       console.log("previousValue", previousValue);
@@ -155,7 +153,7 @@ export const PATCH = async (
       }
 
       const previousValue =
-        previousValues[field as keyof typeof previousValues];
+        previousValues?.[field as keyof typeof previousValues];
 
       if (currentValue !== previousValue) {
         // Determine section based on field

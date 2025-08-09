@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/src/lib/utils";
+import { Toaster } from "@/src/components/ui/sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,6 +24,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={cn(inter.className, "overflow-x-hidden")}>
         {children}
+        <Toaster />
       </body>
     </html>
   );

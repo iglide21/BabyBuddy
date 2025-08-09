@@ -1,7 +1,7 @@
 import { createClient } from "@/src/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
-export const GET = async (request: NextRequest) => {
+export const GET = async () => {
   const supabase = await createClient();
 
   const { data: user, error: userError } = await supabase.auth.getUser();
@@ -49,17 +49,18 @@ export const POST = async (request: NextRequest) => {
   const { data: babyData, error: babyDataError } = await supabase
     .from("babies")
     .insert(body)
-    .select();
+    .select()
+    .single();
 
   if (babyDataError) {
     return NextResponse.json({ error: babyDataError.message }, { status: 500 });
   }
 
-  const { data: babyGuardian, error: babyGuardianError } = await supabase
+  const { error: babyGuardianError } = await supabase
     .from("baby_guardians")
     .insert({
       user_id: user.user.id,
-      baby_id: babyData[0].id,
+      baby_id: babyData.id,
       role: "parent",
     })
     .select();

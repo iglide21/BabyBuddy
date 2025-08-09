@@ -19,7 +19,7 @@ export const useUpdateBaby = () => {
     }: {
       babyId: string;
       currentValues: Partial<UpdateBabyWithHistory["currentValues"]>;
-      previousValues: Partial<UpdateBabyWithHistory["previousValues"]>;
+      previousValues: Partial<UpdateBabyWithHistory["previousValues"]> | null;
     }) => {
       return updateBabyWithHistory({
         babyId,

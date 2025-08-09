@@ -8,6 +8,7 @@ export type ApplicationModal = {
     | "diaper_log"
     | "diaper_edit"
     | "reminder_log"
-    | "edit_baby_setting";
+    | "edit_baby_setting"
+    | "onboarding_quiz";
   data?: Record<string, any>;
 };

@@ -1,7 +1,7 @@
 "use client";
 
 import { Switch } from "components/ui/switch";
-import { toast } from "@/src/hooks/use-toast";
+import { toast } from "sonner";
 import { useUpdateReminder } from "@/src/hooks/data/mutations/useUpdateReminder";
 import type { Reminder } from "@/types/data/reminders/types";
 
@@ -23,17 +23,10 @@ const ReminderToggle = ({ reminder, className }: ReminderToggleProps) => {
       },
       {
         onSuccess: () => {
-          toast({
-            title: `Reminder ${checked ? "enabled" : "disabled"}`,
-            variant: "default",
-          });
+          toast.success(`Reminder ${checked ? "enabled" : "disabled"}`);
         },
         onError: (error) => {
-          toast({
-            title: "Failed to update reminder",
-            description: error.message,
-            variant: "destructive",
-          });
+          toast.error(`Failed to update reminder: ${error.message}`);
         },
       }
     );
