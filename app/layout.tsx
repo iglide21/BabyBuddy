@@ -27,7 +27,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={cn(inter.className, "overflow-x-hidden")}>
+      <body className={cn(inter.className, "overflow-x-hidden min-h-screen")}>
         {children}
         <Toaster />
       </body>

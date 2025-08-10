@@ -114,7 +114,10 @@ const HamburgerMenu = () => {
           <Menu className="w-5 h-5" />
         </Button>
       </SheetTrigger>
-      <SheetContent side="right" className="w-80">
+      <SheetContent
+        side="right"
+        className="w-80 max-h-[100vh] min-h-[100vh] overflow-y-scroll"
+      >
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2 text-left">
             Menu

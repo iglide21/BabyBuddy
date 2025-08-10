@@ -22,7 +22,7 @@ const Header = () => {
                 {currentBaby.gender === "male" ? "👶🏻" : "👧🏻"}
               </div>
               <div>
-                <h1 className="text-lg font-bold text-gray-800">Baby Buddy</h1>
+                <h1 className="text-lg font-bold text-gray-800">Baby Max</h1>
                 <p className="text-xs text-gray-600">
                   Tracking for {currentBaby.name}
                 </p>
@@ -34,7 +34,7 @@ const Header = () => {
                 <Baby className="w-8 h-8 text-gray-800" />
               </div>
               <div>
-                <h1 className="text-lg font-bold text-gray-800">Baby Buddy</h1>
+                <h1 className="text-lg font-bold text-gray-800">Baby Max</h1>
                 <p className="text-xs text-gray-600">
                   Track your baby's journey
                 </p>
