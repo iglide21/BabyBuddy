@@ -126,7 +126,7 @@ const EditSleepModal = () => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-sm mx-0 p-0 rounded-xl">
+      <DialogContent className="max-w-sm max-h-[90vh] h-70vh mx-0 p-0 rounded-xl overflow-y-scroll">
         <DialogHeader className="p-4 bg-gradient-to-tr from-blue-400 to-blue-500 text-white rounded-t-xl">
           <DialogTitle className="flex items-center gap-3">
             <span className="bg-gradient-to-tr from-blue-300 to-blue-400 rounded-xl p-2">

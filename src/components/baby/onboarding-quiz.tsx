@@ -62,7 +62,7 @@ export function BabyOnboardingQuiz() {
   const currentModal = useApplicationStore.use.currentModal();
   const closeModal = useApplicationStore.use.closeModal();
   const [currentStep, setCurrentStep] = useState(0);
-  const { mutate: updateBaby } = useUpdateBaby();
+  const { mutate: updateBaby, isPending } = useUpdateBaby();
 
   const { baby = {} as Baby } = currentModal?.data || {};
 
@@ -174,7 +174,7 @@ export function BabyOnboardingQuiz() {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-sm mx-auto p-0 border-none max-h-[90vh] flex flex-col overflow-y-scroll">
+      <DialogContent className="max-w-sm mx-auto p-0 border-none max-h-[90vh] h-70vh flex flex-col overflow-y-scroll">
         <DialogHeader className="p-6 bg-gradient-to-r from-pink-400 to-purple-400 text-white">
           <DialogTitle className="flex flex-col items-center gap-3 ">
             <div className="text-xl">Setting up {baby?.name}'s Profile</div>
@@ -249,7 +249,11 @@ export function BabyOnboardingQuiz() {
 
                   <div className="flex gap-2">
                     {currentStep === steps.length - 1 ? (
-                      <Button type="submit">
+                      <Button
+                        type="submit"
+                        disabled={isPending}
+                        className="bg-gradient-to-r from-pink-400 to-purple-400 text-white"
+                      >
                         <Sparkles className="w-4 h-4" />
                         Complete Setup
                       </Button>
