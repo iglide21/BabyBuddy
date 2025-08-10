@@ -8,7 +8,7 @@ import { Toaster } from "@/src/components/ui/sonner";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "BabyBuddy - Baby Care Tracker",
+  title: "BabyMax - Baby Care Tracker",
   description: "Simple, intuitive baby care tracking for feeding and sleep",
   generator: "v0.dev",
 };

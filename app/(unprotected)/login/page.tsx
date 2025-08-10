@@ -31,7 +31,7 @@ const LoginPage = () => {
             <Baby className="w-8 h-8 text-white" />
           </div>
           <CardTitle className="text-2xl font-bold">
-            Welcome to BabyBuddy
+            Welcome to BabyMax
           </CardTitle>
           <p className="text-pink-100 text-sm">
             Track your baby's journey with love

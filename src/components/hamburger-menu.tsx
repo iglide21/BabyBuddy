@@ -69,6 +69,13 @@ const HamburgerMenu = () => {
       color: "pink",
       caption: "Manage your baby's settings",
     },
+    {
+      label: "Reminders",
+      icon: Bell,
+      navigate: () => handleBabyNavigate("/reminders"),
+      color: "purple",
+      caption: "Set up reminders for important events",
+    },
   ];
 
   const userMenuItems = [
@@ -78,13 +85,6 @@ const HamburgerMenu = () => {
       navigate: () => handleNavigate("/settings"),
       color: "green",
       caption: "Manage your account settings",
-    },
-    {
-      label: "Reminders",
-      icon: Bell,
-      navigate: () => handleBabyNavigate("/reminders"),
-      color: "purple",
-      caption: "Set up reminders for important events",
     },
   ];
 
@@ -140,70 +140,83 @@ const HamburgerMenu = () => {
 
           {/* Menu Items */}
           <div className="space-y-2">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-2">
-              Baby Management
-            </h3>
             {showBabyMenus && (
-              <Button
-                variant="ghost"
-                onClick={handleSwitchBaby}
-                className="w-full justify-start h-12 text-left"
-              >
-                <ArrowLeftRight className="w-5 h-5 mr-3 text-orange-600" />
+              <div>
                 <div>
-                  <div className="font-medium">Switch Baby</div>
-                  <div className="text-xs text-gray-500">
-                    Switch between your babies
-                  </div>
+                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-2">
+                    Baby Management
+                  </h3>
+
+                  <Button
+                    variant="ghost"
+                    onClick={handleSwitchBaby}
+                    className="w-full justify-start h-12 text-left"
+                  >
+                    <ArrowLeftRight className="w-5 h-5 mr-3 text-orange-600" />
+                    <div>
+                      <div className="font-medium">Switch Baby</div>
+                      <div className="text-xs text-gray-500">
+                        Switch between your babies
+                      </div>
+                    </div>
+                  </Button>
+
+                  {babyMenuItems.map((item) => {
+                    if (!pathname.includes("/babies")) {
+                      return null;
+                    }
+
+                    return (
+                      <Button
+                        variant="ghost"
+                        key={item.label}
+                        onClick={item.navigate}
+                        disabled={!currentBaby}
+                        className={`w-full justify-start h-12 text-left hover:bg-${item.color}-50`}
+                      >
+                        <item.icon
+                          className={`w-5 h-5 mr-3 text-${item.color}-600`}
+                        />
+                        <div>
+                          <div className="font-medium">{item.label}</div>
+                          <div className="text-xs text-gray-500">
+                            {item.caption}
+                          </div>
+                        </div>
+                      </Button>
+                    );
+                  })}
                 </div>
-              </Button>
+
+                {/* Data and analytics */}
+                <div>
+                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-2">
+                    Data and analytics
+                  </h3>
+                  {/* User Menu Items */}
+                  {dataAndAnalyticsMenuItems.map((item) => {
+                    return (
+                      <Button
+                        variant="ghost"
+                        key={item.label}
+                        onClick={item.navigate}
+                        className="w-full justify-start h-12 text-left"
+                      >
+                        <item.icon
+                          className={`w-5 h-5 mr-3 text-${item.color}-600`}
+                        />
+                        <div>
+                          <div className="font-medium">{item.label}</div>
+                          <div className="text-xs text-gray-500">
+                            {item.caption}
+                          </div>
+                        </div>
+                      </Button>
+                    );
+                  })}
+                </div>
+              </div>
             )}
-            {babyMenuItems.map((item) => {
-              if (!pathname.includes("/babies")) {
-                return null;
-              }
-
-              return (
-                <Button
-                  variant="ghost"
-                  key={item.label}
-                  onClick={item.navigate}
-                  disabled={!currentBaby}
-                  className={`w-full justify-start h-12 text-left hover:bg-${item.color}-50`}
-                >
-                  <item.icon
-                    className={`w-5 h-5 mr-3 text-${item.color}-600`}
-                  />
-                  <div>
-                    <div className="font-medium">{item.label}</div>
-                    <div className="text-xs text-gray-500">{item.caption}</div>
-                  </div>
-                </Button>
-              );
-            })}
-
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-2">
-              Data and analytics
-            </h3>
-            {/* User Menu Items */}
-            {dataAndAnalyticsMenuItems.map((item) => {
-              return (
-                <Button
-                  variant="ghost"
-                  key={item.label}
-                  onClick={item.navigate}
-                  className="w-full justify-start h-12 text-left"
-                >
-                  <item.icon
-                    className={`w-5 h-5 mr-3 text-${item.color}-600`}
-                  />
-                  <div>
-                    <div className="font-medium">{item.label}</div>
-                    <div className="text-xs text-gray-500">{item.caption}</div>
-                  </div>
-                </Button>
-              );
-            })}
 
             <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-2">
               Settings
@@ -245,7 +258,7 @@ const HamburgerMenu = () => {
           {/* App Info */}
           <div className="pt-4 border-t">
             <div className="text-center text-xs text-gray-500">
-              <p>BabyBuddy v2.0</p>
+              <p>BabyMax v0.1 Beta</p>
               <p className="mt-1">Made with ❤️ for families</p>
             </div>
           </div>

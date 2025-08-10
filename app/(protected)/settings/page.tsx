@@ -111,19 +111,18 @@ export function SettingsPage() {
         {/* App Info */}
         <Card>
           <CardHeader>
-            <CardTitle>About BabyBuddy</CardTitle>
+            <CardTitle>About BabyMax</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="text-sm text-gray-600">
               <p className="mb-2">
-                BabyBuddy helps you track your baby's feeding and sleep patterns
-                with ease.
+                BabyMax helps you track your baby's patterns with ease.
               </p>
               <p className="mb-2">
                 Designed for tired parents who need simple, one-handed logging.
               </p>
               <p className="text-xs text-gray-500">
-                Version 1.0 • Made with ❤️ for parents
+                Version 0.1 Beta • Made with ❤️ for parents
               </p>
             </div>
           </CardContent>
