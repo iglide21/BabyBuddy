@@ -1,10 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "components/ui/button";
-import { Input } from "components/ui/input";
-import { Label } from "components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "components/ui/card";
+import { Button } from "@/src/components/ui/button";
+import { Input } from "@/src/components/ui/input";
+import { Label } from "@/src/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/src/components/ui/card";
 import { Baby, Trash2, AlertTriangle } from "lucide-react";
 import {
   Dialog,
@@ -12,7 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from "components/ui/dialog";
+} from "@/src/components/ui/dialog";
 
 interface SettingsViewProps {
   babyName: string;

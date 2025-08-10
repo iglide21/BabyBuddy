@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { Mail, ArrowLeft, RefreshCw } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -66,7 +66,7 @@ const OTPVerificationScreen = () => {
     } else {
       router.push("/login");
     }
-  }, [urlEmail]);
+  }, [urlEmail, userEmail, router]);
 
   const onSubmit = async (data: OtpFormData) => {
     setIsVerifying(true);
@@ -172,4 +172,35 @@ const OTPVerificationScreen = () => {
   );
 };
 
-export default OTPVerificationScreen;
+// Loading component for Suspense fallback
+const LoadingOTP = () => {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50 flex items-center justify-center p-4">
+      <Card className="w-full max-w-md shadow-2xl border-0 bg-white rounded-3xl overflow-hidden">
+        <CardHeader className="text-center bg-gradient-to-r from-blue-400 to-purple-400 text-white p-8">
+          <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
+            <Mail className="w-10 h-10 text-white" />
+          </div>
+          <CardTitle className="text-2xl font-bold">Loading...</CardTitle>
+        </CardHeader>
+        <CardContent className="p-8">
+          <div className="animate-pulse space-y-4">
+            <div className="h-12 bg-gray-200 rounded"></div>
+            <div className="h-12 bg-gray-200 rounded"></div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+// Wrapped component with Suspense
+const OTPVerificationPage = () => {
+  return (
+    <Suspense fallback={<LoadingOTP />}>
+      <OTPVerificationScreen />
+    </Suspense>
+  );
+};
+
+export default OTPVerificationPage;
