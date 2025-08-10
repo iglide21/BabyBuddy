@@ -174,7 +174,7 @@ export function BabyOnboardingQuiz() {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-sm mx-auto p-0 border-none max-h-[90vh] h-70vh flex flex-col overflow-y-scroll">
+      <DialogContent className="max-w-sm mx-auto p-0 border-none max-h-[80vh] h-70vh flex flex-col overflow-y-scroll">
         <DialogHeader className="p-6 bg-gradient-to-r from-pink-400 to-purple-400 text-white">
           <DialogTitle className="flex flex-col items-center gap-3 ">
             <div className="text-xl">Setting up {baby?.name}'s Profile</div>
