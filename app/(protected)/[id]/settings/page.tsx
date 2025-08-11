@@ -19,15 +19,6 @@ import {
   DialogDescription,
 } from "@/src/components/ui/dialog";
 
-interface SettingsViewProps {
-  babyName: string;
-  birthDate: string;
-  onBabyNameChange: (name: string) => void;
-  onBirthDateChange: (date: string) => void;
-  onBack: () => void;
-  onClearData: () => void;
-}
-
 export function SettingsPage() {
   const [tempName, setTempName] = useState("Maksim");
   const [showClearDialog, setShowClearDialog] = useState(false);
@@ -48,66 +39,6 @@ export function SettingsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50">
       <div className="max-w-md mx-auto px-4 py-6 space-y-6">
-        {/* Baby Profile */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Baby className="w-5 h-5 text-pink-600" />
-              Baby Profile
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="babyName" className="text-sm font-medium">
-                Baby's Name
-              </Label>
-              <div className="flex gap-2">
-                <Input
-                  id="babyName"
-                  value={tempName}
-                  onChange={(e) => setTempName(e.target.value)}
-                  placeholder="Enter baby's name"
-                  className="flex-1"
-                />
-                <Button
-                  onClick={handleSaveName}
-                  disabled={tempName.trim() === ""}
-                  className="bg-pink-500 hover:bg-pink-600 text-white"
-                >
-                  Save
-                </Button>
-              </div>
-              <p className="text-xs text-gray-500">
-                This name will appear throughout the app
-              </p>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="birthDate" className="text-sm font-medium">
-                Birth Date
-              </Label>
-              <div className="flex gap-2">
-                <Input
-                  id="birthDate"
-                  type="date"
-                  value={tempBirthDate}
-                  onChange={(e) => setTempBirthDate(e.target.value)}
-                  className="flex-1"
-                />
-                <Button
-                  onClick={handleSaveBirthDate}
-                  disabled={tempBirthDate === ""}
-                  className="bg-pink-500 hover:bg-pink-600 text-white"
-                >
-                  Save
-                </Button>
-              </div>
-              <p className="text-xs text-gray-500">
-                Used to calculate baby's age and milestones
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* App Info */}
         <Card>
           <CardHeader>

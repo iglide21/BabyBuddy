@@ -27,6 +27,7 @@ import { useApplicationStore } from "../stores/applicationStore";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "../lib/supabase/client";
 import { useBabyFromUrl } from "../hooks/useBabyFromUrl";
+import { Badge } from "./ui";
 
 const HamburgerMenu = () => {
   const supabase = createClient();
@@ -116,31 +117,35 @@ const HamburgerMenu = () => {
       </SheetTrigger>
       <SheetContent
         side="right"
-        className="w-80 max-h-[100vh] min-h-[100vh] overflow-y-scroll"
+        className="w-80 max-h-[100vh] min-h-[100vh] overflow-y-scroll p-0 border-none"
       >
-        <SheetHeader>
-          <SheetTitle className="flex items-center gap-2 text-left">
+        <SheetHeader className="bg-gradient-to-r from-pink-500 to-blue-500 p-6 text-white">
+          <SheetTitle className="flex items-center gap-2 text-left text-white">
             Menu
           </SheetTitle>
-        </SheetHeader>
-
-        <div className="mt-6 space-y-6">
-          {/* User Info */}
-          <div className="p-4 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full flex items-center justify-center">
-                <User className="w-5 h-5 text-white" />
+          <div className="space-y-2">
+            <div className="flex gap-3">
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                <User className="w-5 h-5" />
               </div>
-              <div>
-                <div className="font-medium text-gray-800">
+              <div className="text-left">
+                <div className="font-semibold">
                   {session?.user.user_metadata.name}
                 </div>
+                <div className="text-sm opacity-90">{session?.user.email}</div>
               </div>
             </div>
+
+            {currentBaby && (
+              <div className="flex items-center gap-2 mt-3">
+                <Badge className="bg-white/20 text-white border-white/30">
+                  Tracking: {currentBaby?.name}
+                </Badge>
+              </div>
+            )}
           </div>
-
-          <Separator />
-
+        </SheetHeader>
+        <div className="space-y-6 mt-2">
           {/* Menu Items */}
           <div className="space-y-2">
             {showBabyMenus && (
