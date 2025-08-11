@@ -2,15 +2,13 @@
 
 import { useState } from "react";
 import { Button } from "@/src/components/ui/button";
-import { Input } from "@/src/components/ui/input";
-import { Label } from "@/src/components/ui/label";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "@/src/components/ui/card";
-import { Baby, Trash2, AlertTriangle } from "lucide-react";
+import { Trash2, AlertTriangle, Settings } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -18,27 +16,22 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/src/components/ui/dialog";
+import InnerPageHeader from "@/src/components/inner-page-header";
 
 export function SettingsPage() {
-  const [tempName, setTempName] = useState("Maksim");
   const [showClearDialog, setShowClearDialog] = useState(false);
-  const [tempBirthDate, setTempBirthDate] = useState("2025-08-15");
-
-  const handleSaveName = () => {
-    setTempName(tempName.trim() || "Baby");
-  };
-
-  const handleSaveBirthDate = () => {
-    setTempBirthDate(tempBirthDate);
-  };
 
   const handleClearData = () => {
     setShowClearDialog(false);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50">
-      <div className="max-w-md mx-auto px-4 py-6 space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50 p-4 space-y-4">
+      <InnerPageHeader
+        title="Settings"
+        icon={<Settings className="w-5 h-5 text-gray-600" />}
+      />
+      <div className="max-w-md mx-auto space-y-4">
         {/* App Info */}
         <Card>
           <CardHeader>

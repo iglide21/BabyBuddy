@@ -3,11 +3,16 @@
 import QuickStats from "@/src/components/quick-stats";
 import TodaysActivities from "@/src/components/todays-activities";
 import QuickActions from "@/src/components/quick-actions";
+import { Archive } from "lucide-react";
 
 export default function BabyMaxApp() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50">
       <div className="max-w-md mx-auto px-4 py-6 space-y-6">
+        <div className="flex items-center gap-2">
+          <Archive className="w-5 h-5" />
+          <h2 className="text-xl font-medium">Logged events</h2>
+        </div>
         <QuickStats />
         <QuickActions />
 

@@ -4,7 +4,14 @@ import useEvents from "@/src/hooks/data/queries/useEvents";
 import dayjs from "@/src/lib/dayjs";
 import { useMemo, useState } from "react";
 import { Event, HistoryFilterType } from "@/types/data/events/types";
-import { Calendar, ChevronDown, ChevronRight, Milk, Moon } from "lucide-react";
+import {
+  Calendar,
+  ChevronDown,
+  ChevronRight,
+  History,
+  Milk,
+  Moon,
+} from "lucide-react";
 import { formatDateForDisplay } from "@/src/lib/dayjs";
 import {
   Card,
@@ -18,6 +25,7 @@ import { eventTypeToComponent } from "@/src/lib/components";
 import HistoryFilterSection from "@/src/components/history-filter-section";
 import { useApplicationStore } from "@/src/stores";
 import { ApplicationModal } from "@/src/lib/types";
+import InnerPageHeader from "@/src/components/inner-page-header";
 
 export function HistoryPage() {
   const { currentBaby, isLoading: isBabyLoading } = useBabyFromUrl();
@@ -156,7 +164,11 @@ export function HistoryPage() {
   }
 
   return (
-    <div className="space-y-4 px-4 py-4">
+    <div className="space-y-4 p-4 min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50">
+      <InnerPageHeader
+        title="History"
+        icon={<History className="w-5 h-5 text-gray-600" />}
+      />
       {/* Filter Section */}
       <HistoryFilterSection
         activeFilters={activeFilters}

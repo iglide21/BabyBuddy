@@ -22,12 +22,14 @@ import {
   FileText,
   Edit,
   TrendingUp,
+  Settings,
 } from "lucide-react";
 import EditBabySettingModal from "@/src/components/baby/edit-baby-setting-modal";
 import { useBabyFromUrl } from "@/src/hooks";
 import dayjs, { calculateAge } from "@/src/lib/dayjs";
 import { useApplicationStore } from "@/src/stores";
 import { BabySettingSection } from "@/types/baby";
+import InnerPageHeader from "@/src/components/inner-page-header";
 
 const BabySettings = () => {
   const { currentBaby } = useBabyFromUrl();
@@ -38,8 +40,6 @@ const BabySettings = () => {
       sectionType: BabySettingSection;
     };
   }) => void;
-
-  // const renderHistoryChart = () => {
   //   if (!selectedSection) return null;
 
   //   const data = generateGrowthData(selectedSection);
@@ -93,9 +93,14 @@ const BabySettings = () => {
   // };
 
   return (
-    <div className="space-y-6 px-4">
+    <div className="space-y-6 p-4 min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50">
+      <InnerPageHeader
+        title="Settings"
+        icon={<Settings className="w-5 h-5 text-gray-600" />}
+      />
+
       {/* Profile Overview */}
-      <Card className="bg-gradient-to-r from-pink-50 to-blue-50 border-pink-200">
+      <Card className="border-pink-200">
         <CardContent className="p-6">
           <div className="text-center space-y-4">
             <div className="text-6xl">

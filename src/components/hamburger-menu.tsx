@@ -70,13 +70,13 @@ const HamburgerMenu = () => {
       color: "pink",
       caption: "Manage your baby's settings",
     },
-    {
-      label: "Reminders",
-      icon: Bell,
-      navigate: () => handleBabyNavigate("/reminders"),
-      color: "purple",
-      caption: "Set up reminders for important events",
-    },
+    // {
+    //   label: "Reminders",
+    //   icon: Bell,
+    //   navigate: () => handleBabyNavigate("/reminders"),
+    //   color: "purple",
+    //   caption: "Set up reminders for important events",
+    // },
   ];
 
   const userMenuItems = [
@@ -196,6 +196,8 @@ const HamburgerMenu = () => {
                   })}
                 </div>
 
+                <Separator className="my-4" />
+
                 {/* Data and analytics */}
                 <div>
                   <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-2">
@@ -223,6 +225,7 @@ const HamburgerMenu = () => {
                     );
                   })}
                 </div>
+                <Separator className="my-4" />
               </div>
             )}
 
