@@ -25,7 +25,7 @@ async function handleEmailLogin(formData: FormData) {
 const LoginPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md shadow-2xl border-2 border-pink-200">
+      <Card className="w-full max-w-screen-lg shadow-2xl border-2 border-pink-200">
         <CardHeader className="text-center bg-gradient-to-r from-pink-400 to-purple-400 text-white rounded-t-lg">
           <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <Baby className="w-8 h-8 text-white" />

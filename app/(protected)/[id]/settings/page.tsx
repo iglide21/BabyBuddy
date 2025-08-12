@@ -31,7 +31,7 @@ export function SettingsPage() {
         title="Settings"
         icon={<Settings className="w-5 h-5 text-gray-600" />}
       />
-      <div className="max-w-md mx-auto space-y-4">
+      <div className="max-w-screen-lg mx-auto space-y-4">
         {/* App Info */}
         <Card>
           <CardHeader>

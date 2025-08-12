@@ -22,7 +22,7 @@ const BabiesScreen = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50">
-      <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
+      <div className="max-w-screen-lg mx-auto px-4 py-8 space-y-8">
         {isLoading && (
           <div className="space-y-4 w-full flex flex-col items-center justify-center">
             <div className="flex flex-col  items-center gap-2">

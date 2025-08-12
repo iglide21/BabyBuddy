@@ -62,14 +62,20 @@ const HamburgerMenu = () => {
     router.push(`/babies/${currentBaby?.id}${href}`);
   };
 
-  const babyMenuItems = [
-    {
-      label: "Baby Settings",
-      icon: BabyIcon,
-      navigate: () => handleBabyNavigate("/settings"),
-      color: "pink",
-      caption: "Manage your baby's settings",
-    },
+  const babyMenuItems: {
+    label: string;
+    icon: React.ElementType;
+    navigate: () => void;
+    color: string;
+    caption: string;
+  }[] = [
+    // {
+    //   label: "Baby Settings",
+    //   icon: BabyIcon,
+    //   navigate: () => handleBabyNavigate("/settings"),
+    //   color: "pink",
+    //   caption: "Manage your baby's settings",
+    // },
     // {
     //   label: "Reminders",
     //   icon: Bell,
@@ -79,7 +85,13 @@ const HamburgerMenu = () => {
     // },
   ];
 
-  const userMenuItems = [
+  const userMenuItems: {
+    label: string;
+    icon: React.ElementType;
+    navigate: () => void;
+    color: string;
+    caption: string;
+  }[] = [
     {
       label: "Account Settings",
       icon: Settings,
@@ -89,21 +101,27 @@ const HamburgerMenu = () => {
     },
   ];
 
-  const dataAndAnalyticsMenuItems = [
-    {
-      label: "Analytics",
-      icon: ChartLine,
-      navigate: () => handleBabyNavigate("/analytics"),
-      color: "purple",
-      caption: "View your baby's analytics",
-    },
-    {
-      label: "History",
-      icon: History,
-      navigate: () => handleBabyNavigate("/history"),
-      color: "blue",
-      caption: "View your baby's growth history",
-    },
+  const dataAndAnalyticsMenuItems: {
+    label: string;
+    icon: React.ElementType;
+    navigate: () => void;
+    color: string;
+    caption: string;
+  }[] = [
+    // {
+    //   label: "Analytics",
+    //   icon: ChartLine,
+    //   navigate: () => handleBabyNavigate("/analytics"),
+    //   color: "purple",
+    //   caption: "View your baby's analytics",
+    // },
+    // {
+    //   label: "History",
+    //   icon: History,
+    //   navigate: () => handleBabyNavigate("/history"),
+    //   color: "blue",
+    //   caption: "View your baby's growth history",
+    // },
   ];
 
   const showBabyMenus = pathname.includes("/babies/");
@@ -199,33 +217,37 @@ const HamburgerMenu = () => {
                 <Separator className="my-4" />
 
                 {/* Data and analytics */}
-                <div>
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-2">
-                    Data and analytics
-                  </h3>
-                  {/* User Menu Items */}
-                  {dataAndAnalyticsMenuItems.map((item) => {
-                    return (
-                      <Button
-                        variant="ghost"
-                        key={item.label}
-                        onClick={item.navigate}
-                        className="w-full justify-start h-12 text-left"
-                      >
-                        <item.icon
-                          className={`w-5 h-5 mr-3 text-${item.color}-600`}
-                        />
-                        <div>
-                          <div className="font-medium">{item.label}</div>
-                          <div className="text-xs text-gray-500">
-                            {item.caption}
-                          </div>
-                        </div>
-                      </Button>
-                    );
-                  })}
-                </div>
-                <Separator className="my-4" />
+                {dataAndAnalyticsMenuItems.length > 0 && (
+                  <>
+                    <div>
+                      <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-3 py-2">
+                        Data and analytics
+                      </h3>
+                      {/* User Menu Items */}
+                      {dataAndAnalyticsMenuItems.map((item) => {
+                        return (
+                          <Button
+                            variant="ghost"
+                            key={item.label}
+                            onClick={item.navigate}
+                            className="w-full justify-start h-12 text-left"
+                          >
+                            <item.icon
+                              className={`w-5 h-5 mr-3 text-${item.color}-600`}
+                            />
+                            <div>
+                              <div className="font-medium">{item.label}</div>
+                              <div className="text-xs text-gray-500">
+                                {item.caption}
+                              </div>
+                            </div>
+                          </Button>
+                        );
+                      })}
+                    </div>
+                    <Separator className="my-4" />
+                  </>
+                )}
               </div>
             )}
 

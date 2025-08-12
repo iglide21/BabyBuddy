@@ -165,137 +165,139 @@ export function HistoryPage() {
 
   return (
     <div className="space-y-4 p-4 min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50">
-      <InnerPageHeader
-        title="History"
-        icon={<History className="w-5 h-5 text-gray-600" />}
-      />
-      {/* Filter Section */}
-      <HistoryFilterSection
-        activeFilters={activeFilters}
-        toggleFilter={toggleFilter}
-      />
+      <div className="flex flex-col gap-4 max-w-screen-lg mx-auto">
+        <InnerPageHeader
+          title="History"
+          icon={<History className="w-5 h-5 text-gray-600" />}
+        />
+        {/* Filter Section */}
+        <HistoryFilterSection
+          activeFilters={activeFilters}
+          toggleFilter={toggleFilter}
+        />
 
-      {groupedLogs.length === 0 ? (
-        <Card>
-          <CardContent className="p-4 text-center">
-            <Calendar className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-            <p className="text-gray-500">No history found.</p>
-            <p className="text-sm text-gray-400 mt-1">
-              {activeFilters.size === 0
-                ? "Select at least one filter to view history."
-                : "No events match your current filters."}
-            </p>
-          </CardContent>
-        </Card>
-      ) : (
-        groupedLogs.map(([dateKey, { feedings, sleeps, diapers }]) => {
-          const isExpanded = expandedDays.has(dateKey);
-          const { totalFeedings, totalSleepHours, totalDiapers } = getDayStats(
-            feedings,
-            sleeps,
-            diapers
-          );
+        {groupedLogs.length === 0 ? (
+          <Card>
+            <CardContent className="p-4 text-center">
+              <Calendar className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+              <p className="text-gray-500">No history found.</p>
+              <p className="text-sm text-gray-400 mt-1">
+                {activeFilters.size === 0
+                  ? "Select at least one filter to view history."
+                  : "No events match your current filters."}
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          groupedLogs.map(([dateKey, { feedings, sleeps, diapers }]) => {
+            const isExpanded = expandedDays.has(dateKey);
+            const { totalFeedings, totalSleepHours, totalDiapers } =
+              getDayStats(feedings, sleeps, diapers);
 
-          // Combine and sort activities for the day
-          const dayActivities = [
-            ...feedings.map((log) => ({
-              ...log,
-              event_type: "feeding" as const,
-            })),
-            ...sleeps.map((log) => ({ ...log, event_type: "sleep" as const })),
-            ...diapers.map((log) => ({
-              ...log,
-              event_type: "diaper" as const,
-            })),
-          ].sort((a, b) => {
-            const timeA =
-              a.event_type === "feeding"
-                ? a.occurred_at
-                : a.event_type === "diaper"
-                ? a.occurred_at
-                : a.occurred_at;
-            const timeB =
-              b.event_type === "feeding"
-                ? b.occurred_at
-                : b.event_type === "diaper"
-                ? b.occurred_at
-                : b.occurred_at;
-            return dayjs(timeB).diff(dayjs(timeA), "millisecond");
-          });
+            // Combine and sort activities for the day
+            const dayActivities = [
+              ...feedings.map((log) => ({
+                ...log,
+                event_type: "feeding" as const,
+              })),
+              ...sleeps.map((log) => ({
+                ...log,
+                event_type: "sleep" as const,
+              })),
+              ...diapers.map((log) => ({
+                ...log,
+                event_type: "diaper" as const,
+              })),
+            ].sort((a, b) => {
+              const timeA =
+                a.event_type === "feeding"
+                  ? a.occurred_at
+                  : a.event_type === "diaper"
+                  ? a.occurred_at
+                  : a.occurred_at;
+              const timeB =
+                b.event_type === "feeding"
+                  ? b.occurred_at
+                  : b.event_type === "diaper"
+                  ? b.occurred_at
+                  : b.occurred_at;
+              return dayjs(timeB).diff(dayjs(timeA), "millisecond");
+            });
 
-          return (
-            <Card key={dateKey}>
-              <CardHeader
-                className="cursor-pointer"
-                onClick={() => toggleDay(dateKey)}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-lg">
-                      {formatDate(dateKey)}
-                    </CardTitle>
-                    <div className="flex items-center gap-4 mt-2">
-                      {activeFilters.has("feeding") && (
-                        <div className="flex items-center gap-1 text-sm text-orange-600">
-                          <Milk className="w-4 h-4" />
-                          <span>{totalFeedings} feeds</span>
-                        </div>
-                      )}
-                      {activeFilters.has("sleep") && (
-                        <div className="flex items-center gap-1 text-sm text-blue-600">
-                          <Moon className="w-4 h-4" />
-                          <span>{totalSleepHours}h sleep</span>
-                        </div>
-                      )}
-                      {activeFilters.has("diaper") && (
-                        <div className="flex items-center gap-1 text-sm text-green-600">
-                          <span className="text-sm">💩</span>
-                          <span>{totalDiapers} diapers</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  {isExpanded ? (
-                    <ChevronDown className="w-5 h-5 text-gray-400" />
-                  ) : (
-                    <ChevronRight className="w-5 h-5 text-gray-400" />
-                  )}
-                </div>
-              </CardHeader>
-
-              {isExpanded && (
-                <CardContent className="pt-0 space-y-3">
-                  {dayActivities.map((activity) => {
-                    const EventComponent =
-                      eventTypeToComponent[
-                        activity.event_type as keyof typeof eventTypeToComponent
-                      ];
-
-                    return (
-                      <div
-                        key={activity.id}
-                        className="border px-2 py-2 rounded-md"
-                      >
-                        <EventComponent
-                          event={activity}
-                          editEvent={() => {
-                            showModal({
-                              type: `${activity.event_type}_edit` as ApplicationModal["type"],
-                              data: {
-                                eventId: activity.id,
-                              },
-                            });
-                          }}
-                        />
+            return (
+              <Card key={dateKey}>
+                <CardHeader
+                  className="cursor-pointer"
+                  onClick={() => toggleDay(dateKey)}
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <CardTitle className="text-lg">
+                        {formatDate(dateKey)}
+                      </CardTitle>
+                      <div className="flex items-center gap-4 mt-2">
+                        {activeFilters.has("feeding") && (
+                          <div className="flex items-center gap-1 text-sm text-orange-600">
+                            <Milk className="w-4 h-4" />
+                            <span>{totalFeedings} feeds</span>
+                          </div>
+                        )}
+                        {activeFilters.has("sleep") && (
+                          <div className="flex items-center gap-1 text-sm text-blue-600">
+                            <Moon className="w-4 h-4" />
+                            <span>{totalSleepHours}h sleep</span>
+                          </div>
+                        )}
+                        {activeFilters.has("diaper") && (
+                          <div className="flex items-center gap-1 text-sm text-green-600">
+                            <span className="text-sm">💩</span>
+                            <span>{totalDiapers} diapers</span>
+                          </div>
+                        )}
                       </div>
-                    );
-                  })}
-                </CardContent>
-              )}
-            </Card>
-          );
-        })
-      )}
+                    </div>
+                    {isExpanded ? (
+                      <ChevronDown className="w-5 h-5 text-gray-400" />
+                    ) : (
+                      <ChevronRight className="w-5 h-5 text-gray-400" />
+                    )}
+                  </div>
+                </CardHeader>
+
+                {isExpanded && (
+                  <CardContent className="pt-0 space-y-3">
+                    {dayActivities.map((activity) => {
+                      const EventComponent =
+                        eventTypeToComponent[
+                          activity.event_type as keyof typeof eventTypeToComponent
+                        ];
+
+                      return (
+                        <div
+                          key={activity.id}
+                          className="border px-2 py-2 rounded-md"
+                        >
+                          <EventComponent
+                            event={activity}
+                            editEvent={() => {
+                              showModal({
+                                type: `${activity.event_type}_edit` as ApplicationModal["type"],
+                                data: {
+                                  eventId: activity.id,
+                                },
+                              });
+                            }}
+                          />
+                        </div>
+                      );
+                    })}
+                  </CardContent>
+                )}
+              </Card>
+            );
+          })
+        )}
+      </div>
     </div>
   );
 }

@@ -108,7 +108,7 @@ const OTPVerificationScreen = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md shadow-2xl border-0 bg-white rounded-3xl overflow-hidden">
+      <Card className="w-full max-w-screen-lg shadow-2xl border-0 bg-white rounded-3xl overflow-hidden">
         <CardHeader className="text-center bg-gradient-to-r from-blue-400 to-purple-400 text-white p-8">
           <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
             <Mail className="w-10 h-10 text-white" />
@@ -176,7 +176,7 @@ const OTPVerificationScreen = () => {
 const LoadingOTP = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md shadow-2xl border-0 bg-white rounded-3xl overflow-hidden">
+      <Card className="w-full max-w-screen-lg shadow-2xl border-0 bg-white rounded-3xl overflow-hidden">
         <CardHeader className="text-center bg-gradient-to-r from-blue-400 to-purple-400 text-white p-8">
           <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
             <Mail className="w-10 h-10 text-white" />

@@ -52,18 +52,18 @@ const AnalyticsView = () => {
   const [activeTab, setActiveTab] = useState("overview");
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50">
+    <div className="flex flex-col gap-4 min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50 p-4">
       {/* Header */}
       <InnerPageHeader
         title="Analytics"
         icon={<BarChart3 className="w-5 h-5 text-gray-600" />}
       />
 
-      <div className="max-w-md mx-auto px-4 py-6">
+      <div className="max-w-screen-lg mx-auto">
         <Tabs
           value={activeTab}
           onValueChange={setActiveTab}
-          className="space-y-6"
+          className="space-y-4"
         >
           <TabsList className="grid w-full grid-cols-4 bg-white/80 backdrop-blur-sm">
             <TabsTrigger value="overview" className="text-xs">

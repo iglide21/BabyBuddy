@@ -1,8 +1,7 @@
-import PageHeader from "@/src/components/baby/page-header";
 import { LogDiaperModal, EditDiaperModal } from "@/src/components/diaper";
 import { LogFeedingModal, EditFeedingModal } from "@/src/components/feeding";
 import { LogSleepModal, EditSleepModal } from "@/src/components/sleeping";
-import LocalizationProvider from "@/src/providers/localization-provider";
+import BottomTabBar from "@/src/components/baby/bottom-tab-bar";
 
 const BabyLayout = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -16,6 +15,8 @@ const BabyLayout = ({ children }: { children: React.ReactNode }) => {
       <EditSleepModal />
       <EditFeedingModal />
       <EditDiaperModal />
+
+      <BottomTabBar />
     </div>
   );
 };
