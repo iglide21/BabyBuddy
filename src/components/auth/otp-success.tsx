@@ -13,7 +13,7 @@ export const OtpSuccess = () => (
         <CardTitle className="text-2xl font-bold">
           Verification Successful!
         </CardTitle>
-        <p className="text-green-100 text-sm mt-2">Welcome to BabyBuddy</p>
+        <p className="text-green-100 text-sm mt-2">Welcome to BabyMax</p>
       </CardHeader>
 
       <CardContent className="p-8 text-center">

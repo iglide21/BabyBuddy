@@ -22,12 +22,14 @@ import {
   FileText,
   Edit,
   TrendingUp,
+  Settings,
 } from "lucide-react";
 import EditBabySettingModal from "@/src/components/baby/edit-baby-setting-modal";
 import { useBabyFromUrl } from "@/src/hooks";
 import dayjs, { calculateAge } from "@/src/lib/dayjs";
 import { useApplicationStore } from "@/src/stores";
 import { BabySettingSection } from "@/types/baby";
+import InnerPageHeader from "@/src/components/inner-page-header";
 
 const BabySettings = () => {
   const { currentBaby } = useBabyFromUrl();
@@ -38,8 +40,6 @@ const BabySettings = () => {
       sectionType: BabySettingSection;
     };
   }) => void;
-
-  // const renderHistoryChart = () => {
   //   if (!selectedSection) return null;
 
   //   const data = generateGrowthData(selectedSection);
@@ -93,9 +93,14 @@ const BabySettings = () => {
   // };
 
   return (
-    <div className="space-y-6 px-4">
+    <div className="space-y-6 p-4 min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50">
+      <InnerPageHeader
+        title="Settings"
+        icon={<Settings className="w-5 h-5 text-gray-600" />}
+      />
+
       {/* Profile Overview */}
-      <Card className="bg-gradient-to-r from-pink-50 to-blue-50 border-pink-200">
+      <Card className="border-pink-200">
         <CardContent className="p-6">
           <div className="text-center space-y-4">
             <div className="text-6xl">
@@ -166,42 +171,6 @@ const BabySettings = () => {
               <Ruler className="w-5 h-5 text-blue-500" />
               Current Measurements
             </div>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  showModal({
-                    type: "edit_baby_setting",
-                    data: {
-                      babyId: currentBaby?.id || "",
-                      sectionType: "history_current_measurements",
-                    },
-                  })
-                }
-                className="bg-white hover:bg-blue-50"
-              >
-                <TrendingUp className="w-4 h-4 mr-2" />
-                History
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  showModal({
-                    type: "edit_baby_setting",
-                    data: {
-                      babyId: currentBaby?.id || "",
-                      sectionType: "current_measurements",
-                    },
-                  })
-                }
-                className="bg-white hover:bg-blue-50"
-              >
-                <Edit className="w-4 h-4 mr-2" />
-                Edit
-              </Button>
-            </div>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -234,6 +203,23 @@ const BabySettings = () => {
               <div className="text-sm text-gray-600">Head Circumference</div>
             </div>
           </div>
+          <Button
+            variant="outline"
+            size="lg"
+            className="w-full bg-white border-blue-200"
+            onClick={() =>
+              showModal({
+                type: "edit_baby_setting",
+                data: {
+                  babyId: currentBaby?.id || "",
+                  sectionType: "current_measurements",
+                },
+              })
+            }
+          >
+            <Edit className="w-4 h-4 mr-2" />
+            Edit
+          </Button>
         </CardContent>
       </Card>
 
@@ -245,44 +231,9 @@ const BabySettings = () => {
               <Stethoscope className="w-5 h-5 text-green-500" />
               Medical Information
             </div>
-            <div className="flex gap-2">
-              {/* <Button
-                variant="outline"
-                size="sm"
-                onClick={() => showModal({
-                    type: "edit_baby_setting",
-                    data: {
-                      babyId: currentBaby?.id || "",
-                      sectionType: "medical",
-                    },
-                  })
-                }
-                className="bg-white hover:bg-green-50"
-              >
-                <TrendingUp className="w-4 h-4 mr-2" />
-                History
-              </Button> */}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  showModal({
-                    type: "edit_baby_setting",
-                    data: {
-                      babyId: currentBaby?.id || "",
-                      sectionType: "medical",
-                    },
-                  })
-                }
-                className="bg-white hover:bg-green-50"
-              >
-                <Edit className="w-4 h-4 mr-2" />
-                Edit
-              </Button>
-            </div>
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-4">
           {/* Allergies & Medications */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-3">
@@ -403,6 +354,24 @@ const BabySettings = () => {
               )}
             </div>
           </div>
+
+          <Button
+            variant="outline"
+            size="lg"
+            className="w-full bg-white border-green-200"
+            onClick={() =>
+              showModal({
+                type: "edit_baby_setting",
+                data: {
+                  babyId: currentBaby?.id || "",
+                  sectionType: "medical",
+                },
+              })
+            }
+          >
+            <Edit className="w-4 h-4 mr-2" />
+            Edit
+          </Button>
         </CardContent>
       </Card>
 
@@ -414,37 +383,9 @@ const BabySettings = () => {
               <FileText className="w-5 h-5 text-purple-500" />
               Additional Notes
             </div>
-            <div className="flex gap-2">
-              {/* <Button
-                variant="outline"
-                size="sm"
-                onClick={() => showSectionHistory("notes")}
-                className="bg-white hover:bg-purple-50"
-              >
-                <TrendingUp className="w-4 h-4 mr-2" />
-                History
-              </Button> */}
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  showModal({
-                    type: "edit_baby_setting",
-                    data: {
-                      babyId: currentBaby?.id || "",
-                      sectionType: "notes",
-                    },
-                  })
-                }
-                className="bg-white hover:bg-purple-50"
-              >
-                <Edit className="w-4 h-4 mr-2" />
-                Edit
-              </Button>
-            </div>
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <div className="bg-white p-4 rounded-lg border border-purple-200">
             {currentBaby?.notes ? (
               <p className="text-gray-700 whitespace-pre-wrap">
@@ -454,23 +395,25 @@ const BabySettings = () => {
               <p className="text-gray-500 text-sm">No additional notes</p>
             )}
           </div>
+          <Button
+            variant="outline"
+            size="lg"
+            className="w-full bg-white border-purple-200"
+            onClick={() =>
+              showModal({
+                type: "edit_baby_setting",
+                data: {
+                  babyId: currentBaby?.id || "",
+                  sectionType: "notes",
+                },
+              })
+            }
+          >
+            <Edit className="w-4 h-4 mr-2" />
+            Edit
+          </Button>
         </CardContent>
       </Card>
-
-      {/* History Modal */}
-      {/* <Dialog open={showHistoryModal} onOpenChange={setShowHistoryModal}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-blue-600" />
-              Change History -{" "}
-              {selectedSection.charAt(0).toUpperCase() +
-                selectedSection.slice(1)}
-            </DialogTitle>
-          </DialogHeader>
-          {renderHistoryChart()}
-        </DialogContent>
-      </Dialog> */}
 
       <EditBabySettingModal />
     </div>

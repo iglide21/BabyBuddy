@@ -224,7 +224,7 @@ const MedicalInformationStep = () => {
                     <FormLabel>Relationship</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="(555) 987-6543"
+                        placeholder="Father"
                         {...field}
                         className="border-green-200 focus:border-green-400"
                       />

@@ -46,6 +46,11 @@ export async function signInWithEmailOtp(email: string) {
     email,
   });
 
+  console.log("--------------------------------");
+  console.log("data", data);
+  console.log("error", error);
+  console.log("--------------------------------");
+
   if (error) {
     throw new Error(error.message);
   }

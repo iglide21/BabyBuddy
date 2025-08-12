@@ -2,15 +2,13 @@
 
 import { useState } from "react";
 import { Button } from "@/src/components/ui/button";
-import { Input } from "@/src/components/ui/input";
-import { Label } from "@/src/components/ui/label";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "@/src/components/ui/card";
-import { Baby, Trash2, AlertTriangle } from "lucide-react";
+import { Trash2, AlertTriangle, Settings } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -18,112 +16,37 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/src/components/ui/dialog";
-
-interface SettingsViewProps {
-  babyName: string;
-  birthDate: string;
-  onBabyNameChange: (name: string) => void;
-  onBirthDateChange: (date: string) => void;
-  onBack: () => void;
-  onClearData: () => void;
-}
+import InnerPageHeader from "@/src/components/inner-page-header";
 
 export function SettingsPage() {
-  const [tempName, setTempName] = useState("Maksim");
   const [showClearDialog, setShowClearDialog] = useState(false);
-  const [tempBirthDate, setTempBirthDate] = useState("2025-08-15");
-
-  const handleSaveName = () => {
-    setTempName(tempName.trim() || "Baby");
-  };
-
-  const handleSaveBirthDate = () => {
-    setTempBirthDate(tempBirthDate);
-  };
 
   const handleClearData = () => {
     setShowClearDialog(false);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50">
-      <div className="max-w-md mx-auto px-4 py-6 space-y-6">
-        {/* Baby Profile */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Baby className="w-5 h-5 text-pink-600" />
-              Baby Profile
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="babyName" className="text-sm font-medium">
-                Baby's Name
-              </Label>
-              <div className="flex gap-2">
-                <Input
-                  id="babyName"
-                  value={tempName}
-                  onChange={(e) => setTempName(e.target.value)}
-                  placeholder="Enter baby's name"
-                  className="flex-1"
-                />
-                <Button
-                  onClick={handleSaveName}
-                  disabled={tempName.trim() === ""}
-                  className="bg-pink-500 hover:bg-pink-600 text-white"
-                >
-                  Save
-                </Button>
-              </div>
-              <p className="text-xs text-gray-500">
-                This name will appear throughout the app
-              </p>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="birthDate" className="text-sm font-medium">
-                Birth Date
-              </Label>
-              <div className="flex gap-2">
-                <Input
-                  id="birthDate"
-                  type="date"
-                  value={tempBirthDate}
-                  onChange={(e) => setTempBirthDate(e.target.value)}
-                  className="flex-1"
-                />
-                <Button
-                  onClick={handleSaveBirthDate}
-                  disabled={tempBirthDate === ""}
-                  className="bg-pink-500 hover:bg-pink-600 text-white"
-                >
-                  Save
-                </Button>
-              </div>
-              <p className="text-xs text-gray-500">
-                Used to calculate baby's age and milestones
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50 p-4 space-y-4">
+      <InnerPageHeader
+        title="Settings"
+        icon={<Settings className="w-5 h-5 text-gray-600" />}
+      />
+      <div className="max-w-md mx-auto space-y-4">
         {/* App Info */}
         <Card>
           <CardHeader>
-            <CardTitle>About BabyBuddy</CardTitle>
+            <CardTitle>About BabyMax</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="text-sm text-gray-600">
               <p className="mb-2">
-                BabyBuddy helps you track your baby's feeding and sleep patterns
-                with ease.
+                BabyMax helps you track your baby's patterns with ease.
               </p>
               <p className="mb-2">
                 Designed for tired parents who need simple, one-handed logging.
               </p>
               <p className="text-xs text-gray-500">
-                Version 1.0 • Made with ❤️ for parents
+                Version 0.1 Beta • Made with ❤️ for parents
               </p>
             </div>
           </CardContent>

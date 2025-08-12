@@ -1,18 +1,18 @@
 "use client";
 
-import { EditFeedingModal, LogFeedingModal } from "components/feeding";
-import { EditSleepModal, LogSleepModal } from "components/sleeping";
-import { EditDiaperModal, LogDiaperModal } from "components/diaper";
 import QuickStats from "@/src/components/quick-stats";
 import TodaysActivities from "@/src/components/todays-activities";
 import QuickActions from "@/src/components/quick-actions";
-import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { Archive } from "lucide-react";
 
-export default function BabyBuddyApp() {
+export default function BabyMaxApp() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-yellow-50">
       <div className="max-w-md mx-auto px-4 py-6 space-y-6">
+        <div className="flex items-center gap-2">
+          <Archive className="w-5 h-5" />
+          <h2 className="text-xl font-medium">Logged events</h2>
+        </div>
         <QuickStats />
         <QuickActions />
 
@@ -49,23 +49,6 @@ export default function BabyBuddyApp() {
         )} */}
 
         <TodaysActivities />
-
-        {/* Encouraging Message */}
-        {/* {feedings && sleeps && diapers && (
-          <Card className="bg-gradient-to-r from-pink-50 to-purple-50 border-pink-200">
-            <CardContent className="p-4 text-center">
-              <p className="text-sm text-gray-700">
-                {feedings?.length >= 6 &&
-                sleeps?.length >= 10 &&
-                diapers?.length >= 6
-                  ? "Amazing job today! You're both doing great! 🌟"
-                  : feedings?.length >= 3 && diapers?.length >= 3
-                  ? "You're doing wonderful! Keep up the great work! 💪"
-                  : "Every moment counts. You're an amazing parent! ❤️"}
-              </p>
-            </CardContent>
-          </Card>
-        )} */}
       </div>
     </div>
   );
