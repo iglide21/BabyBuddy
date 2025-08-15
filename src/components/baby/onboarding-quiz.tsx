@@ -157,8 +157,6 @@ export function BabyOnboardingQuiz() {
   };
 
   const onSubmit = (data: BabyQuizFormValues) => {
-    console.log(data);
-
     updateBaby({
       babyId: baby.id,
       currentValues: {

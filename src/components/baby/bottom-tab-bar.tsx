@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { ChartColumnBig, Calendar, History, Settings } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useBabyFromUrl } from "@/src/hooks";
@@ -35,15 +35,36 @@ const tabs = [
 ];
 
 const BottomTabBar = () => {
-  const { currentBaby } = useBabyFromUrl();
+  const pathname = usePathname();
+  const { currentBaby, isLoading } = useBabyFromUrl();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<string | undefined>(tabs[0].label);
+  const [activeTab, setActiveTab] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    if (currentBaby) {
-      setActiveTab(tabs[0].label);
+    if (!activeTab) {
+      if (isLoading) return;
+
+      if (!currentBaby) {
+        router.push("/babies");
+      }
+
+      const splitPathname = pathname.split("/").filter((i) => i !== "");
+
+      if (splitPathname.length > 2) {
+        const tabName = splitPathname[2];
+
+        const tab = tabs.find(
+          (tab) => tab.label.toLowerCase() === tabName.toLowerCase()
+        );
+
+        if (tab && activeTab !== tab.label) {
+          setActiveTab(tab.label);
+        }
+      } else {
+        setActiveTab(tabs[0].label);
+      }
     }
-  }, [currentBaby]);
+  }, [pathname, currentBaby, isLoading]);
 
   const handleTabClick = (tab: (typeof tabs)[number]) => {
     setActiveTab(tab.label);
@@ -51,7 +72,7 @@ const BottomTabBar = () => {
   };
 
   return (
-    <div className="flex items-center max-w-screen-md mx-auto w-full fixed bottom-0 bg-white border border-t-2 border-pink-100">
+    <div className="flex items-center max-w-screen-lg mx-auto w-full fixed bottom-0 left-1/2 -translate-x-1/2 bg-white border border-t-2 border-pink-100">
       {tabs.map((tab) => (
         <div
           key={tab.label}

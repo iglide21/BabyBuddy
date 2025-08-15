@@ -266,7 +266,7 @@ client_id = "env(SUPABASE_AUTH_GOOGLE_CLIENT_ID)"
 # DO NOT commit your OAuth provider secret to git. Use environment variable substitution instead:
 secret = "env(SUPABASE_AUTH_GOOGLE_SECRET_KEY)"
 # Overrides the default auth redirectUrl.
-redirect_uri = "http://localhost:54321/auth/v1/callback"
+redirect_uri = "http://127.0.0.1:54321/auth/v1/callback"
 # Overrides the default auth provider URL. Used to support self-hosted gitlab, single-tenant Azure,
 # or any other third-party OIDC providers.
 url = ""

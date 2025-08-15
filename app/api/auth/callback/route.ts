@@ -5,13 +5,6 @@ import { createClient } from "@/src/lib/supabase/server";
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  // if "next" is in param, use it as the redirect URL
-
-  console.log("--------------------------------");
-  console.log("code", code);
-  console.log("origin", origin);
-  console.log("--------------------------------");
-
   let next = searchParams.get("next") ?? "/";
   if (!next.startsWith("/")) {
     // if "next" is not a relative URL, use the default
@@ -22,22 +15,11 @@ export async function GET(request: Request) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
-    console.log("--------------------------------");
-    console.log("error", error);
-    console.log("--------------------------------");
-
     if (!error) {
       const forwardedHost = request.headers.get("x-forwarded-host"); // original origin before load balancer
       const isLocalEnv = process.env.NODE_ENV === "development";
 
-      console.log("--------------------------------");
-      console.log("isLocalEnv", isLocalEnv);
-      console.log("--------------------------------");
-
       if (isLocalEnv) {
-        console.log("--------------------------------");
-        console.log("origin", origin);
-        console.log("--------------------------------");
         // we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
         return NextResponse.redirect(`${origin}${next}`);
       } else if (forwardedHost) {

@@ -90,15 +90,10 @@ export const PATCH = async (
       const previousValue =
         previousValues?.[field as keyof typeof previousValues];
 
-      console.log("currentValue", currentValue);
-      console.log("previousValue", previousValue);
-
       const shouldInsert =
         currentValue !== previousValue &&
         currentValue !== null &&
         currentValue !== undefined;
-
-      console.log("shouldInsert measurement", shouldInsert);
 
       if (shouldInsert) {
         const measurementData = {
@@ -118,7 +113,6 @@ export const PATCH = async (
 
     // Insert measurement records if any
     if (measurementInserts.length > 0) {
-      console.log(measurementInserts);
       const { error: measurementError } = await supabase
         .from("baby_measurements")
         .insert(measurementInserts);
@@ -191,8 +185,6 @@ export const PATCH = async (
           currentValue !== null &&
           currentValue !== undefined;
 
-        console.log("shouldInsert history", shouldInsert);
-
         if (shouldInsert) {
           const historyData = {
             baby_id: babyId,
@@ -212,7 +204,6 @@ export const PATCH = async (
 
     // Insert history records if any
     if (historyInserts.length > 0) {
-      console.log(historyInserts);
       const { error: historyError } = await supabase
         .from("baby_profile_history")
         .insert(historyInserts);

@@ -44,8 +44,6 @@ const SleepAnalytics = ({ currentBabyId, dateRange }: SleepAnalyticsProps) => {
 
   const sleepData = sleepAnalytics.generateSleepData();
 
-  console.log(sleepData);
-
   return (
     <TabsContent value="sleep" className="space-y-6">
       <div className="grid grid-cols-2 gap-4">
