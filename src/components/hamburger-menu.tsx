@@ -12,15 +12,11 @@ import {
 import { Separator } from "./ui/separator";
 import {
   Menu,
-  History,
-  Bell,
   Settings,
   LogOut,
   User,
-  Baby,
-  BabyIcon,
   ArrowLeftRight,
-  ChartLine,
+  UserPlus,
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { useApplicationStore } from "../stores/applicationStore";
@@ -69,6 +65,13 @@ const HamburgerMenu = () => {
     color: string;
     caption: string;
   }[] = [
+    {
+      label: "Invite Caregiver",
+      icon: UserPlus,
+      navigate: () => handleBabyNavigate("/invite-caregiver"),
+      color: "blue",
+      caption: "Invite a caregiver",
+    },
     // {
     //   label: "Baby Settings",
     //   icon: BabyIcon,
