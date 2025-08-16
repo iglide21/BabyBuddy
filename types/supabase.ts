@@ -7,11 +7,6 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
-  __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)"
-  }
   graphql_public: {
     Tables: {
       [_ in never]: never
@@ -22,10 +17,10 @@ export type Database = {
     Functions: {
       graphql: {
         Args: {
+          extensions?: Json
           operationName?: string
           query?: string
           variables?: Json
-          extensions?: Json
         }
         Returns: Json
       }
@@ -182,7 +177,7 @@ export type Database = {
           field: string
           id: string
           new_value: Json
-          old_value: Json
+          old_value: Json | null
           section: Database["public"]["Enums"]["BabySettingsSections"]
           user_id: string
           value_type: Database["public"]["Enums"]["SettingValueType"]
@@ -193,7 +188,7 @@ export type Database = {
           field: string
           id?: string
           new_value: Json
-          old_value: Json
+          old_value?: Json | null
           section: Database["public"]["Enums"]["BabySettingsSections"]
           user_id: string
           value_type?: Database["public"]["Enums"]["SettingValueType"]
@@ -204,7 +199,7 @@ export type Database = {
           field?: string
           id?: string
           new_value?: Json
-          old_value?: Json
+          old_value?: Json | null
           section?: Database["public"]["Enums"]["BabySettingsSections"]
           user_id?: string
           value_type?: Database["public"]["Enums"]["SettingValueType"]
@@ -215,6 +210,51 @@ export type Database = {
             columns: ["baby_id"]
             isOneToOne: false
             referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      breastfeeding_segments: {
+        Row: {
+          baby_id: string
+          created_at: string
+          end_at: string
+          feeding_id: number | null
+          id: number
+          side: Database["public"]["Enums"]["BreastSide"] | null
+          start_at: string
+        }
+        Insert: {
+          baby_id: string
+          created_at: string
+          end_at: string
+          feeding_id?: number | null
+          id?: number
+          side?: Database["public"]["Enums"]["BreastSide"] | null
+          start_at: string
+        }
+        Update: {
+          baby_id?: string
+          created_at?: string
+          end_at?: string
+          feeding_id?: number | null
+          id?: number
+          side?: Database["public"]["Enums"]["BreastSide"] | null
+          start_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "breastfeeding_segments_baby_id_fkey"
+            columns: ["baby_id"]
+            isOneToOne: false
+            referencedRelation: "babies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "breastfeeding_segments_feeding_id_fkey"
+            columns: ["feeding_id"]
+            isOneToOne: false
+            referencedRelation: "feedings"
             referencedColumns: ["id"]
           },
         ]
@@ -423,6 +463,7 @@ export type Database = {
         | "AB-"
         | "O+"
         | "O-"
+      BreastSide: "left" | "right"
       DiaperColor:
         | "yellow"
         | "green"
@@ -551,7 +592,7 @@ export type CompositeTypes<
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]   
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
@@ -582,6 +623,7 @@ export const Constants = {
         "O+",
         "O-",
       ],
+      BreastSide: ["left", "right"],
       DiaperColor: [
         "yellow",
         "green",

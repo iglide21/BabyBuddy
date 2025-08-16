@@ -39,17 +39,21 @@ const FeedingActivity = ({ event, editEvent }: ActivityComponentProps) => {
                 <span>{formatTime(event.occurred_at)}</span>
               </div>
             )}
-            <span className="text-gray-400">•</span>
             {event.duration && (
-              <div>
-                <span>{formatDurationInMinutes(event.duration)}</span>
-              </div>
+              <>
+                <span className="text-gray-400">•</span>
+                <div>
+                  <span>{formatDurationInMinutes(event.duration)}</span>
+                </div>
+              </>
             )}
-            <span className="text-gray-400">•</span>
             {event.amount && (
-              <div>
-                <span>{event.amount}ml</span>
-              </div>
+              <>
+                <span className="text-gray-400">•</span>
+                <div>
+                  <span>{event.amount}ml</span>
+                </div>
+              </>
             )}
           </div>
           {event.note && (
@@ -58,10 +62,10 @@ const FeedingActivity = ({ event, editEvent }: ActivityComponentProps) => {
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <EditButton
+        {/* <EditButton
           onClick={() => event.id && editEvent?.(event.id)}
           disabled={status === "pending"}
-        />
+        /> */}
         <DeleteButton
           onClick={() => event.id && deleteEvent(event.id.toString())}
           disabled={status === "pending"}

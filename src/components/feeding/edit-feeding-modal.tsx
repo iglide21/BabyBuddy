@@ -17,7 +17,6 @@ import {
   FormMessage,
 } from "components/ui/form";
 import { RadioGroup, RadioGroupItem } from "components/ui/radio-group";
-import { Milk, Trash2 } from "lucide-react";
 import dayjs, { getNow } from "lib/dayjs";
 import { useApplicationStore } from "@/src/stores/applicationStore";
 import { Feeding, UpdateFeeding } from "@/types/data/feeding/types";
@@ -25,6 +24,7 @@ import { useUpdateFeeding } from "@/src/hooks/data/mutations";
 import { useFeeding } from "@/src/hooks/data/queries";
 import FeedingModal from "./feeding-modal";
 import { DateTimeField } from "@mui/x-date-pickers";
+import BreastFeedingSegmentsField from "./breast-feeding-segments-field";
 
 // Validation schema
 const feedingFormSchema = z
@@ -33,6 +33,13 @@ const feedingFormSchema = z
     occurred_at: z.string().min(1, "Date is required"),
     amount_ml: z.string().optional(),
     duration_minutes: z.string().optional(),
+    breast_feed: z.array(
+      z.object({
+        side: z.enum(["left", "right"]),
+        start_at: z.string().min(1, "Start time is required"),
+        end_at: z.string().min(1, "End time is required"),
+      })
+    ),
     note: z.string().optional(),
   })
   .refine(
@@ -90,6 +97,7 @@ const EditFeedingModal = () => {
       amount_ml: "",
       duration_minutes: "",
       note: "",
+      breast_feed: [],
     },
   });
 
@@ -104,6 +112,7 @@ const EditFeedingModal = () => {
         amount_ml: feeding.amount_ml?.toString() || "",
         duration_minutes: feeding.duration_minutes?.toString() || "",
         note: feeding.note || "",
+        breast_feed: feeding.breastfeeding_segments || [],
       });
     }
 
@@ -123,8 +132,8 @@ const EditFeedingModal = () => {
         data.type === "breast"
           ? null
           : data.amount_ml
-          ? Number(data.amount_ml)
-          : null,
+            ? Number(data.amount_ml)
+            : null,
       duration_minutes: data.duration_minutes
         ? Number(data.duration_minutes)
         : null,
@@ -136,14 +145,6 @@ const EditFeedingModal = () => {
         closeModal();
       },
     });
-  };
-
-  const handleDelete = () => {
-    if (!feeding) return;
-    if (confirm("Are you sure you want to delete this feeding entry?")) {
-      // onDelete(feeding.id);
-      closeModal();
-    }
   };
 
   const onClose = () => {
@@ -253,51 +254,54 @@ const EditFeedingModal = () => {
             />
 
             {["bottle", "solid"].includes(type) && (
-              <FormField
-                control={form.control}
-                name="amount_ml"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium">
-                      Amount (ml)
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        step="0.5"
-                        placeholder="e.g., 120"
-                        className="text-lg"
-                        disabled={status === "pending"}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <>
+                <FormField
+                  control={form.control}
+                  name="amount_ml"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium">
+                        Amount (ml)
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          step="0.5"
+                          placeholder="e.g., 120"
+                          className="text-lg"
+                          disabled={status === "pending"}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="duration_minutes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium">
+                        Duration (minutes)
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="e.g., 15"
+                          className="text-lg"
+                          disabled={status === "pending"}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </>
             )}
 
-            <FormField
-              control={form.control}
-              name="duration_minutes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium">
-                    Duration (minutes)
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      placeholder="e.g., 15"
-                      className="text-lg"
-                      disabled={status === "pending"}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <BreastFeedingSegmentsField />
 
             {/* Notes */}
             {form.watch("note") ? (

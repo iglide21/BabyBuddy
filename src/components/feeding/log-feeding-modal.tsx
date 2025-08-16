@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -25,6 +25,9 @@ import { useBabyFromUrl } from "@/src/hooks/useBabyFromUrl";
 import FeedingModal from "./feeding-modal";
 import { DateTimeField } from "@mui/x-date-pickers";
 import AddNoteButton from "../add-note-button";
+import { calculateDurationInMinutes } from "@/src/lib/calculations";
+import BreastFeedingSegmentsField from "./breast-feeding-segments-field";
+import { CreateBreastFeeding } from "@/types/breast-feedings";
 
 // Validation schema
 const feedingFormSchema = z
@@ -33,6 +36,13 @@ const feedingFormSchema = z
     occurred_at: z.string().min(1, "Date is required"),
     amount_ml: z.string().optional(),
     duration_minutes: z.string().optional(),
+    breast_feed: z.array(
+      z.object({
+        side: z.enum(["left", "right"]),
+        start_at: z.string().min(1, "Start time is required"),
+        end_at: z.string().min(1, "End time is required"),
+      })
+    ),
     note: z.string().optional(),
   })
   .refine(
@@ -53,18 +63,48 @@ const feedingFormSchema = z
   )
   .refine(
     (data) => {
+      if (data.type === "breast") {
+        return data.breast_feed.length > 0;
+      }
+
       if (!data.duration_minutes || data.duration_minutes.trim() === "") {
         return false;
       }
+
       return true;
     },
     {
       message: "Feeding duration is required",
-      path: ["duration_minutes"],
+      path: ["duration_minutes", "breast_feed"],
     }
-  );
+  )
+  .superRefine((data, ctx) => {
+    if (data.type === "breast") {
+      if (data.breast_feed.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Atleast 1 segment is required when breastfeeding",
+          path: ["breast_feed"],
+        });
+      }
+    }
 
-type FeedingFormData = z.infer<typeof feedingFormSchema>;
+    if (data.type === "breast") {
+      data.breast_feed.forEach((feed) => {
+        const start = dayjs(feed.start_at);
+        const end = dayjs(feed.end_at);
+        if (end.isBefore(start) || end.isSame(start)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "End time must be after start time",
+            path: ["breast_feed"],
+          });
+        }
+      });
+    }
+  });
+
+export type FeedingFormData = z.infer<typeof feedingFormSchema>;
 
 const LogFeedingModal = () => {
   const { currentBaby } = useBabyFromUrl();
@@ -79,6 +119,7 @@ const LogFeedingModal = () => {
       occurred_at: getNow().toISOString(),
       amount_ml: "",
       duration_minutes: "",
+      breast_feed: [],
       note: "",
     },
   });
@@ -86,15 +127,22 @@ const LogFeedingModal = () => {
   const watchedType = form.watch("type");
 
   const onSubmit = (data: FeedingFormData) => {
-    const { occurred_at, amount_ml, duration_minutes, note, type } = data;
+    const { occurred_at, amount_ml, note, type } = data;
 
-    const event: CreateFeeding = {
-      occurred_at: occurred_at,
-      type,
-      amount_ml: amount_ml ? Number(amount_ml) : null,
-      duration_minutes: duration_minutes ? Number(duration_minutes) : null,
-      note: note || null,
-      baby_id: currentBaby?.id ?? "",
+    const durationInMinutes = calculateDurationInMinutes(data);
+
+    const event: {
+      feeding: CreateFeeding;
+    } & { breast_feedings: CreateBreastFeeding[] } = {
+      feeding: {
+        occurred_at: occurred_at,
+        type,
+        amount_ml: amount_ml ? Number(amount_ml) : null,
+        duration_minutes: durationInMinutes,
+        note: note || null,
+        baby_id: currentBaby?.id ?? "",
+      },
+      breast_feedings: data.breast_feed,
     };
 
     form.reset();
@@ -139,7 +187,7 @@ const LogFeedingModal = () => {
               name="type"
               render={({ field }) => (
                 <FormItem className="space-y-3">
-                  <FormLabel className="text-sm font-medium">
+                  <FormLabel className="font-bold text-lg">
                     Feeding Type
                   </FormLabel>
                   <FormControl>
@@ -183,49 +231,52 @@ const LogFeedingModal = () => {
             />
 
             {["bottle", "solid"].includes(watchedType) && (
-              <FormField
-                control={form.control}
-                name="amount_ml"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium">
-                      Amount (ml)
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        step="0.5"
-                        placeholder="e.g., 4"
-                        className="text-lg"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <>
+                <FormField
+                  control={form.control}
+                  name="amount_ml"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium">
+                        Amount (ml)
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          step="0.5"
+                          placeholder="e.g., 4"
+                          className="text-lg"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="duration_minutes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-sm font-medium">
+                        Duration (minutes)
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="e.g., 15"
+                          className="text-lg"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </>
             )}
 
-            <FormField
-              control={form.control}
-              name="duration_minutes"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-sm font-medium">
-                    Duration (minutes)
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      placeholder="e.g., 15"
-                      className="text-lg"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <BreastFeedingSegmentsField />
 
             {/* Notes Toggle */}
             {!showNotes && (

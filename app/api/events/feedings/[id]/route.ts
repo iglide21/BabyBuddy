@@ -11,7 +11,15 @@ export const GET = async (
 
   const { data, error } = await supabase
     .from("feedings")
-    .select()
+    .select(`
+      *,
+      breastfeeding_segments (
+        id,
+        side,
+        start_at,
+        end_at
+      )
+      `)
     .eq("id", id)
     .single();
 
