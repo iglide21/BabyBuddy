@@ -1,5 +1,5 @@
 import { ActivityComponentProps } from "@/types/common";
-import { formatDurationInMinutes, formatTime } from "lib/dayjs";
+import dayjs, { formatDurationInMinutes, formatTime } from "lib/dayjs";
 import { Badge } from "../ui/badge";
 import EditButton from "../edit-button";
 import { Milk } from "lucide-react";
@@ -36,7 +36,14 @@ const FeedingActivity = ({ event, editEvent }: ActivityComponentProps) => {
           <div className="text-sm text-gray-600 flex flex-row gap-2">
             {event.occurred_at && (
               <div>
-                <span>{formatTime(event.occurred_at)}</span>
+                <span>
+                  {formatTime(event.occurred_at)} -{" "}
+                  {formatTime(
+                    dayjs(event.occurred_at)
+                      .add(event.duration, "minutes")
+                      .toISOString()
+                  )}
+                </span>
               </div>
             )}
             <span className="text-gray-400">•</span>
@@ -45,11 +52,13 @@ const FeedingActivity = ({ event, editEvent }: ActivityComponentProps) => {
                 <span>{formatDurationInMinutes(event.duration)}</span>
               </div>
             )}
-            <span className="text-gray-400">•</span>
             {event.amount && (
-              <div>
-                <span>{event.amount}ml</span>
-              </div>
+              <>
+                <span className="text-gray-400">•</span>
+                <div>
+                  <span>{event.amount}ml</span>
+                </div>
+              </>
             )}
           </div>
           {event.note && (
