@@ -1,6 +1,6 @@
 import { ActivityComponentProps } from "@/types/common";
 import { Moon, Badge, ArrowRight } from "lucide-react";
-import { formatDuration, formatTime } from "lib/dayjs";
+import dayjs, { formatDuration, formatTime } from "lib/dayjs";
 import EditButton from "../edit-button";
 import { useDeleteSleep } from "@/src/hooks/data/mutations";
 import DeleteButton from "../delete-button";
@@ -9,10 +9,7 @@ import { cn } from "@/src/lib/utils";
 const SleepingActivity = ({ event, editEvent }: ActivityComponentProps) => {
   const { mutate: deleteEvent, status } = useDeleteSleep();
 
-  const formattedDuration = formatDuration(
-    event.occurred_at || "",
-    event.end_date || ""
-  );
+  const formattedDuration = formatDuration(event.duration || 0, "minutes");
 
   return (
     <div
